@@ -1,0 +1,24 @@
+[project]
+name = "veridian-quant"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Shashank", email = "shaank05@gmail.com" }
+]
+requires-python = ">=3.11.9"
+dependencies = [
+    "numpy>=2.4.4",
+    "pandas>=3.0.2",
+    "psycopg2-binary>=2.9.11",
+    "python-dotenv>=1.2.2",
+    "requests>=2.33.1",
+    "scipy>=1.17.1",
+    "sqlalchemy>=2.0.49",
+    "timezonefinder>=8.2.4",
+    "upstox-python-sdk>=2.22.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.6,<0.12.0"]
+build-backend = "uv_build"

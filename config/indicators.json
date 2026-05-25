@@ -1,0 +1,16 @@
+{
+    "market_indicators": [
+        {
+            "name": "INDIA_VIX",
+            "upstox_key": "NSE_INDEX|India VIX",
+            "type": "ohlc",
+            "frequency": "day"
+        },
+        {
+            "name": "NIFTY_PCR",
+            "upstox_key": "NSE_INDEX|Nifty PCR",
+            "type": "value", 
+            "frequency": "day"
+        }
+    ]
+}

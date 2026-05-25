@@ -1,0 +1,10 @@
+{
+  "one_minute_targets": [
+    "RELIANCE", "TCS", "HDFCBANK", "ICICIBANK", "INFY", 
+    "BHARTIARTL", "SBIN", "LTIM", "ITC", "HINDUNILVR"
+  ],
+  "one_day_targets": [
+    "AXISBANK", "LT", "ADANIENT", "SUNPHARMA",
+    "POLYCAB", "RVNL", "SUZLON", "IREDA", "JWL", "HUDCO", "NIFTY"
+  ]
+}

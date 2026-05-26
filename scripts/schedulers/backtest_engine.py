@@ -6,6 +6,7 @@ from sqlalchemy import text
 from dotenv import load_dotenv
 from src.veridian_quant.data.db_client import DatabaseClient
 from src.veridian_quant.core.signals.equity_scanner import EquityScanner
+from src.veridian_quant.core.analytics.markov_analysis import calculate_transition_matrix
 from datetime import datetime
 # import timezonefinder # Or simply use datetime with fixed offsets to stay lightweight
 
@@ -15,7 +16,13 @@ class BacktestEngine:
     def __init__(self):
         self.db = DatabaseClient()
         # Ensure source_table matches your DB: 'prices_ohlc'
+        # Mode is explicitly passed as 'BACKTEST' to isolate it cleanly from 'PROD' scanner executions
         self.scanner = EquityScanner(self.db.get_engine(), mode='BACKTEST', source_table='prices_ohlc')
+        
+        # Parse new environment configuration toggles for the Markov engine structure
+        self.markov_enabled = os.getenv("MARKOV_FILTER_ENABLED", "false").lower() == "true"
+        self.markov_lookback = int(os.getenv("MARKOV_LOOKBACK_DAYS", "90"))
+        self.markov_threshold = float(os.getenv("MARKOV_MIN_PROBABILITY_THRESHOLD", "0.35"))
 
     def get_watchlist_symbols(self):
         """Loads symbols from root > config > watchlist.json"""
@@ -60,6 +67,39 @@ class BacktestEngine:
             print(f"Error verifying outcome: {e}")
             return "ERROR", None, None
 
+    def get_historical_z_scores(self, inst_key, end_date):
+        """
+        Fetches point-in-time historical Z-scores for an instrument up to the signal date.
+        This provides the lookback slice needed to build the Markov transition matrix.
+        """
+        query = text("""
+            SELECT timestamp, close FROM prices_ohlc 
+            WHERE instrument_key = :inst_key AND interval = 'day' AND timestamp <= :end_date
+            ORDER BY timestamp DESC LIMIT :lookback_limit;
+        """)
+        try:
+            df = pd.read_sql(query, self.db.get_engine(), params={
+                "inst_key": inst_key,
+                "end_date": end_date,
+                "lookback_limit": self.markov_lookback + 20  # Fetch slightly extra rows to guarantee clean Z calculations
+            })
+            if df.empty or len(df) < self.markov_lookback:
+                return pd.Series(dtype='float64')
+                
+            # Reverse dataframe order so it reads sequentially in standard chronological order
+            df = df.iloc[::-1].reset_index(drop=True)
+            
+            # Compute point-in-time rolling parameters matching historical state windows
+            rolling_mean = df['close'].rolling(window=20).mean()
+            rolling_std = df['close'].rolling(window=20).std()
+            z_scores = (df['close'] - rolling_mean) / rolling_std
+            
+            # Extract and return precisely the final window length slice
+            return z_scores.tail(self.markov_lookback).reset_index(drop=True)
+        except Exception as e:
+            print(f"❌ Error fetching historical Z-scores for Markov calculation: {e}")
+            return pd.Series(dtype='float64')
+
     def run(self, start_date, end_date):
         """
         Executes the backtest evaluating the absolute net yield of a fixed 
@@ -93,6 +133,11 @@ class BacktestEngine:
             return
 
         print(f"🧐 Scanning {len(instruments)} instruments from {start_date} to {end_date}...")
+        if self.markov_enabled:
+            print(f"⛓️ Markov Filter Engaged: Window={self.markov_lookback} Days, Threshold={self.markov_threshold * 100}%")
+        else:
+            print("⚠️ Markov Filter Disabled: Running baseline metrics configuration.")
+
         test_days = pd.date_range(start=start_date, end=end_date, freq='B')
         results = []
 
@@ -102,6 +147,22 @@ class BacktestEngine:
                 signal = self.scanner.scan_instrument(inst_key, symbol, as_of_date=current_day)
                 
                 if signal:
+                    # --- CONFIGURATION-BASED MARKOV GATE-CHECK FILTER ---
+                    if self.markov_enabled:
+                        # Extract the exact historical point-in-time sequence preceding this setup trigger
+                        historical_z = self.get_historical_z_scores(inst_key, current_day)
+                        
+                        # Generate the row-normalized 3x3 regime matrix
+                        transition_matrix = calculate_transition_matrix(historical_z)
+                        
+                        # Extract entry probability parameter out of State 0 (Crater) moving to State 1 (Equilibrium)
+                        p_crater_to_mean = transition_matrix[0][1]
+                        
+                        # Suppress trade generation if statistical verification threshold falls short
+                        if p_crater_to_mean < self.markov_threshold:
+                            # print(f"🛡️ [Blocked by Markov] {symbol} at {current_day.date()} | P(0->1): {p_crater_to_mean:.2f} < {self.markov_threshold}")
+                            continue
+
                     outcome, hit_date, days_taken = self.verify_outcome(
                         inst_key, current_day, signal['target_1'], signal['stop_loss']
                     )

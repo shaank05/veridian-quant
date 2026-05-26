@@ -1,12 +1,14 @@
 import pandas as pd
 import logging
 import numpy as np
+import os
 from sqlalchemy import text
 from veridian_quant.core.analytics.vectorized_math import (
     calculate_z_score, 
     calculate_expected_move,
     check_cycle_phase
 )
+from src.veridian_quant.core.analytics.markov_analysis import calculate_transition_matrix
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,6 +23,11 @@ class EquityScanner:
         self.engine = db_engine
         self.mode = mode
         self.source_table = source_table
+        
+        # Parse environment configuration parameters for the Markov filter layer
+        self.markov_enabled = os.getenv("MARKOV_FILTER_ENABLED", "false").lower() == "true"
+        self.markov_lookback = int(os.getenv("MARKOV_LOOKBACK_DAYS", "90"))
+        self.markov_threshold = float(os.getenv("MARKOV_MIN_PROBABILITY_THRESHOLD", "0.35"))
 
     def get_dynamic_z_threshold(self, as_of_date=None):
         """
@@ -154,6 +161,41 @@ class EquityScanner:
             result = conn.execute(query, {"symbol": symbol})
             return result.scalar() > 0
 
+    def _validate_production_markov_regime(self, instrument_key, symbol, as_of_date):
+        """
+        Isolated verification method to check the live end-of-day Markov regime status.
+        Returns True if the asset clears the threshold transition requirements, False if blocked.
+        """
+        if not self.markov_enabled or self.mode != 'PROD':
+            return True  # Instantly clear validation if disabled or running in simulation backtest mode
+            
+        # Pull an extra 20 rows beyond lookback configuration to guarantee stable rolling indicators
+        lookback_limit = self.markov_lookback + 20
+        prod_df = self.fetch_data(instrument_key, limit=lookback_limit, as_of_date=as_of_date)
+        
+        if prod_df.empty or len(prod_df) < self.markov_lookback:
+            logger.warning(f"Insufficient live historical bars found to execute production Markov validation for {symbol}.")
+            return True  # Fail-safe open boundary path to prevent skipping valid inputs on system data gaps
+            
+        # Recompute standard terminal rolling Z-scores matching the production close timeline
+        prod_mean = prod_df['close'].rolling(window=20).mean()
+        prod_std = prod_df['close'].rolling(window=20).std()
+        prod_z_scores = (prod_df['close'] - prod_mean) / prod_std
+        
+        # Extract the clean matrix input slice matching the configuration lookback days
+        clean_z_slice = prod_z_scores.tail(self.markov_lookback).reset_index(drop=True)
+        
+        # Run transition calculation across the active asset tracking history
+        transition_matrix = calculate_transition_matrix(clean_z_slice)
+        p_crater_to_mean = transition_matrix[0][1]
+        
+        # Validate entry probability parameters against minimum allowed settings
+        if p_crater_to_mean < self.markov_threshold:
+            logger.info(f"🛡️ [Live Markov Block] {symbol} suppressed. P(Crater->Mean): {p_crater_to_mean:.2f} < Threshold: {self.markov_threshold}")
+            return False
+            
+        return True
+
     def scan_instrument(self, instrument_key, symbol, as_of_date=None):
         """
         Applies macro trend-regime filters, statistical Z-score conditions, FFT timing cycle turns, 
@@ -187,14 +229,18 @@ class EquityScanner:
             if not vsa_passed:
                 return None
                 
+            # 3. Modular Production Markov Regime Validation Gate
+            if not self._validate_production_markov_regime(instrument_key, symbol, as_of_date):
+                return None
+            
             # TODO: Add Delivery Volume Analysis Gate (Track % Deliverable Quantity to confirm true long accumulation)
             
-            # 3. Position Guard Rails Check
+            # 4. Position Guard Rails Check
             if self.mode == 'PROD' and self.is_already_recommended(symbol):
                 logger.info(f"Signal found for {symbol} but an active trade already exists. Skipping.")
                 return None
 
-            # 4. Generate Signal Output Metrics
+            # 5. Generate Signal Output Metrics
             atr_values = calculate_expected_move(df['close'])
             latest_atr = float(atr_values.iloc[-1])
             latest_price = float(df['close'].iloc[-1])

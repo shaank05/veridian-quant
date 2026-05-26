@@ -16,6 +16,7 @@ The objective is to refine our entry precision and mathematically normalize capi
 - [x] **Macro Context (v1.1 - Experiment)**: Nifty Daily Z-Score Threshold Overlay (*Failed: Dropped due to severe alpha choke during secular bull runs*).
 - [x] **Macro Context (v1.2)**: Normalized 50 SMA Strict Percentage Slope Velocity Hurdle ($\ge 0.10\%$). Safely stabilizes the 2025 distribution decay while maintaining high capital efficiency.
 - [x] **Bug Fix**: Fixed `np.float64` engine-level schema compilation warnings and UTC-to-IST fallback loop issues inside `backtest_engine.py`.
+- [x] **Workspace Recovery**: Cleared corrupted `.gitignore` binary trailing sequences and stabilized repository untracked paths.
 
 ---
 
@@ -35,9 +36,17 @@ The objective is to refine our entry precision and mathematically normalize capi
 - **Math**: Fast Fourier Transform (FFT) via `scipy.fft`.
 - **Goal**: Identify dominant cyclical frequency sweeps of single equities to prevent catching falling knives while asset velocity vectors point downward.
 
-### 🎭 Stage 3: Markov Regimes (The Context Engine Upgrade) - *UPCOMING QUANT UPGRADE*
+### 🌪️ Stage 2.1: Shannon Information Entropy Gate (Noise Shield)
+- **Math**: Information Entropy ($H(X) = -\sum P(x_i) \log_2 P(x_i)$).
+- **Goal**: Measure rolling 20-day statistical randomness/disorder of price spreads. Outright block assets exhibiting high entropy where price patterns are purely chaotic noise, ensuring the FFT engine only triggers when structured institutional presence is detected.
+
+### 🗺️ Stage 2.2: Continuous Wavelet Transform (CWT Upgrade)
+- **Math**: Mother Wavelet scaling functions ($\psi_{a,b}(t)$).
+- **Goal**: Replace standard FFT's time-blindness with simultaneous time-frequency localization. Pinpoint exactly *when* dominant historical alpha cycles are expanding or decaying in real-time to eliminate phase-lag entry errors.
+
+### 🎭 Stage 3: Markov Regimes (The Context Engine Upgrade)
 - **Math**: Hidden Markov Models (HMM) via `hmmlearn`.
-- **Goal**: Track structural market shifts (e.g., High-Velocity Bull Expansion vs. Hollow Stagnation Distribution) using a multi-variate transition probability matrix. Automatically overrides short-term index pauses in secular environments to **fully capture and resurrect lost 2023 alpha (~₹1.27L tier)** while clamping gates in exhaustion periods.
+- **Goal**: Track structural market shifts (e.g., High-Velocity Bull Expansion vs. Hollow Stagnation Distribution) using a multi-variate transition probability matrix. Automatically overrides short-term index pauses in secular environments to **fully capture and resurrect lost alpha** while clamping gates in exhaustion periods.
 
 ### 🎲 Stage 4: Stochastic Path Prediction
 - **Math**: Geometric Brownian Motion & Monte Carlo Simulations.

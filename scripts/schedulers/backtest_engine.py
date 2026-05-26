@@ -22,7 +22,8 @@ class BacktestEngine:
         # Parse new environment configuration toggles for the Markov engine structure
         self.markov_enabled = os.getenv("MARKOV_FILTER_ENABLED", "false").lower() == "true"
         self.markov_lookback = int(os.getenv("MARKOV_LOOKBACK_DAYS", "90"))
-        self.markov_threshold = float(os.getenv("MARKOV_MIN_PROBABILITY_THRESHOLD", "0.35"))
+        # Swapped from min probability hurdle to an anti-cascade maximum persistence ceiling threshold
+        self.markov_max_persistence = float(os.getenv("MARKOV_MAX_PERSISTENCE_THRESHOLD", "0.60"))
 
     def get_watchlist_symbols(self):
         """Loads symbols from root > config > watchlist.json"""
@@ -134,7 +135,7 @@ class BacktestEngine:
 
         print(f"🧐 Scanning {len(instruments)} instruments from {start_date} to {end_date}...")
         if self.markov_enabled:
-            print(f"⛓️ Markov Filter Engaged: Window={self.markov_lookback} Days, Threshold={self.markov_threshold * 100}%")
+            print(f"⛓️ Markov Anti-Cascade Filter Engaged: Window={self.markov_lookback} Days, Max Persistence Ceiling={self.markov_max_persistence * 100}%")
         else:
             print("⚠️ Markov Filter Disabled: Running baseline metrics configuration.")
 
@@ -155,12 +156,12 @@ class BacktestEngine:
                         # Generate the row-normalized 3x3 regime matrix
                         transition_matrix = calculate_transition_matrix(historical_z)
                         
-                        # Extract entry probability parameter out of State 0 (Crater) moving to State 1 (Equilibrium)
-                        p_crater_to_mean = transition_matrix[0][1]
+                        # Extract entry probability parameter measuring State 0 (Crater) persistence stability
+                        p_crater_persistence = transition_matrix[0][0]
                         
-                        # Suppress trade generation if statistical verification threshold falls short
-                        if p_crater_to_mean < self.markov_threshold:
-                            # print(f"🛡️ [Blocked by Markov] {symbol} at {current_day.date()} | P(0->1): {p_crater_to_mean:.2f} < {self.markov_threshold}")
+                        # Suppress trade generation if stock has a high probability of cascading down further inside State 0
+                        if p_crater_persistence > self.markov_max_persistence:
+                            # print(f"🛡️ [Blocked by Markov Anti-Cascade] {symbol} at {current_day.date()} | P(0->0): {p_crater_persistence:.2f} > {self.markov_max_persistence}")
                             continue
 
                     outcome, hit_date, days_taken = self.verify_outcome(

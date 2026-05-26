@@ -36,7 +36,7 @@ I want to fill prices_ohlc using the price ingestion script and need HISTORICAL_
 start_date = now - timedelta(days=HISTORICAL_LOOKBACK), last timestamp in DB for 1minute interval 
 is 2026-04-30 09:59:00+00  and for 1day is 2026-04-2916 18:30:00+00
 
-Here is VSA data, I have analyzed you do it too, give total profit and number of trade analysis of 6 years strategy wise
+Here is Markov max resistance data, I have analyzed you do it too, total profits have increased, give total profit and number of trade analysis of 6 years strategy wise
 | Year | Strategy / Filter Setup | Total Recs | Hit SL | Hit Target | Expired | Net Profit/Loss (₹) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | **2020** | z_score | 43 | 28 | 15 | 0 | -12,444 | |
@@ -52,6 +52,7 @@ Here is VSA data, I have analyzed you do it too, give total profit and number of
 | **2020** | VSA | 30 | 14 | 16 | 0 | +76,383 | |
 | **2020** | After data clean | 42 | 29 | 13 | 0 | +921 | |
 | **2020** | Markov | 27 | 21 | 6 | 0 | -21,457 | |
+| **2020** | Markov max persistence | 36 | 26 | 10 | 0 | -13,338 | |
 
 | **2021** | z_score | 38 | 20 | 17 | 1 | +31,884 | |
 | **2021** | z_score + fft | 58 | 30 | 26 | 2 | +60,650 | |
@@ -67,6 +68,7 @@ Here is VSA data, I have analyzed you do it too, give total profit and number of
 | **2021** | VSA | 45 | 24 | 21 | 0 | +43,978 | |
 | **2021** | After data clean | 42 | 21 | 21 | 0 | +37,641 | |
 | **2021** | Markov | 30 | 16 | 14 | 0 | +30,493 | |
+| **2021** | Markov max persistence | 35 | 19 | 16 | 0 | +28,566 | |
 
 | **2022** | z_score | 47 | 27 | 20 | 0 | +52,230 | |
 | **2022** | z_score + fft | 85 | 49 | 36 | 0 | +81,820 | |
@@ -82,6 +84,7 @@ Here is VSA data, I have analyzed you do it too, give total profit and number of
 | **2022** | VSA | 59 | 34 | 25 | 0 | +40,112 | |
 | **2022** | After data clean | 59 | 35 | 24 | 0 | +36,876 | |
 | **2022** | Markov | 33 | 20 | 13 | 0 | +19,738 | |
+| **2022** | Markov max persistence | 37 | 21 | 16 | 0 | +44,986 | |
 
 | **2023** | z_score | 47 | 23 | 16 | 8 | -324 | |
 | **2023** | z_score + fft | 77 | 35 | 40 | 2 | +127,533 | |
@@ -97,6 +100,7 @@ Here is VSA data, I have analyzed you do it too, give total profit and number of
 | **2023** | VSA | 36 | 14 | 22 | 0 | +73,546 | |
 | **2023** | After data clean | 38 | 19 | 18 | 1 | +49,967 | |
 | **2023** | Markov | 16 | 8 | 8 | 0 | +9,359 | |
+| **2023** | Markov max persistence | 18 | 10 | 8 | 0 | +18,545 | |
 
 | **2024** | z_score | 59 | 36 | 23 | 0 | +62,232 | |
 | **2024** | z_score + fft | 99 | 65 | 34 | 0 | +53,365 | |
@@ -112,6 +116,7 @@ Here is VSA data, I have analyzed you do it too, give total profit and number of
 | **2024** | VSA | 45 | 25 | 20 | 0 | +59,889 | |
 | **2024** | After data clean | 49 | 29 | 19 | 1 | +54,400 | |
 | **2024** | Markov | 29 | 16 | 12 | 1 | +35,670 | |
+| **2024** | Markov max persistence | 30 | 17 | 12 | 1 | +31,510 | |
 
 | **2025** | z_score | 46 | 27 | 19 | 0 | +50,964 | |
 | **2025** | z_score + fft | 88 | 61 | 27 | 0 | -3,353 | |
@@ -127,9 +132,11 @@ Here is VSA data, I have analyzed you do it too, give total profit and number of
 | **2025** | VSA | 42 | 24 | 18 | 0 | +40,394 | |
 | **2025** | After data clean | 48 | 30 | 17 | 1 | +22,054 | |
 | **2025** | Markov | 27 | 16 | 10 | 1 | +11,888 | |
+| **2025** | Markov max persistence | 28 | 17 | 10 | 1 | +9,509 | |
 
 | **2026** | After data clean | 33 | 26 | 7 | 0 | -18,113 | |
 | **2026** | Markov | 21 | 15 | 6 | 0 | +2,800 | |
+| **2026** | Markov max persistence | 22 | 16 | 6 | 0 | -183 | |
 
 
 VIX data + previously shared result

@@ -27,7 +27,8 @@ class EquityScanner:
         # Parse environment configuration parameters for the Markov filter layer
         self.markov_enabled = os.getenv("MARKOV_FILTER_ENABLED", "false").lower() == "true"
         self.markov_lookback = int(os.getenv("MARKOV_LOOKBACK_DAYS", "90"))
-        self.markov_threshold = float(os.getenv("MARKOV_MIN_PROBABILITY_THRESHOLD", "0.35"))
+        # Swapped from min probability hurdle to an anti-cascade maximum persistence ceiling threshold
+        self.markov_max_persistence = float(os.getenv("MARKOV_MAX_PERSISTENCE_THRESHOLD", "0.60"))
 
     def get_dynamic_z_threshold(self, as_of_date=None):
         """
@@ -187,11 +188,11 @@ class EquityScanner:
         
         # Run transition calculation across the active asset tracking history
         transition_matrix = calculate_transition_matrix(clean_z_slice)
-        p_crater_to_mean = transition_matrix[0][1]
+        p_crater_persistence = transition_matrix[0][0]
         
-        # Validate entry probability parameters against minimum allowed settings
-        if p_crater_to_mean < self.markov_threshold:
-            logger.info(f"🛡️ [Live Markov Block] {symbol} suppressed. P(Crater->Mean): {p_crater_to_mean:.2f} < Threshold: {self.markov_threshold}")
+        # Suppress trade generation if stock has a high probability of cascading down further inside State 0
+        if p_crater_persistence > self.markov_max_persistence:
+            logger.info(f"🛡️ [Live Markov Anti-Cascade Block] {symbol} suppressed. P(Crater->Crater): {p_crater_persistence:.2f} > Max Ceiling: {self.markov_max_persistence}")
             return False
             
         return True

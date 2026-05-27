@@ -36,7 +36,7 @@ I want to fill prices_ohlc using the price ingestion script and need HISTORICAL_
 start_date = now - timedelta(days=HISTORICAL_LOOKBACK), last timestamp in DB for 1minute interval 
 is 2026-04-30 09:59:00+00  and for 1day is 2026-04-2916 18:30:00+00
 
-Here is Shannon Entropy result after deactivating (Markov), I have analyzed you do it too, result is similar to "After data clean" result so there is no value add but atleast no value lost, give total profit and number of trade analysis of 6 years strategy wise
+Here is parallel strategy execution result, I have analyzed you do it too, results are spectacular, profits have increased only concern is 2023, give total profit and number of trade analysis of 6 years strategy wise and how the year was for Indian market I want to understand if the momentum has been captured
 | Year | Strategy / Filter Setup | Total Recs | Hit SL | Hit Target | Expired | Net Profit/Loss (₹) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | **2020** | z_score |  |  |  |  |  | |
@@ -53,7 +53,8 @@ Here is Shannon Entropy result after deactivating (Markov), I have analyzed you 
 | **2020** | After data clean | 42 | 29 | 13 | 0 | +921 | |
 | **2020** | Markov | 27 |  | 6 | 0 | -,457 | |
 | **2020** | Markov max persistence | 36 | 26 | 10 | 0 | -13,338 | |
-| **2020** | Shannon Entropy (Removed Markov)  | 42 | 29 | 13 | 0 | +921 | |
+| **2020** | Shannon Entropy (Removed Markov) | 42 | 29 | 13 | 0 | +921 | |
+| **2020** | Parallel execution | 68 | 44 | 24 | 0 | +17,062 | |
 
 | **2021** | z_score |  |  |  |  |  | |
 | **2021** | z_score + fft |  |  |  |  |  | |
@@ -70,6 +71,7 @@ Here is Shannon Entropy result after deactivating (Markov), I have analyzed you 
 | **2021** | Markov | 30 | 16 | 14 | 0 | +30,493 | |
 | **2021** | Markov max persistence | 35 | 19 | 16 | 0 | +28,566 | |
 | **2021** | Shannon Entropy (Removed Markov)  | 42 | 21 | 21 | 0 | +37,641 | |
+| **2021** | Parallel execution | 72 | 38 | 33 | 1 | +31,765 | |
 
 | **2022** | z_score |  |  |  |  |  | |
 | **2022** | z_score + fft |  |  |  |  |  | |
@@ -86,6 +88,7 @@ Here is Shannon Entropy result after deactivating (Markov), I have analyzed you 
 | **2022** | Markov | 33 | 20 | 13 | 0 | +19,738 | |
 | **2022** | Markov max persistence | 37 | 21 | 16 | 0 | +44,986 | |
 | **2022** | Shannon Entropy (Removed Markov)  | 59 | 35 | 24 | 0 | +36,876 | |
+| **2022** | Parallel execution | 97 | 61 | 36 | 0 | +46,221 | |
 
 | **2023** | z_score |  |  |  |  |  | |
 | **2023** | z_score + fft |  |  |  |  |  | |
@@ -102,6 +105,7 @@ Here is Shannon Entropy result after deactivating (Markov), I have analyzed you 
 | **2023** | Markov | 16 | 8 | 8 | 0 | +9,359 | |
 | **2023** | Markov max persistence | 18 | 10 | 8 | 0 | +18,545 | |
 | **2023** | Shannon Entropy (Removed Markov)  | 37 | 19 | 18 | 0 | +49,967 | |
+| **2023** | Parallel execution | 63 | 37 | 26 | 0 | +12,680 | |
 
 | **2024** | z_score |  |  |  |  |  | |
 | **2024** | z_score + fft |  |  |  |  |  | |
@@ -118,6 +122,7 @@ Here is Shannon Entropy result after deactivating (Markov), I have analyzed you 
 | **2024** | Markov | 29 | 16 | 12 | 1 | +35,670 | |
 | **2024** | Markov max persistence | 30 | 17 | 12 | 1 | +31,510 | |
 | **2024** | Shannon Entropy (Removed Markov)  | 49 | 29 | 19 | 1 | +54,400 | |
+| **2024** | Parallel execution | 99 | 57 | 41 | 1 | +1,22,625 | |
 
 | **2025** | z_score |  |  |  |  |  | |
 | **2025** | z_score + fft |  |  |  |  |  | |
@@ -134,193 +139,45 @@ Here is Shannon Entropy result after deactivating (Markov), I have analyzed you 
 | **2025** | Markov | 27 | 16 | 10 | 1 | +11,888 | |
 | **2025** | Markov max persistence | 28 | 17 | 10 | 1 | +9,509 | |
 | **2025** | Shannon Entropy (Removed Markov)  | 48 | 30 | 17 | 1 | +22,054 | |
+| **2025** | Parallel execution | 94 | 59 | 34 | 1 | +71,258 | |
 
 | **2026** | After data clean | 33 | 26 | 7 | 0 | -18,113 | |
 | **2026** | Markov | 21 | 15 | 6 | 0 | +2,800 | |
 | **2026** | Markov max persistence | 22 | 16 | 6 | 0 | -183 | |
 | **2026** | Shannon Entropy (Removed Markov)  | 33 | 26 | 7 | 0 | -18,113 | |
+| **2026** | Parallel execution | 55 | 42 | 13 | 0 | -16,246 | |
 
 
-VIX data + previously shared result
-For 2020 - 112 Recommendations were generated out of which 78 hit SL and 34 hit TARGET, loss -20322
-2020: 📊 VIX IMPACT ANALYSIS
-==================================================
-                Targets  Total_Trades  Win_Rate_%
-vix_bucket                                       
-10-15 (Calm)          0             0         NaN
-15-20 (Normal)        1             2       50.00
-20-25 (High)         15            30       50.00
-25-30 (Stress)        0             0         NaN
-30+ (Panic)          15            58       25.86
-==================================================
-
-For 2021 - 58 Recommendations were generated out of which 30 hit SL, 26 hit TARGET and 2 were expired, profit 60650. After deleting Relaxed (-2.5 <= Z < -2.2), profit was down to 9015 and total 29 recommendations out of which 16 hit SL, 12 hit target and 1 was expired
-2021: 📊 VIX IMPACT ANALYSIS
-==================================================
-                Targets  Total_Trades  Win_Rate_%
-vix_bucket                                       
-10-15 (Calm)          6            14       42.86
-15-20 (Normal)        5            12       41.67
-20-25 (High)          6            14       42.86
-25-30 (Stress)        1             2       50.00
-30+ (Panic)           0             0         NaN
-==================================================
-
-For 2022 - 85 Recommendations were generated out of which 49 hit SL, 36 hit TARGET, profit 81820. After deleting Relaxed (-2.5 <= Z < -2.2), profit was down to 36216 and total 41 recommendations out of which 24 hit SL and 17 hit target
-2022: 📊 VIX IMPACT ANALYSIS
-==================================================
-                Targets  Total_Trades  Win_Rate_%
-vix_bucket                                       
-10-15 (Calm)          1             2       50.00
-15-20 (Normal)        5            13       38.46
-20-25 (High)         12            34       35.29
-25-30 (Stress)       10            21       47.62
-30+ (Panic)           0             0         NaN
-==================================================
-
-
-For 2023 - 77 Recommendations were generated out of which 35 hit SL, 40 hit TARGET and 2 were expired, profit 127533. After deleting Relaxed (-2.5 <= Z < -2.2), profit was down to 24717 and total 32 recommendations out of which 14 hit SL, 16 hit target and 2 were expired
-2023: 📊 VIX IMPACT ANALYSIS
-==================================================
-                Targets  Total_Trades  Win_Rate_%
-vix_bucket                                       
-10-15 (Calm)         24            42       57.14
-15-20 (Normal)        5            15       33.33
-20-25 (High)          0             0         NaN
-25-30 (Stress)        0             0         NaN
-30+ (Panic)           0             0         NaN
-==================================================
-
-
-For 2024 - 99 Recommendations were generated out of which 65 hit SL, 34 hit TARGET, profit 53365. After deleting Relaxed (-2.5 <= Z < -2.2), profit was down to 38711 and total 45 recommendations out of which 28 hit SL and 17 hit target
-2024: 📊 VIX IMPACT ANALYSIS
-==================================================
-                Targets  Total_Trades  Win_Rate_%
-vix_bucket                                       
-10-15 (Calm)         12            50       24.00
-15-20 (Normal)       12            26       46.15
-20-25 (High)          0             1        0.00
-25-30 (Stress)        0             0         NaN
-30+ (Panic)           0             0         NaN
-==================================================
-
-For 2025 - 88 Recommendations were generated out of which 61 hit SL, 27 hit TARGET, loss -3353. After deleting Relaxed (-2.5 <= Z < -2.2), profit was up to 11593 and total 32 recommendations out of which 21 hit SL and 11 hit target
-2025: 📊 VIX IMPACT ANALYSIS
-==================================================
-                Targets  Total_Trades  Win_Rate_%
-vix_bucket                                       
-10-15 (Calm)         11            48       22.92
-15-20 (Normal)        6            13       46.15
-20-25 (High)          3             3      100.00
-25-30 (Stress)        0             0         NaN
-30+ (Panic)           0             0         NaN
-==================================================
-
-
-| Year | Strategy / Filter Setup | Total Recs | Hit SL | Hit Target | Expired | Net Profit/Loss (₹) |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **2020** | z_score | 43 | 28 | 15 | 0 | -12,444 | |
-| **2020** | z_score + fft | 112 | 78 | 34 | 0 | -20,322 | |
-| **2020** | VIX Filter | 41 | 21 | 20 | 0 | +74,864 | |
-| **2020** | Nifty Trend Filter (20 SMA) | 44 | 23 | 21 | 0 | +74,385 | |
-| **2020** | Nifty Trend Filter (50 SMA) | 44 | 23 | 21 | 0 | +74,385 | |
-| **2020** | Slope | 44 | 23 | 21 | 0 | +74,385 | |
-| **2020** | Low VIX Filter | 44 | 23 | 21 | 0 | +74,385 | |
-| **2020** | Nifty z_score | 38 | 20 | 18 | 0 | +52,728 | |
-| **2020** | Strict % slope | 36 | 17 | 19 | 0 | +77,715 | |
-| **2020** | ATR & sizing | 36 | 17 | 19 | 0 | +14,21,772 | |
-| **2020** | VSA | 30 | 14 | 16 | 0 | +76,383 | |
-| **2020** | After data clean | 42 | 29 | 13 | 0 | +921 | |
-| **2020** | Markov | 27 | 21 | 6 | 0 | -21,457 | |
-| **2020** | Markov max persistence | 36 | 26 | 10 | 0 | -13,338 | |
-| **2020** | Shannon Entropy (Removed Markov)  | 42 | 29 | 13 | 0 | +921 | |
-
-| **2021** | z_score | 38 | 20 | 17 | 1 | +31,884 | |
-| **2021** | z_score + fft | 58 | 30 | 26 | 2 | +60,650 | |
-| **2021** | Deleting Relaxed (-2.5 <= Z < -2.2) | 29 | 16 | 12 | 1 | +9,015 | |
-| **2021** | VIX Filter | 37 | 20 | 15 | 2 | +9,035 | |
-| **2021** | Nifty Trend Filter (20 SMA) | 48 | 25 | 21 | 2 | +50,021 | |
-| **2021** | Nifty Trend Filter (50 SMA) | 57 | 30 | 25 | 2 | +57,630 | |
-| **2021** | Slope |  |  |  |  |  | |
-| **2021** | Low VIX Filter | 66 | 37 | 27 | 2 | +38,492 | |
-| **2021** | Nifty z_score | 64 | 35 | 27 | 2 | +42,644 | |
-| **2021** | Strict % slope | 66 | 37 | 27 | 2 | +38,492 | |
-| **2021** | ATR & sizing | 66 | 37 | 27 | 2 | +9,16,320 | |
-| **2021** | VSA | 45 | 24 | 21 | 0 | +43,978 | |
-| **2021** | After data clean | 42 | 21 | 21 | 0 | +37,641 | |
-| **2021** | Markov | 30 | 16 | 14 | 0 | +30,493 | |
-| **2021** | Markov max persistence | 35 | 19 | 16 | 0 | +28,566 | |
-| **2021** | Shannon Entropy (Removed Markov)  | 42 | 21 | 21 | 0 | +37,641 | |
-
-| **2022** | z_score | 47 | 27 | 20 | 0 | +52,230 | |
-| **2022** | z_score + fft | 85 | 49 | 36 | 0 | +81,820 | |
-| **2022** | Deleting Relaxed (-2.5 <= Z < -2.2) | 41 | 24 | 17 | 0 | +36,216 | |
-| **2022** | VIX Filter | 71 | 42 | 29 | 0 | +55,662 | |
-| **2022** | Nifty Trend Filter (20 SMA) | 81 | 45 | 36 | 0 | +75,889 | |
-| **2022** | Nifty Trend Filter (50 SMA) | 81 | 45 | 36 | 0 | +74,879 |  |
-| **2022** | Slope |  |  |  |  |  | |
-| **2022** | Low VIX Filter | 83 | 46 | 37 | 0 | +77,853 | |
-| **2022** | Nifty z_score | 83 | 46 | 37 | 0 | +77,853 | |
-| **2022** | Strict % slope | 83 | 46 | 37 | 0 | +77,853 | |
-| **2022** | ATR & sizing | 83 | 46 | 37 | 0 | +19,23,890 | |
-| **2022** | VSA | 59 | 34 | 25 | 0 | +40,112 | |
-| **2022** | After data clean | 59 | 35 | 24 | 0 | +36,876 | |
-| **2022** | Markov | 33 | 20 | 13 | 0 | +19,738 | |
-| **2022** | Markov max persistence | 37 | 21 | 16 | 0 | +44,986 | |
-| **2022** | Shannon Entropy (Removed Markov)  | 59 | 35 | 24 | 0 | +36,876 | |
-
-| **2023** | z_score | 47 | 23 | 16 | 8 | -324 | |
-| **2023** | z_score + fft | 77 | 35 | 40 | 2 | +127,533 | |
-| **2023** | Deleting Relaxed (-2.5 <= Z < -2.2) | 32 | 14 | 16 | 2 | +24,717 | |
-| **2023** | VIX Filter | 27 | 15 | 11 | 1 | -6,684 | |
-| **2023** | Nifty Trend Filter (20 SMA) | 36 | 18 | 17 | 1 | +15,684 | |
-| **2023** | Nifty Trend Filter (50 SMA) | 38 | 18 | 19 | 1 | +24,745 | |
-| **2023** | Slope | 47 | 23 | 23 | 1 | +33,625 | |
-| **2023** | Low VIX Filter | 62 | 29 | 32 | 1 | +73,186 | |
-| **2023** | Nifty z_score | 47 | 22 | 24 | 1 | +52,351 | |
-| **2023** | Strict % slope | 47 | 21 | 25 | 1 | +50,347 | |
-| **2023** | ATR & sizing | 47 | 21 | 25 | 1 | +18,27,218 | |
-| **2023** | VSA | 36 | 14 | 22 | 0 | +73,546 | |
-| **2023** | After data clean | 38 | 19 | 18 | 1 | +49,967 | |
-| **2023** | Markov | 16 | 8 | 8 | 0 | +9,359 | |
-| **2023** | Markov max persistence | 18 | 10 | 8 | 0 | +18,545 | |
-| **2023** | Shannon Entropy (Removed Markov)  | 37 | 19 | 18 | 0 | +49,967 | |
-
-| **2024** | z_score | 59 | 36 | 23 | 0 | +62,232 | |
-| **2024** | z_score + fft | 99 | 65 | 34 | 0 | +53,365 | |
-| **2024** | Deleting Relaxed (-2.5 <= Z < -2.2) | 45 | 28 | 17 | 0 | +38,711 | |
-| **2024** | VIX Filter | 48 | 28 | 20 | 0 | +61,000 | |
-| **2024** | Nifty Trend Filter (20 SMA) | 61 | 38 | 23 | 0 | +52,498 | |
-| **2024** | Nifty Trend Filter (50 SMA) | 76 | 46 | 30 | 0 | +72,701 | |
-| **2024** | Slope |  |  |  |  |  | |
-| **2024** | Low VIX Filter | 102 | 63 | 39 | 0 | +81,039 | |
-| **2024** | Nifty z_score | 96 | 59 | 37 | 0 | +78,464 | |
-| **2024** | Strict % slope | 85 | 51 | 34 | 0 | +79,884 | |
-| **2024** | ATR & sizing | 85 | 51 | 34 | 0 | +21,79,745 | |
-| **2024** | VSA | 45 | 25 | 20 | 0 | +59,889 | |
-| **2024** | After data clean | 49 | 29 | 19 | 1 | +54,400 | |
-| **2024** | Markov | 29 | 16 | 12 | 1 | +35,670 | |
-| **2024** | Markov max persistence | 30 | 17 | 12 | 1 | +31,510 | |
-| **2024** | Shannon Entropy (Removed Markov)  | 49 | 29 | 19 | 1 | +54,400 | |
-
-| **2025** | z_score | 46 | 27 | 19 | 0 | +50,964 | |
-| **2025** | z_score + fft | 88 | 61 | 27 | 0 | -3,353 | |
-| **2025** | Deleting Relaxed (-2.5 <= Z < -2.2) | 32 | 21 | 11 | 0 | +11,593 | |
-| **2025** | VIX Filter | 29 | 18 | 11 | 0 | +21,100 | |
-| **2025** | Nifty Trend Filter (20 SMA) | 40 | 25 | 15 | 0 | +25,901 | |
-| **2025** | Nifty Trend Filter (50 SMA) | 51 | 34 | 17 | 0 | +16,968 | |
-| **2025** | Slope |  |  |  |  |  | |
-| **2025** | Low VIX Filter | 82 | 57 | 25 | 0 | +1,250 | |
-| **2025** | Nifty z_score | 71 | 46 | 25 | 0 | +19,933 | |
-| **2025** | Strict % slope | 70 | 45 | 25 | 0 | +23,679 | |
-| **2025** | ATR & sizing | 66 | 44 | 22 | 0 | +4,01,560 | |
-| **2025** | VSA | 42 | 24 | 18 | 0 | +40,394 | |
-| **2025** | After data clean | 48 | 30 | 17 | 1 | +22,054 | |
-| **2025** | Markov | 27 | 16 | 10 | 1 | +11,888 | |
-| **2025** | Markov max persistence | 28 | 17 | 10 | 1 | +9,509 | |
-| **2025** | Shannon Entropy (Removed Markov)  | 48 | 30 | 17 | 1 | +22,054 | |
-
-| **2026** | After data clean | 33 | 26 | 7 | 0 | -18,113 | |
-| **2026** | Markov | 21 | 15 | 6 | 0 | +2,800 | |
-| **2026** | Markov max persistence | 22 | 16 | 6 | 0 | -183 | |
-| **2026** | Shannon Entropy (Removed Markov)  | 33 | 26 | 7 | 0 | -18,113 | |
+📊 Loading Parallel Strategy Registry Backtest Ledger...
+📈 Total Baseline Z-Score Signals Triggered: 548
+------------------------------------------------------------
+🧬 PROFILE: RAW CORE Z-SCORE SETUP (No Filtering Multi-Matrix)
+   Trades Executed : 548
+   Win Rate        : 37.77% (Targets: 207 | Stops: 338 | Expired: 3)
+   Profit Factor   : 1.28x
+   Avg Days to TP  : 7.6 sessions
+------------------------------------------------------------
+🧬 PROFILE: FILTERED BY FFT CYCLE (Momentum Turning Verified)
+   Trades Executed : 418
+   Win Rate        : 36.84% (Targets: 154 | Stops: 261 | Expired: 3)
+   Profit Factor   : 1.24x
+   Avg Days to TP  : 7.6 sessions
+------------------------------------------------------------
+🧬 PROFILE: FILTERED BY VSA (Institutional Accumulation Confirmed)
+   Trades Executed : 396
+   Win Rate        : 37.88% (Targets: 150 | Stops: 244 | Expired: 2)
+   Profit Factor   : 1.27x
+   Avg Days to TP  : 7.9 sessions
+------------------------------------------------------------
+🧬 PROFILE: FILTERED BY MARKOV OVERLAYS (Protected from State 0 Cascades)
+   Trades Executed : 381
+   Win Rate        : 37.53% (Targets: 143 | Stops: 235 | Expired: 3)
+   Profit Factor   : 1.33x
+   Avg Days to TP  : 7.7 sessions
+------------------------------------------------------------
+🧬 PROFILE: HIGH CONVICTION ENSEMBLE (Conviction Score >= 75.0%)
+   Trades Executed : 206
+   Win Rate        : 37.86% (Targets: 78 | Stops: 126 | Expired: 2)
+   Profit Factor   : 1.32x
+   Avg Days to TP  : 8.0 sessions
+------------------------------------------------------------

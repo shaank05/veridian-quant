@@ -36,107 +36,109 @@ I want to fill prices_ohlc using the price ingestion script and need HISTORICAL_
 start_date = now - timedelta(days=HISTORICAL_LOOKBACK), last timestamp in DB for 1minute interval 
 is 2026-04-30 09:59:00+00  and for 1day is 2026-04-2916 18:30:00+00
 
-Here is Markov max resistance data, I have analyzed you do it too, total profits have increased, give total profit and number of trade analysis of 6 years strategy wise
+Here is Shannon Entropy result after deactivating (Markov), I have analyzed you do it too, result is similar to "After data clean" result so there is no value add but atleast no value lost, give total profit and number of trade analysis of 6 years strategy wise
 | Year | Strategy / Filter Setup | Total Recs | Hit SL | Hit Target | Expired | Net Profit/Loss (₹) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **2020** | z_score | 43 | 28 | 15 | 0 | -12,444 | |
-| **2020** | z_score + fft | 112 | 78 | 34 | 0 | -20,322 | |
-| **2020** | VIX Filter | 41 | 21 | 20 | 0 | +74,864 | |
-| **2020** | Nifty Trend Filter (20 SMA) | 44 | 23 | 21 | 0 | +74,385 | |
-| **2020** | Nifty Trend Filter (50 SMA) | 44 | 23 | 21 | 0 | +74,385 | |
-| **2020** | Slope | 44 | 23 | 21 | 0 | +74,385 | |
-| **2020** | Low VIX Filter | 44 | 23 | 21 | 0 | +74,385 | |
-| **2020** | Nifty z_score | 38 | 20 | 18 | 0 | +52,728 | |
-| **2020** | Strict % slope | 36 | 17 | 19 | 0 | +77,715 | |
-| **2020** | ATR & sizing | 36 | 17 | 19 | 0 | +14,21,772 | |
-| **2020** | VSA | 30 | 14 | 16 | 0 | +76,383 | |
+| **2020** | z_score |  |  |  |  |  | |
+| **2020** | z_score + fft |  |  |  |  |  | |
+| **2020** | VIX Filter |  |  |  |  |  | |
+| **2020** | Nifty Trend Filter (20 SMA) |  |  |  |  |  | |
+| **2020** | Nifty Trend Filter (50 SMA) |  |  |  |  |  | |
+| **2020** | Slope |  |  |  |  |  | |
+| **2020** | Low VIX Filter |  |  |  |  |  | |
+| **2020** | Nifty z_score |  |  |  |  |  | |
+| **2020** | Strict % slope |  |  |  |  |  | |
+| **2020** | ATR & sizing |  |  |  |  |  | |
+| **2020** | VSA |  |  |  |  |  | |
 | **2020** | After data clean | 42 | 29 | 13 | 0 | +921 | |
-| **2020** | Markov | 27 | 21 | 6 | 0 | -21,457 | |
+| **2020** | Markov | 27 |  | 6 | 0 | -,457 | |
 | **2020** | Markov max persistence | 36 | 26 | 10 | 0 | -13,338 | |
+| **2020** | Shannon Entropy (Removed Markov)  | 42 | 29 | 13 | 0 | +921 | |
 
-| **2021** | z_score | 38 | 20 | 17 | 1 | +31,884 | |
-| **2021** | z_score + fft | 58 | 30 | 26 | 2 | +60,650 | |
-| **2021** | Deleting Relaxed (-2.5 <= Z < -2.2) | 29 | 16 | 12 | 1 | +9,015 | |
-| **2021** | VIX Filter | 37 | 20 | 15 | 2 | +9,035 | |
-| **2021** | Nifty Trend Filter (20 SMA) | 48 | 25 | 21 | 2 | +50,021 | |
-| **2021** | Nifty Trend Filter (50 SMA) | 57 | 30 | 25 | 2 | +57,630 | |
+| **2021** | z_score |  |  |  |  |  | |
+| **2021** | z_score + fft |  |  |  |  |  | |
+| **2021** | VIX Filter |  |  |  |  |  | |
+| **2021** | Nifty Trend Filter (20 SMA) |  |  |  |  |  | |
+| **2021** | Nifty Trend Filter (50 SMA) |  |  |  |  |  | |
 | **2021** | Slope |  |  |  |  |  | |
-| **2021** | Low VIX Filter | 66 | 37 | 27 | 2 | +38,492 | |
-| **2021** | Nifty z_score | 64 | 35 | 27 | 2 | +42,644 | |
-| **2021** | Strict % slope | 66 | 37 | 27 | 2 | +38,492 | |
-| **2021** | ATR & sizing | 66 | 37 | 27 | 2 | +9,16,320 | |
-| **2021** | VSA | 45 | 24 | 21 | 0 | +43,978 | |
+| **2021** | Low VIX Filter |  |  |  |  |  | |
+| **2021** | Nifty z_score |  |  |  |  |  | |
+| **2021** | Strict % slope |  |  |  |  |  | |
+| **2021** | ATR & sizing |  |  |  |  |  | |
+| **2021** | VSA |  |  |  |  |  | |
 | **2021** | After data clean | 42 | 21 | 21 | 0 | +37,641 | |
 | **2021** | Markov | 30 | 16 | 14 | 0 | +30,493 | |
 | **2021** | Markov max persistence | 35 | 19 | 16 | 0 | +28,566 | |
+| **2021** | Shannon Entropy (Removed Markov)  | 42 | 21 | 21 | 0 | +37,641 | |
 
-| **2022** | z_score | 47 | 27 | 20 | 0 | +52,230 | |
-| **2022** | z_score + fft | 85 | 49 | 36 | 0 | +81,820 | |
-| **2022** | Deleting Relaxed (-2.5 <= Z < -2.2) | 41 | 24 | 17 | 0 | +36,216 | |
-| **2022** | VIX Filter | 71 | 42 | 29 | 0 | +55,662 | |
-| **2022** | Nifty Trend Filter (20 SMA) | 81 | 45 | 36 | 0 | +75,889 | |
-| **2022** | Nifty Trend Filter (50 SMA) | 81 | 45 | 36 | 0 | +74,879 |  |
+| **2022** | z_score |  |  |  |  |  | |
+| **2022** | z_score + fft |  |  |  |  |  | |
+| **2022** | VIX Filter |  |  |  |  |  | |
+| **2022** | Nifty Trend Filter (20 SMA) |  |  |  |  |  | |
+| **2022** | Nifty Trend Filter (50 SMA) |  |  |  |  |  | |
 | **2022** | Slope |  |  |  |  |  | |
-| **2022** | Low VIX Filter | 83 | 46 | 37 | 0 | +77,853 | |
-| **2022** | Nifty z_score | 83 | 46 | 37 | 0 | +77,853 | |
-| **2022** | Strict % slope | 83 | 46 | 37 | 0 | +77,853 | |
-| **2022** | ATR & sizing | 83 | 46 | 37 | 0 | +19,23,890 | |
-| **2022** | VSA | 59 | 34 | 25 | 0 | +40,112 | |
+| **2022** | Low VIX Filter |  |  |  |  |  | |
+| **2022** | Nifty z_score |  |  |  |  |  | |
+| **2022** | Strict % slope |  |  |  |  |  | |
+| **2022** | ATR & sizing |  |  |  |  |  | |
+| **2022** | VSA |  |  |  |  |  | |
 | **2022** | After data clean | 59 | 35 | 24 | 0 | +36,876 | |
 | **2022** | Markov | 33 | 20 | 13 | 0 | +19,738 | |
 | **2022** | Markov max persistence | 37 | 21 | 16 | 0 | +44,986 | |
+| **2022** | Shannon Entropy (Removed Markov)  | 59 | 35 | 24 | 0 | +36,876 | |
 
-| **2023** | z_score | 47 | 23 | 16 | 8 | -324 | |
-| **2023** | z_score + fft | 77 | 35 | 40 | 2 | +127,533 | |
-| **2023** | Deleting Relaxed (-2.5 <= Z < -2.2) | 32 | 14 | 16 | 2 | +24,717 | |
-| **2023** | VIX Filter | 27 | 15 | 11 | 1 | -6,684 | |
-| **2023** | Nifty Trend Filter (20 SMA) | 36 | 18 | 17 | 1 | +15,684 | |
-| **2023** | Nifty Trend Filter (50 SMA) | 38 | 18 | 19 | 1 | +24,745 | |
-| **2023** | Slope | 47 | 23 | 23 | 1 | +33,625 | |
-| **2023** | Low VIX Filter | 62 | 29 | 32 | 1 | +73,186 | |
-| **2023** | Nifty z_score | 47 | 22 | 24 | 1 | +52,351 | |
-| **2023** | Strict % slope | 47 | 21 | 25 | 1 | +50,347 | |
-| **2023** | ATR & sizing | 47 | 21 | 25 | 1 | +18,27,218 | |
-| **2023** | VSA | 36 | 14 | 22 | 0 | +73,546 | |
+| **2023** | z_score |  |  |  |  |  | |
+| **2023** | z_score + fft |  |  |  |  |  | |
+| **2023** | VIX Filter |  |  |  |  |  | |
+| **2023** | Nifty Trend Filter (20 SMA) |  |  |  |  |  | |
+| **2023** | Nifty Trend Filter (50 SMA) |  |  |  |  |  | |
+| **2023** | Slope |  |  |  |  |  | |
+| **2023** | Low VIX Filter |  |  |  |  |  | |
+| **2023** | Nifty z_score |  |  |  |  |  | |
+| **2023** | Strict % slope |  |  |  |  |  | |
+| **2023** | ATR & sizing |  |  |  |  |  | |
+| **2023** | VSA |  |  |  |  |  | |
 | **2023** | After data clean | 38 | 19 | 18 | 1 | +49,967 | |
 | **2023** | Markov | 16 | 8 | 8 | 0 | +9,359 | |
 | **2023** | Markov max persistence | 18 | 10 | 8 | 0 | +18,545 | |
+| **2023** | Shannon Entropy (Removed Markov)  | 37 | 19 | 18 | 0 | +49,967 | |
 
-| **2024** | z_score | 59 | 36 | 23 | 0 | +62,232 | |
-| **2024** | z_score + fft | 99 | 65 | 34 | 0 | +53,365 | |
-| **2024** | Deleting Relaxed (-2.5 <= Z < -2.2) | 45 | 28 | 17 | 0 | +38,711 | |
-| **2024** | VIX Filter | 48 | 28 | 20 | 0 | +61,000 | |
-| **2024** | Nifty Trend Filter (20 SMA) | 61 | 38 | 23 | 0 | +52,498 | |
-| **2024** | Nifty Trend Filter (50 SMA) | 76 | 46 | 30 | 0 | +72,701 | |
+| **2024** | z_score |  |  |  |  |  | |
+| **2024** | z_score + fft |  |  |  |  |  | |
+| **2024** | VIX Filter |  |  |  |  |  | |
+| **2024** | Nifty Trend Filter (20 SMA) |  |  |  |  |  | |
+| **2024** | Nifty Trend Filter (50 SMA) |  |  |  |  |  | |
 | **2024** | Slope |  |  |  |  |  | |
-| **2024** | Low VIX Filter | 102 | 63 | 39 | 0 | +81,039 | |
-| **2024** | Nifty z_score | 96 | 59 | 37 | 0 | +78,464 | |
-| **2024** | Strict % slope | 85 | 51 | 34 | 0 | +79,884 | |
-| **2024** | ATR & sizing | 85 | 51 | 34 | 0 | +21,79,745 | |
-| **2024** | VSA | 45 | 25 | 20 | 0 | +59,889 | |
+| **2024** | Low VIX Filter |  |  |  |  |  | |
+| **2024** | Nifty z_score |  |  |  |  |  | |
+| **2024** | Strict % slope |  |  |  |  |  | |
+| **2024** | ATR & sizing |  |  |  |  |  | |
+| **2024** | VSA |  |  |  |  |  | |
 | **2024** | After data clean | 49 | 29 | 19 | 1 | +54,400 | |
 | **2024** | Markov | 29 | 16 | 12 | 1 | +35,670 | |
 | **2024** | Markov max persistence | 30 | 17 | 12 | 1 | +31,510 | |
+| **2024** | Shannon Entropy (Removed Markov)  | 49 | 29 | 19 | 1 | +54,400 | |
 
-| **2025** | z_score | 46 | 27 | 19 | 0 | +50,964 | |
-| **2025** | z_score + fft | 88 | 61 | 27 | 0 | -3,353 | |
-| **2025** | Deleting Relaxed (-2.5 <= Z < -2.2) | 32 | 21 | 11 | 0 | +11,593 | |
-| **2025** | VIX Filter | 29 | 18 | 11 | 0 | +21,100 | |
-| **2025** | Nifty Trend Filter (20 SMA) | 40 | 25 | 15 | 0 | +25,901 | |
-| **2025** | Nifty Trend Filter (50 SMA) | 51 | 34 | 17 | 0 | +16,968 | |
+| **2025** | z_score |  |  |  |  |  | |
+| **2025** | z_score + fft |  |  |  |  |  | |
+| **2025** | VIX Filter |  |  |  |  |  | |
+| **2025** | Nifty Trend Filter (20 SMA) |  |  |  |  |  | |
+| **2025** | Nifty Trend Filter (50 SMA) |  |  |  |  |  | |
 | **2025** | Slope |  |  |  |  |  | |
-| **2025** | Low VIX Filter | 82 | 57 | 25 | 0 | +1,250 | |
-| **2025** | Nifty z_score | 71 | 46 | 25 | 0 | +19,933 | |
-| **2025** | Strict % slope | 70 | 45 | 25 | 0 | +23,679 | |
-| **2025** | ATR & sizing | 66 | 44 | 22 | 0 | +4,01,560 | |
-| **2025** | VSA | 42 | 24 | 18 | 0 | +40,394 | |
+| **2025** | Low VIX Filter |  |  |  |  |  | |
+| **2025** | Nifty z_score |  |  |  |  |  | |
+| **2025** | Strict % slope |  |  |  |  |  | |
+| **2025** | ATR & sizing |  |  |  |  |  | |
+| **2025** | VSA |  |  |  |  |  | |
 | **2025** | After data clean | 48 | 30 | 17 | 1 | +22,054 | |
 | **2025** | Markov | 27 | 16 | 10 | 1 | +11,888 | |
 | **2025** | Markov max persistence | 28 | 17 | 10 | 1 | +9,509 | |
+| **2025** | Shannon Entropy (Removed Markov)  | 48 | 30 | 17 | 1 | +22,054 | |
 
 | **2026** | After data clean | 33 | 26 | 7 | 0 | -18,113 | |
 | **2026** | Markov | 21 | 15 | 6 | 0 | +2,800 | |
 | **2026** | Markov max persistence | 22 | 16 | 6 | 0 | -183 | |
+| **2026** | Shannon Entropy (Removed Markov)  | 33 | 26 | 7 | 0 | -18,113 | |
 
 
 VIX data + previously shared result
@@ -215,3 +217,110 @@ vix_bucket
 ==================================================
 
 
+| Year | Strategy / Filter Setup | Total Recs | Hit SL | Hit Target | Expired | Net Profit/Loss (₹) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **2020** | z_score | 43 | 28 | 15 | 0 | -12,444 | |
+| **2020** | z_score + fft | 112 | 78 | 34 | 0 | -20,322 | |
+| **2020** | VIX Filter | 41 | 21 | 20 | 0 | +74,864 | |
+| **2020** | Nifty Trend Filter (20 SMA) | 44 | 23 | 21 | 0 | +74,385 | |
+| **2020** | Nifty Trend Filter (50 SMA) | 44 | 23 | 21 | 0 | +74,385 | |
+| **2020** | Slope | 44 | 23 | 21 | 0 | +74,385 | |
+| **2020** | Low VIX Filter | 44 | 23 | 21 | 0 | +74,385 | |
+| **2020** | Nifty z_score | 38 | 20 | 18 | 0 | +52,728 | |
+| **2020** | Strict % slope | 36 | 17 | 19 | 0 | +77,715 | |
+| **2020** | ATR & sizing | 36 | 17 | 19 | 0 | +14,21,772 | |
+| **2020** | VSA | 30 | 14 | 16 | 0 | +76,383 | |
+| **2020** | After data clean | 42 | 29 | 13 | 0 | +921 | |
+| **2020** | Markov | 27 | 21 | 6 | 0 | -21,457 | |
+| **2020** | Markov max persistence | 36 | 26 | 10 | 0 | -13,338 | |
+| **2020** | Shannon Entropy (Removed Markov)  | 42 | 29 | 13 | 0 | +921 | |
+
+| **2021** | z_score | 38 | 20 | 17 | 1 | +31,884 | |
+| **2021** | z_score + fft | 58 | 30 | 26 | 2 | +60,650 | |
+| **2021** | Deleting Relaxed (-2.5 <= Z < -2.2) | 29 | 16 | 12 | 1 | +9,015 | |
+| **2021** | VIX Filter | 37 | 20 | 15 | 2 | +9,035 | |
+| **2021** | Nifty Trend Filter (20 SMA) | 48 | 25 | 21 | 2 | +50,021 | |
+| **2021** | Nifty Trend Filter (50 SMA) | 57 | 30 | 25 | 2 | +57,630 | |
+| **2021** | Slope |  |  |  |  |  | |
+| **2021** | Low VIX Filter | 66 | 37 | 27 | 2 | +38,492 | |
+| **2021** | Nifty z_score | 64 | 35 | 27 | 2 | +42,644 | |
+| **2021** | Strict % slope | 66 | 37 | 27 | 2 | +38,492 | |
+| **2021** | ATR & sizing | 66 | 37 | 27 | 2 | +9,16,320 | |
+| **2021** | VSA | 45 | 24 | 21 | 0 | +43,978 | |
+| **2021** | After data clean | 42 | 21 | 21 | 0 | +37,641 | |
+| **2021** | Markov | 30 | 16 | 14 | 0 | +30,493 | |
+| **2021** | Markov max persistence | 35 | 19 | 16 | 0 | +28,566 | |
+| **2021** | Shannon Entropy (Removed Markov)  | 42 | 21 | 21 | 0 | +37,641 | |
+
+| **2022** | z_score | 47 | 27 | 20 | 0 | +52,230 | |
+| **2022** | z_score + fft | 85 | 49 | 36 | 0 | +81,820 | |
+| **2022** | Deleting Relaxed (-2.5 <= Z < -2.2) | 41 | 24 | 17 | 0 | +36,216 | |
+| **2022** | VIX Filter | 71 | 42 | 29 | 0 | +55,662 | |
+| **2022** | Nifty Trend Filter (20 SMA) | 81 | 45 | 36 | 0 | +75,889 | |
+| **2022** | Nifty Trend Filter (50 SMA) | 81 | 45 | 36 | 0 | +74,879 |  |
+| **2022** | Slope |  |  |  |  |  | |
+| **2022** | Low VIX Filter | 83 | 46 | 37 | 0 | +77,853 | |
+| **2022** | Nifty z_score | 83 | 46 | 37 | 0 | +77,853 | |
+| **2022** | Strict % slope | 83 | 46 | 37 | 0 | +77,853 | |
+| **2022** | ATR & sizing | 83 | 46 | 37 | 0 | +19,23,890 | |
+| **2022** | VSA | 59 | 34 | 25 | 0 | +40,112 | |
+| **2022** | After data clean | 59 | 35 | 24 | 0 | +36,876 | |
+| **2022** | Markov | 33 | 20 | 13 | 0 | +19,738 | |
+| **2022** | Markov max persistence | 37 | 21 | 16 | 0 | +44,986 | |
+| **2022** | Shannon Entropy (Removed Markov)  | 59 | 35 | 24 | 0 | +36,876 | |
+
+| **2023** | z_score | 47 | 23 | 16 | 8 | -324 | |
+| **2023** | z_score + fft | 77 | 35 | 40 | 2 | +127,533 | |
+| **2023** | Deleting Relaxed (-2.5 <= Z < -2.2) | 32 | 14 | 16 | 2 | +24,717 | |
+| **2023** | VIX Filter | 27 | 15 | 11 | 1 | -6,684 | |
+| **2023** | Nifty Trend Filter (20 SMA) | 36 | 18 | 17 | 1 | +15,684 | |
+| **2023** | Nifty Trend Filter (50 SMA) | 38 | 18 | 19 | 1 | +24,745 | |
+| **2023** | Slope | 47 | 23 | 23 | 1 | +33,625 | |
+| **2023** | Low VIX Filter | 62 | 29 | 32 | 1 | +73,186 | |
+| **2023** | Nifty z_score | 47 | 22 | 24 | 1 | +52,351 | |
+| **2023** | Strict % slope | 47 | 21 | 25 | 1 | +50,347 | |
+| **2023** | ATR & sizing | 47 | 21 | 25 | 1 | +18,27,218 | |
+| **2023** | VSA | 36 | 14 | 22 | 0 | +73,546 | |
+| **2023** | After data clean | 38 | 19 | 18 | 1 | +49,967 | |
+| **2023** | Markov | 16 | 8 | 8 | 0 | +9,359 | |
+| **2023** | Markov max persistence | 18 | 10 | 8 | 0 | +18,545 | |
+| **2023** | Shannon Entropy (Removed Markov)  | 37 | 19 | 18 | 0 | +49,967 | |
+
+| **2024** | z_score | 59 | 36 | 23 | 0 | +62,232 | |
+| **2024** | z_score + fft | 99 | 65 | 34 | 0 | +53,365 | |
+| **2024** | Deleting Relaxed (-2.5 <= Z < -2.2) | 45 | 28 | 17 | 0 | +38,711 | |
+| **2024** | VIX Filter | 48 | 28 | 20 | 0 | +61,000 | |
+| **2024** | Nifty Trend Filter (20 SMA) | 61 | 38 | 23 | 0 | +52,498 | |
+| **2024** | Nifty Trend Filter (50 SMA) | 76 | 46 | 30 | 0 | +72,701 | |
+| **2024** | Slope |  |  |  |  |  | |
+| **2024** | Low VIX Filter | 102 | 63 | 39 | 0 | +81,039 | |
+| **2024** | Nifty z_score | 96 | 59 | 37 | 0 | +78,464 | |
+| **2024** | Strict % slope | 85 | 51 | 34 | 0 | +79,884 | |
+| **2024** | ATR & sizing | 85 | 51 | 34 | 0 | +21,79,745 | |
+| **2024** | VSA | 45 | 25 | 20 | 0 | +59,889 | |
+| **2024** | After data clean | 49 | 29 | 19 | 1 | +54,400 | |
+| **2024** | Markov | 29 | 16 | 12 | 1 | +35,670 | |
+| **2024** | Markov max persistence | 30 | 17 | 12 | 1 | +31,510 | |
+| **2024** | Shannon Entropy (Removed Markov)  | 49 | 29 | 19 | 1 | +54,400 | |
+
+| **2025** | z_score | 46 | 27 | 19 | 0 | +50,964 | |
+| **2025** | z_score + fft | 88 | 61 | 27 | 0 | -3,353 | |
+| **2025** | Deleting Relaxed (-2.5 <= Z < -2.2) | 32 | 21 | 11 | 0 | +11,593 | |
+| **2025** | VIX Filter | 29 | 18 | 11 | 0 | +21,100 | |
+| **2025** | Nifty Trend Filter (20 SMA) | 40 | 25 | 15 | 0 | +25,901 | |
+| **2025** | Nifty Trend Filter (50 SMA) | 51 | 34 | 17 | 0 | +16,968 | |
+| **2025** | Slope |  |  |  |  |  | |
+| **2025** | Low VIX Filter | 82 | 57 | 25 | 0 | +1,250 | |
+| **2025** | Nifty z_score | 71 | 46 | 25 | 0 | +19,933 | |
+| **2025** | Strict % slope | 70 | 45 | 25 | 0 | +23,679 | |
+| **2025** | ATR & sizing | 66 | 44 | 22 | 0 | +4,01,560 | |
+| **2025** | VSA | 42 | 24 | 18 | 0 | +40,394 | |
+| **2025** | After data clean | 48 | 30 | 17 | 1 | +22,054 | |
+| **2025** | Markov | 27 | 16 | 10 | 1 | +11,888 | |
+| **2025** | Markov max persistence | 28 | 17 | 10 | 1 | +9,509 | |
+| **2025** | Shannon Entropy (Removed Markov)  | 48 | 30 | 17 | 1 | +22,054 | |
+
+| **2026** | After data clean | 33 | 26 | 7 | 0 | -18,113 | |
+| **2026** | Markov | 21 | 15 | 6 | 0 | +2,800 | |
+| **2026** | Markov max persistence | 22 | 16 | 6 | 0 | -183 | |
+| **2026** | Shannon Entropy (Removed Markov)  | 33 | 26 | 7 | 0 | -18,113 | |

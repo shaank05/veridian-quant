@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from src.veridian_quant.data.db_client import DatabaseClient
 from src.veridian_quant.core.signals.equity_scanner import EquityScanner
 from src.veridian_quant.core.analytics.markov_analysis import calculate_transition_matrix
+from src.veridian_quant.core.analytics.vectorized_math import calculate_shannon_entropy
 from datetime import datetime
 # import timezonefinder # Or simply use datetime with fixed offsets to stay lightweight
 
@@ -24,6 +25,11 @@ class BacktestEngine:
         self.markov_lookback = int(os.getenv("MARKOV_LOOKBACK_DAYS", "90"))
         # Swapped from min probability hurdle to an anti-cascade maximum persistence ceiling threshold
         self.markov_max_persistence = float(os.getenv("MARKOV_MAX_PERSISTENCE_THRESHOLD", "0.60"))
+
+        # Parse environment configurations for Stage 2.1 Shannon Entropy Noise Shield Gate
+        self.entropy_enabled = os.getenv("ENTROPY_FILTER_ENABLED", "false").lower() == "true"
+        self.entropy_lookback = int(os.getenv("ENTROPY_LOOKBACK_DAYS", "20"))
+        self.entropy_max_threshold = float(os.getenv("ENTROPY_MAX_THRESHOLD", "0.75"))
 
     def get_watchlist_symbols(self):
         """Loads symbols from root > config > watchlist.json"""
@@ -101,6 +107,29 @@ class BacktestEngine:
             print(f"❌ Error fetching historical Z-scores for Markov calculation: {e}")
             return pd.Series(dtype='float64')
 
+    def get_historical_prices_for_entropy(self, inst_key, end_date):
+        """
+        Fetches point-in-time historical closing prices up to the current backtest date 
+        to guarantee calculation safety for the Shannon Entropy gate.
+        """
+        query = text("""
+            SELECT timestamp, close FROM prices_ohlc 
+            WHERE instrument_key = :inst_key AND interval = 'day' AND timestamp <= :end_date
+            ORDER BY timestamp DESC LIMIT :lookback_limit;
+        """)
+        try:
+            df = pd.read_sql(query, self.db.get_engine(), params={
+                "inst_key": inst_key,
+                "end_date": end_date,
+                "lookback_limit": self.entropy_lookback + 5
+            })
+            if df.empty or len(df) < self.entropy_lookback:
+                return pd.Series(dtype='float64')
+            return df.iloc[::-1]['close'].reset_index(drop=True)
+        except Exception as e:
+            print(f"❌ Error fetching historical prices for Entropy calculation: {e}")
+            return pd.Series(dtype='float64')
+
     def run(self, start_date, end_date):
         """
         Executes the backtest evaluating the absolute net yield of a fixed 
@@ -134,6 +163,12 @@ class BacktestEngine:
             return
 
         print(f"🧐 Scanning {len(instruments)} instruments from {start_date} to {end_date}...")
+        
+        if self.entropy_enabled:
+            print(f"🛑 Shannon Entropy Noise Shield Engaged: Window={self.entropy_lookback} Days, Max Chaos Threshold={self.entropy_max_threshold}")
+        else:
+            print("⚠️ Shannon Entropy Filter Disabled.")
+
         if self.markov_enabled:
             print(f"⛓️ Markov Anti-Cascade Filter Engaged: Window={self.markov_lookback} Days, Max Persistence Ceiling={self.markov_max_persistence * 100}%")
         else:
@@ -148,6 +183,15 @@ class BacktestEngine:
                 signal = self.scanner.scan_instrument(inst_key, symbol, as_of_date=current_day)
                 
                 if signal:
+                    # --- CONFIGURATION-BASED SHANNON ENTROPY GATE-CHECK FILTER ---
+                    if self.entropy_enabled:
+                        historical_prices = self.get_historical_prices_for_entropy(inst_key, current_day)
+                        if not historical_prices.empty and len(historical_prices) >= self.entropy_lookback:
+                            current_entropy = calculate_shannon_entropy(historical_prices, window=self.entropy_lookback)
+                            if current_entropy > self.entropy_max_threshold:
+                                # Suppress backtest signal generation if dataset exhibits structural noise chaos
+                                continue
+
                     # --- CONFIGURATION-BASED MARKOV GATE-CHECK FILTER ---
                     if self.markov_enabled:
                         # Extract the exact historical point-in-time sequence preceding this setup trigger

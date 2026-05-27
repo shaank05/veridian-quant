@@ -6,7 +6,8 @@ from sqlalchemy import text
 from veridian_quant.core.analytics.vectorized_math import (
     calculate_z_score, 
     calculate_expected_move,
-    check_cycle_phase
+    check_cycle_phase,
+    calculate_shannon_entropy
 )
 from src.veridian_quant.core.analytics.markov_analysis import calculate_transition_matrix
 
@@ -25,10 +26,16 @@ class EquityScanner:
         self.source_table = source_table
         
         # Parse environment configuration parameters for the Markov filter layer
-        self.markov_enabled = os.getenv("MARKOV_FILTER_ENABLED", "false").lower() == "true"
+        # Set to force-false/disabled to transition system capital back to clean baseline metrics
+        self.markov_enabled = False
         self.markov_lookback = int(os.getenv("MARKOV_LOOKBACK_DAYS", "90"))
         # Swapped from min probability hurdle to an anti-cascade maximum persistence ceiling threshold
         self.markov_max_persistence = float(os.getenv("MARKOV_MAX_PERSISTENCE_THRESHOLD", "0.60"))
+
+        # Parse environment configurations for Stage 2.1 Shannon Entropy Noise Shield Gate
+        self.entropy_enabled = os.getenv("ENTROPY_FILTER_ENABLED", "false").lower() == "true"
+        self.entropy_lookback = int(os.getenv("ENTROPY_LOOKBACK_DAYS", "20"))
+        self.entropy_max_threshold = float(os.getenv("ENTROPY_MAX_THRESHOLD", "0.75"))
 
     def get_dynamic_z_threshold(self, as_of_date=None):
         """
@@ -219,6 +226,13 @@ class EquityScanner:
         # Primary entry filter execution
         if latest_z < dynamic_threshold:
             
+            # --- SHANNON INFORMATION ENTROPY PRE-SIGNAL FILTER ---
+            if self.entropy_enabled:
+                current_entropy = calculate_shannon_entropy(df['close'], window=self.entropy_lookback)
+                if current_entropy > self.entropy_max_threshold:
+                    logger.info(f"🛑 {symbol}: Blocked by Entropy Gate. Chaos: {current_entropy:.2f} > Threshold: {self.entropy_max_threshold} | Structural Noise Shield Engaged.")
+                    return None
+            
             # 1. FFT Timing Filter Gate
             is_cycle_turning = check_cycle_phase(df['close'])
             if not is_cycle_turning:
@@ -295,7 +309,7 @@ class EquityScanner:
             'z_score': latest_z,
             'vix_value': current_vix,
             'market_regime': regime,
-            'expected_duration_days': expected_days,
+            'dynamic_threshold': dynamic_threshold,
             'strategies_involved': ['Z_SCORE_REVERSION', 'FFT_CYCLE_TIMING', 'TREND_AWARE_VIX_FILTER', 'VOLUME_SPREAD_ANALYSIS'],
             
             'vsa_relative_volume': relative_volume,

@@ -118,3 +118,31 @@ def check_cycle_phase(price_series: pd.Series):
     
     # We pass the signal if it's NOT at the absolute low OR it's decelerating
     return is_decelerating or not at_low
+
+
+def calculate_shannon_entropy(price_series: pd.Series, window: int = 20) -> float:
+    """
+    Measures the statistical randomness/disorder of price spreads over a rolling window.
+    High entropy signifies chaotic white noise where cyclic calculations collapse into false positives.
+    Low entropy signals highly structured, non-random accumulation/distribution footprints.
+    """
+    if len(price_series) < window + 1:
+        return 0.0
+
+    # 1. Calculate log returns to ensure statistical stationarity
+    log_returns = np.log(price_series / price_series.shift(1)).dropna().tail(window)
+
+    if log_returns.empty or np.all(log_returns == 0):
+        return 0.0
+
+    # 2. Discretize returns into 5 equal-width probability bins
+    counts, _ = np.histogram(log_returns, bins=5)
+    probabilities = counts / counts.sum()
+
+    # 3. Filter out zero probabilities to avoid log2(0) computational crashes
+    probabilities = probabilities[probabilities > 0]
+
+    # 4. Apply the Shannon Entropy equation: -Sum( P(x) * log2(P(x)) )
+    entropy = -np.sum(probabilities * np.log2(probabilities))
+    
+    return float(entropy)

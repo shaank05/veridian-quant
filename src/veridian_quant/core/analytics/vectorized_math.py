@@ -1,6 +1,8 @@
-from scipy.fft import fft, fftfreq
-import pandas as pd
 import numpy as np
+import pandas as pd
+from scipy.fft import fft, fftfreq
+import pywt  # Clean, industry-standard wavelet architecture anchor
+import traceback
 
 def calculate_z_score(price_series: pd.Series, window: int = 20) -> pd.Series:
     """
@@ -82,22 +84,6 @@ def calculate_dominant_cycle(price_series: pd.Series):
         return abs(1 / dominant_freq)
     return 0
 
-# def check_cycle_phase(price_series: pd.Series, window: int = 20):
-#     """
-#     Determines if we are currently in the 'rising' or 'falling' 
-#     part of the dominant cycle.
-#     """
-#     cycle_len = calculate_dominant_cycle(price_series)
-    
-#     # Simple phase check: compare current momentum vs cycle average
-#     # A true Medallion system would use Hilbert Transforms, 
-#     # but a momentum-based slope is a robust starting point.
-#     short_ma = price_series.rolling(window=5).mean()
-#     long_ma = price_series.rolling(window=int(cycle_len) if cycle_len > 5 else 20).mean()
-    
-#     # Return True if the short-term trend is starting to turn up
-#     return short_ma.iloc[-1] > short_ma.iloc[-2]
-
 def check_cycle_phase(price_series: pd.Series):
     """
     Improved Medallion Filter: Checks if the downward momentum is slowing 
@@ -146,3 +132,51 @@ def calculate_shannon_entropy(price_series: pd.Series, window: int = 20) -> floa
     entropy = -np.sum(probabilities * np.log2(probabilities))
     
     return float(entropy)
+
+
+def calculate_wavelet_momentum_intensity(close_series, short_width=3, long_width=10):
+    """
+    Stage 2.2 Continuous Wavelet Transform (CWT) Momentum Engine.
+    
+    Isolates micro-velocity and compares it against structural macro-waves.
+    Explicit scalar execution with structural NaN cleaning to prevent silent fallbacks.
+    """
+    try:
+        # 1. Clean data layer: Ensure we have a pandas series and drop any missing ticks
+        if not isinstance(close_series, pd.Series):
+            series_cleaned = pd.Series(close_series).dropna()
+        else:
+            series_cleaned = close_series.dropna()
+            
+        data = series_cleaned.to_numpy(dtype=float, copy=True).flatten()
+        
+        if len(data) < 30:
+            return 1.0  # Unit neutral fallback for short historical windows
+            
+        # 2. Compute the high-frequency short wave scale explicitly (Velocity)
+        short_coefs, _ = pywt.cwt(data, [float(short_width)], 'mexh')
+        # Force extraction to a completely flat 1D scalar value
+        short_wave_energy = float(np.abs(short_coefs[-1][-1]))
+        
+        # 3. Compute the low-frequency long wave scale explicitly (Structural Cycle)
+        long_coefs, _ = pywt.cwt(data, [float(long_width)], 'mexh')
+        long_wave_energy = float(np.abs(long_coefs[-1][-1]))
+        
+        # Guard against zero-division thresholds or corrupted NaN states
+        if np.isnan(short_wave_energy) or np.isnan(long_wave_energy) or long_wave_energy == 0:
+            return 1.0
+            
+        # Compute the localized intensity ratio
+        wavelet_intensity = short_wave_energy / long_wave_energy
+
+        print(f"🌊 CWT Wavelet Intensity: {wavelet_intensity:.4f}")
+        
+        return float(wavelet_intensity)
+        
+    except Exception as e:
+        # ABSOLUTE SAFETY: Print the actual structural error traceback to the console
+        # This completely stops the engine from masking any dimensional or type issues.
+        print(f"\n❌ [CRITICAL CWT FAILURE ENCOUNTERED]")
+        print(f"Error Detail: {str(e)}")
+        traceback.print_exc()
+        return 1.0

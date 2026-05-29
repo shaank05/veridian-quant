@@ -187,7 +187,9 @@ class BacktestEngine:
                         trade_row[f"{vote_key}_vote"] = 1 if vote_status else 0
                     
                     results.append(trade_row)
-                    print(f"🎯 [{current_day.date()}] {symbol}: {outcome} | PnL: ₹{pnl_amount:,.2f} | Conviction: {payload.get('metrics', {}).get('ensemble_conviction_score', 0.0)}%")
+                    
+                    # Enhanced Terminal Diagnostic Logging supporting Stage 2.2 metrics validation tracking
+                    print(f"🎯 [{current_day.date()}] {symbol}: {outcome} | PnL: ₹{pnl_amount:,.2f} | Conviction: {payload.get('metrics', {}).get('ensemble_conviction_score', 0.0)}% | CWT Intensity: {payload.get('metrics', {}).get('wavelet_intensity', 1.0):.2f}")
 
         # Output persistence processing
         if results:

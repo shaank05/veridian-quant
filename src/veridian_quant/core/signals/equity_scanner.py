@@ -7,7 +7,8 @@ from veridian_quant.core.analytics.vectorized_math import (
     calculate_z_score, 
     calculate_expected_move,
     check_cycle_phase,
-    calculate_shannon_entropy
+    calculate_shannon_entropy,
+    calculate_wavelet_momentum_intensity  # Stage 2.2 Node integration anchor
 )
 from src.veridian_quant.core.analytics.markov_analysis import calculate_transition_matrix
 
@@ -49,13 +50,14 @@ class EquityScanner:
         self.node_markov_lookback = int(os.getenv("NODE_MARKOV_LOOKBACK_DAYS", "90"))
         self.node_markov_max_persistence = float(os.getenv("NODE_MARKOV_MAX_PERSISTENCE", "0.60"))
         
-        # Advanced Phase Expansion Registry Toggles (Placeholders for future integrations)
-        self.node_cwt_enabled = os.getenv("NODE_CWT_ANALYSIS_ENABLED", "false").lower() == "true"
+        # Advanced Phase Expansion Registry Toggles
+        self.node_cwt_enabled = os.getenv("NODE_CWT_ANALYSIS_ENABLED", "true").lower() == "true"
+        self.node_cwt_activation_threshold = float(os.getenv("NODE_CWT_ACTIVATION_THRESHOLD", "1.90"))
         self.node_mc_enabled = os.getenv("NODE_MONTE_CARLO_ENABLED", "false").lower() == "true"
         self.node_bayesian_enabled = os.getenv("NODE_BAYESIAN_MASTER_ENABLED", "false").lower() == "true"
 
         print(f"📡 Parallel Scanner Engine Instantiated | Mode: {self.mode} | Database Source Target Table: {self.source_table}")
-        print(f"⚙️ Enabled Registries: Z-Score={self.node_z_score_enabled}, Macro={self.node_macro_regime_enabled}, Entropy={self.node_entropy_enabled}, FFT={self.node_fft_enabled}, VSA={self.node_vsa_enabled}, Markov={self.node_markov_enabled}")
+        print(f"⚙️ Enabled Registries: Z-Score={self.node_z_score_enabled}, Macro={self.node_macro_regime_enabled}, Entropy={self.node_entropy_enabled}, FFT={self.node_fft_enabled}, VSA={self.node_vsa_enabled}, Markov={self.node_markov_enabled}, CWT={self.node_cwt_enabled}")
 
     def get_dynamic_z_threshold(self, as_of_date=None):
         """
@@ -239,6 +241,7 @@ class EquityScanner:
             "markov_p_persistence": 0.0,
             "vsa_relative_volume": 1.0,
             "vsa_closing_position": 0.5,
+            "wavelet_intensity": 1.0,        # Stage 2.2 Live Metric
             "ensemble_conviction_score": 0.0  # Stage 5 Hub Anchor
         }
 
@@ -248,7 +251,7 @@ class EquityScanner:
             "fft_cycle_turning_vote": False,
             "vsa_confirmed_vote": False,
             "markov_vote": False,
-            "cwt_spectrum_vote": False,       # Stage 2.2 Placeholder
+            "cwt_spectrum_vote": False,       # Stage 2.2 Active Registry
             "monte_carlo_vote": False         # Stage 4 Placeholder
         }
 
@@ -260,6 +263,18 @@ class EquityScanner:
             payload_metrics["shannon_entropy"] = float(entropy_val)
             # A vote passes only if the systemic chaos remains inside bounds
             payload_votes["shannon_entropy_vote"] = bool(entropy_val <= self.node_entropy_max_threshold)
+
+        # NODE CODE 1.5: Stage 2.2 Continuous Wavelet Transform (CWT) Node
+        if self.node_cwt_enabled:
+            try:
+                wavelet_val = calculate_wavelet_momentum_intensity(df['close'])
+                payload_metrics["wavelet_intensity"] = float(wavelet_val)
+                # True signals a massive high-frequency velocity expansion regime
+                payload_votes["cwt_spectrum_vote"] = bool(wavelet_val >= self.node_cwt_activation_threshold)
+            except Exception as e:
+                logger.error(f"Failed concurrent Wavelet processing calculation: {e}")
+                payload_metrics["wavelet_intensity"] = 1.0
+                payload_votes["cwt_spectrum_vote"] = False
 
         # NODE CODE 2: Fast Fourier Transform Wave Phase Turning Node
         if self.node_fft_enabled:
@@ -296,6 +311,8 @@ class EquityScanner:
         total_enabled_nodes = 0
         passed_votes = 0
         
+        # Note: cwt_spectrum_vote is deliberately excluded from the traditional binary ensemble pool
+        # to preserve its continuous scale and isolate it as an absolute execution overrule shield.
         for key in ["shannon_entropy_vote", "fft_cycle_turning_vote", "vsa_confirmed_vote", "markov_vote"]:
             total_enabled_nodes += 1
             if payload_votes[key]:
@@ -303,6 +320,13 @@ class EquityScanner:
                 
         conviction_pct = (passed_votes / total_enabled_nodes) * 100 if total_enabled_nodes > 0 else 0.0
         payload_metrics["ensemble_conviction_score"] = round(conviction_pct, 2)
+
+        # --- CWT HARD CUTOFF OVERRULE SHIELD ---
+        # Intercepts active setup execution orders if micro-velocity conditions are unmet
+        if core_triggered and self.node_cwt_enabled:
+            if payload_metrics["wavelet_intensity"] < self.node_cwt_activation_threshold:
+                logger.info(f"⚠️ [{symbol}] Base setup aborted by CWT Alpha Shield: Intensity ({payload_metrics['wavelet_intensity']:.4f}) < Floor ({self.node_cwt_activation_threshold:.4f})")
+                core_triggered = False
 
         # 4. Generate Target Boundaries using Average True Range (ATR Multipliers)
         atr_values = calculate_expected_move(df['close'])
@@ -335,10 +359,10 @@ class EquityScanner:
         query = text("""
             INSERT INTO equity_recommendations 
             (instrument_key, trading_symbol, investment_type, entry_price, 
-             target_1, stop_loss, expected_duration_val, expected_duration_unit, strategies_involved, \r
+             target_1, stop_loss, expected_duration_val, expected_duration_unit, strategies_involved, 
              notes, status)
             VALUES (:instrument_key, :trading_symbol, 'SWING', :entry_price, 
-                    :target_1, :stop_loss, :expected_duration_days, 'DAYS', :strategies_involved, \r
+                    :target_1, :stop_loss, :expected_duration_days, 'DAYS', :strategies_involved, 
                     :notes, 'PENDING');
         """)
 
@@ -348,12 +372,12 @@ class EquityScanner:
                     'instrument_key': rec['instrument_key'],
                     'trading_symbol': rec['symbol'],
                     'entry_price': rec['entry_price'],
-                    'target_1': rec['target_1'],
-                    'stop_loss': rec['stop_loss'],
-                    'expected_duration_days': 30,  # Default tracking window constraint
+                    'target_1': rec['target_price'],  # Preserved property assignment
+                    'stop_loss': rec['stop_loss_price'],
+                    'expected_duration_days': rec['expected_duration_days'],
                     'strategies_involved': ['PARALLEL_ENSEMBLE_MATRIX'],
-                    'notes': f"Regime: {rec['market_regime']} | VIX: {rec['vix_value']:.2f} | Base Z: {rec['z_score']:.2f}"
+                    'notes': f"Regime: {rec['market_regime']} | VIX: {rec['metrics']['vix_value']:.2f} | Base Z: {rec['metrics']['z_score']:.2f} | CWT Intensity: {rec['metrics']['wavelet_intensity']:.2f}"
                 })
-            logger.info(f"✅ Production transaction recommendation successfully archived for asset token: {rec['symbol']}")
+            logger.info(f"✅ Production transaction recommendation successfully archived for asset token: {rec['trading_symbol']}")
         except Exception as e:
-            logger.error(f"Failed to save recommendation execution payload for {rec['symbol']}: {e}")
+            logger.error(f"Failed to save recommendation execution payload for {rec['trading_symbol']}: {e}")

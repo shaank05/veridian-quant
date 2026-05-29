@@ -1,0 +1,245 @@
+============================================================
+  📊 PARALLEL STRATEGY REGISTRY BASELINE PERFORMANCE REPORT without CWT Filter
+============================================================
+
+📈 Total Baseline Z-Score Signals Triggered: 548
+------------------------------------------------------------
+🧬 PROFILE: RAW CORE Z-SCORE SETUP (No Filtering Multi-Matrix)
+   Trades Executed : 548
+   Win Rate        : 37.77% (Targets: 207 | Stops: 338 | Expired: 3)
+   Profit Factor   : 1.28x
+   Avg Days to TP  : 7.6 sessions
+------------------------------------------------------------
+🧬 PROFILE: FILTERED BY FFT CYCLE (Momentum Turning Verified)
+   Trades Executed : 418
+   Win Rate        : 36.84% (Targets: 154 | Stops: 261 | Expired: 3)
+   Profit Factor   : 1.24x
+   Avg Days to TP  : 7.6 sessions
+------------------------------------------------------------
+🧬 PROFILE: FILTERED BY VSA (Institutional Accumulation Confirmed)
+   Trades Executed : 396
+   Win Rate        : 37.88% (Targets: 150 | Stops: 244 | Expired: 2)
+   Profit Factor   : 1.27x
+   Avg Days to TP  : 7.9 sessions
+------------------------------------------------------------
+🧬 PROFILE: FILTERED BY MARKOV OVERLAYS (Protected from State 0 Cascades)
+   Trades Executed : 381
+   Win Rate        : 37.53% (Targets: 143 | Stops: 235 | Expired: 3)
+   Profit Factor   : 1.33x
+   Avg Days to TP  : 7.7 sessions
+------------------------------------------------------------
+🧬 PROFILE: HIGH CONVICTION ENSEMBLE (Conviction Score >= 75.0%)
+   Trades Executed : 206
+   Win Rate        : 37.86% (Targets: 78 | Stops: 126 | Expired: 2)
+   Profit Factor   : 1.32x
+   Avg Days to TP  : 8.0 sessions
+------------------------------------------------------------
+
+======================================================================
+
+
+==================================================================
+      🏆 VERIDIAN QUANT ADVANCED MULTI-DIMENSIONAL AUDIT REPORT  
+==================================================================
+
+📅 YEAR: 2020
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹17,062.63
+💰 Peak Capital Locked         : ₹1,500,000.00 (15 Simultaneous Positions)
+💤 Capital Idle Deployment      : 252 Days Clear | 114 Days Active (31.1% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 2.3725
+🌊 Avg CWT Intensity (Stop Loss): 1.9641 (Median: 1.8608)
+📊 Total Trades Logged         : 68 | Hits: 24 | Losses: 44
+------------------------------------------------------------------
+
+📅 YEAR: 2021
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹31,765.74
+💰 Peak Capital Locked         : ₹1,700,000.00 (17 Simultaneous Positions)
+💤 Capital Idle Deployment      : 113 Days Clear | 252 Days Active (69.0% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 1.7720
+🌊 Avg CWT Intensity (Stop Loss): 17.0981 (Median: 1.7737)
+📊 Total Trades Logged         : 72 | Hits: 33 | Losses: 38
+------------------------------------------------------------------
+
+📅 YEAR: 2022
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹46,221.27
+💰 Peak Capital Locked         : ₹1,300,000.00 (13 Simultaneous Positions)
+💤 Capital Idle Deployment      : 133 Days Clear | 232 Days Active (63.6% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 1.9052
+🌊 Avg CWT Intensity (Stop Loss): 1.7307 (Median: 1.6337)
+📊 Total Trades Logged         : 97 | Hits: 36 | Losses: 61
+------------------------------------------------------------------
+
+📅 YEAR: 2023
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹12,680.72
+💰 Peak Capital Locked         : ₹1,600,000.00 (16 Simultaneous Positions)
+💤 Capital Idle Deployment      : 127 Days Clear | 238 Days Active (65.2% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 1.8570
+🌊 Avg CWT Intensity (Stop Loss): 2.1340 (Median: 1.8362)
+📊 Total Trades Logged         : 63 | Hits: 26 | Losses: 37
+------------------------------------------------------------------
+
+📅 YEAR: 2024
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹122,625.25
+💰 Peak Capital Locked         : ₹1,000,000.00 (10 Simultaneous Positions)
+💤 Capital Idle Deployment      : 83 Days Clear | 283 Days Active (77.3% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 2.0438
+🌊 Avg CWT Intensity (Stop Loss): 2.7336 (Median: 1.6877)
+📊 Total Trades Logged         : 99 | Hits: 41 | Losses: 57
+------------------------------------------------------------------
+
+📅 YEAR: 2025
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹71,258.68
+💰 Peak Capital Locked         : ₹1,300,000.00 (13 Simultaneous Positions)
+💤 Capital Idle Deployment      : 110 Days Clear | 255 Days Active (69.9% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 5.6256
+🌊 Avg CWT Intensity (Stop Loss): 2.4398 (Median: 1.8821)
+📊 Total Trades Logged         : 94 | Hits: 34 | Losses: 59
+------------------------------------------------------------------
+
+📅 YEAR: 2026
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹-16,246.79
+💰 Peak Capital Locked         : ₹1,300,000.00 (13 Simultaneous Positions)
+💤 Capital Idle Deployment      : 257 Days Clear | 108 Days Active (29.6% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 2.4719
+🌊 Avg CWT Intensity (Stop Loss): 1.7931 (Median: 1.7621)
+📊 Total Trades Logged         : 55 | Hits: 13 | Losses: 42
+------------------------------------------------------------------
+
+
+
+
+============================================================
+  📊 PARALLEL STRATEGY REGISTRY BASELINE PERFORMANCE REPORT with CWT Filter
+============================================================
+
+📈 Total Baseline Z-Score Signals Triggered: 199
+------------------------------------------------------------
+🧬 PROFILE: RAW CORE Z-SCORE SETUP (No Filtering Multi-Matrix)
+   Trades Executed : 199
+   Win Rate        : 39.70% (Targets: 79 | Stops: 119 | Expired: 1)
+   Profit Factor   : 1.59x
+   Avg Days to TP  : 8.8 sessions
+------------------------------------------------------------
+🧬 PROFILE: FILTERED BY FFT CYCLE (Momentum Turning Verified)
+   Trades Executed : 171
+   Win Rate        : 36.26% (Targets: 62 | Stops: 108 | Expired: 1)
+   Profit Factor   : 1.43x
+   Avg Days to TP  : 8.6 sessions
+------------------------------------------------------------
+🧬 PROFILE: FILTERED BY VSA (Institutional Accumulation Confirmed)
+   Trades Executed : 136
+   Win Rate        : 35.29% (Targets: 48 | Stops: 87 | Expired: 1)
+   Profit Factor   : 1.40x
+   Avg Days to TP  : 9.4 sessions
+------------------------------------------------------------
+🧬 PROFILE: FILTERED BY MARKOV OVERLAYS (Protected from State 0 Cascades)
+   Trades Executed : 147
+   Win Rate        : 41.50% (Targets: 61 | Stops: 85 | Expired: 1)
+   Profit Factor   : 1.80x
+   Avg Days to TP  : 8.4 sessions
+------------------------------------------------------------
+🧬 PROFILE: HIGH CONVICTION ENSEMBLE (Conviction Score >= 75.0%)
+   Trades Executed : 82
+   Win Rate        : 32.93% (Targets: 27 | Stops: 54 | Expired: 1)
+   Profit Factor   : 1.41x
+   Avg Days to TP  : 9.3 sessions
+------------------------------------------------------------
+
+======================================================================
+
+
+==================================================================
+      🏆 VERIDIAN QUANT ADVANCED MULTI-DIMENSIONAL AUDIT REPORT  
+==================================================================
+
+📅 YEAR: 2020
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹11,265.57
+💰 Peak Capital Locked         : ₹600,000.00 (6 Simultaneous Positions)
+💤 Capital Idle Deployment      : 284 Days Clear | 82 Days Active (22.4% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 3.6449
+🌊 Avg CWT Intensity (Stop Loss): 2.3817 (Median: 2.0695)
+📊 Total Trades Logged         : 26 | Hits: 9 | Losses: 17
+------------------------------------------------------------------
+
+📅 YEAR: 2021
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹3,026.66
+💰 Peak Capital Locked         : ₹600,000.00 (6 Simultaneous Positions)
+💤 Capital Idle Deployment      : 225 Days Clear | 140 Days Active (38.4% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 2.1842
+🌊 Avg CWT Intensity (Stop Loss): 40.8721 (Median: 2.4269)
+📊 Total Trades Logged         : 25 | Hits: 10 | Losses: 15
+------------------------------------------------------------------
+
+📅 YEAR: 2022
+------------------------------------------------------------------
+
+💵 Total Net Profit Generated : ₹35,502.50
+💰 Peak Capital Locked         : ₹900,000.00 (9 Simultaneous Positions)
+💤 Capital Idle Deployment      : 242 Days Clear | 123 Days Active (33.7% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 2.4166
+🌊 Avg CWT Intensity (Stop Loss): 2.2177 (Median: 2.0766)
+📊 Total Trades Logged         : 30 | Hits: 12 | Losses: 18
+------------------------------------------------------------------
+
+📅 YEAR: 2023
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹-508.68
+💰 Peak Capital Locked         : ₹1,100,000.00 (11 Simultaneous Positions)
+💤 Capital Idle Deployment      : 238 Days Clear | 127 Days Active (34.8% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 2.4154
+🌊 Avg CWT Intensity (Stop Loss): 2.9549 (Median: 2.1507)
+📊 Total Trades Logged         : 24 | Hits: 9 | Losses: 15
+------------------------------------------------------------------
+
+📅 YEAR: 2024
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹122,625.25
+💰 Peak Capital Locked         : ₹1,000,000.00 (10 Simultaneous Positions)
+💤 Capital Idle Deployment      : 83 Days Clear | 283 Days Active (77.3% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 2.0438
+🌊 Avg CWT Intensity (Stop Loss): 2.7336 (Median: 1.6877)
+📊 Total Trades Logged         : 99 | Hits: 41 | Losses: 57
+
+💵 Total Net Profit Generated : ₹114,500.61
+💰 Peak Capital Locked         : ₹800,000.00 (8 Simultaneous Positions)
+💤 Capital Idle Deployment      : 166 Days Clear | 200 Days Active (54.6% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 2.6590
+🌊 Avg CWT Intensity (Stop Loss): 6.0818 (Median: 2.4297)
+📊 Total Trades Logged         : 32 | Hits: 17 | Losses: 15
+------------------------------------------------------------------
+
+📅 YEAR: 2025
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹71,258.68
+💰 Peak Capital Locked         : ₹1,300,000.00 (13 Simultaneous Positions)
+💤 Capital Idle Deployment      : 110 Days Clear | 255 Days Active (69.9% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 5.6256
+🌊 Avg CWT Intensity (Stop Loss): 2.4398 (Median: 1.8821)
+📊 Total Trades Logged         : 94 | Hits: 34 | Losses: 59
+
+💵 Total Net Profit Generated : ₹46,698.38
+💰 Peak Capital Locked         : ₹800,000.00 (8 Simultaneous Positions)
+💤 Capital Idle Deployment      : 216 Days Clear | 149 Days Active (40.8% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 10.1271
+🌊 Avg CWT Intensity (Stop Loss): 3.3209 (Median: 2.5050)
+📊 Total Trades Logged         : 46 | Hits: 16 | Losses: 29
+------------------------------------------------------------------
+
+📅 YEAR: 2026
+------------------------------------------------------------------
+💵 Total Net Profit Generated : ₹18,608.89
+💰 Peak Capital Locked         : ₹700,000.00 (7 Simultaneous Positions)
+💤 Capital Idle Deployment      : 316 Days Clear | 49 Days Active (13.4% Market Exposure)
+🌊 Avg CWT Intensity (Target)  : 3.2650
+🌊 Avg CWT Intensity (Stop Loss): 2.2351 (Median: 2.1715)
+📊 Total Trades Logged         : 16 | Hits: 6 | Losses: 10
+------------------------------------------------------------------

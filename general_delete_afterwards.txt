@@ -36,7 +36,7 @@ I want to fill prices_ohlc using the price ingestion script and need HISTORICAL_
 start_date = now - timedelta(days=HISTORICAL_LOOKBACK), last timestamp in DB for 1minute interval 
 is 2026-04-30 09:59:00+00  and for 1day is 2026-04-2916 18:30:00+00
 
-Here is parallel strategy execution result, I have analyzed you do it too, results are spectacular, profits have increased only concern is 2023, give total profit and number of trade analysis of 6 years strategy wise and how the year was for Indian market I want to understand if the momentum has been captured
+Here is CWT result, I have analyzed you do it too, results are same as parallel execution, give total profit and number of trade analysis of 6 years strategy wise
 | Year | Strategy / Filter Setup | Total Recs | Hit SL | Hit Target | Expired | Net Profit/Loss (₹) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | **2020** | z_score |  |  |  |  |  | |
@@ -55,6 +55,7 @@ Here is parallel strategy execution result, I have analyzed you do it too, resul
 | **2020** | Markov max persistence | 36 | 26 | 10 | 0 | -13,338 | |
 | **2020** | Shannon Entropy (Removed Markov) | 42 | 29 | 13 | 0 | +921 | |
 | **2020** | Parallel execution | 68 | 44 | 24 | 0 | +17,062 | |
+| **2020** | CWT | 68 | 44 | 24 | 0 | +17,062 | |
 
 | **2021** | z_score |  |  |  |  |  | |
 | **2021** | z_score + fft |  |  |  |  |  | |
@@ -72,6 +73,7 @@ Here is parallel strategy execution result, I have analyzed you do it too, resul
 | **2021** | Markov max persistence | 35 | 19 | 16 | 0 | +28,566 | |
 | **2021** | Shannon Entropy (Removed Markov)  | 42 | 21 | 21 | 0 | +37,641 | |
 | **2021** | Parallel execution | 72 | 38 | 33 | 1 | +31,765 | |
+| **2021** | CWT | 72 | 38 | 33 | 1 | +31,765 | |
 
 | **2022** | z_score |  |  |  |  |  | |
 | **2022** | z_score + fft |  |  |  |  |  | |
@@ -89,6 +91,7 @@ Here is parallel strategy execution result, I have analyzed you do it too, resul
 | **2022** | Markov max persistence | 37 | 21 | 16 | 0 | +44,986 | |
 | **2022** | Shannon Entropy (Removed Markov)  | 59 | 35 | 24 | 0 | +36,876 | |
 | **2022** | Parallel execution | 97 | 61 | 36 | 0 | +46,221 | |
+| **2022** | CWT | 97 | 61 | 36 | 0 | +46,221 | |
 
 | **2023** | z_score |  |  |  |  |  | |
 | **2023** | z_score + fft |  |  |  |  |  | |
@@ -106,6 +109,7 @@ Here is parallel strategy execution result, I have analyzed you do it too, resul
 | **2023** | Markov max persistence | 18 | 10 | 8 | 0 | +18,545 | |
 | **2023** | Shannon Entropy (Removed Markov)  | 37 | 19 | 18 | 0 | +49,967 | |
 | **2023** | Parallel execution | 63 | 37 | 26 | 0 | +12,680 | |
+| **2023** | CWT | 63 | 37 | 26 | 0 | +12,680 | |
 
 | **2024** | z_score |  |  |  |  |  | |
 | **2024** | z_score + fft |  |  |  |  |  | |
@@ -123,6 +127,7 @@ Here is parallel strategy execution result, I have analyzed you do it too, resul
 | **2024** | Markov max persistence | 30 | 17 | 12 | 1 | +31,510 | |
 | **2024** | Shannon Entropy (Removed Markov)  | 49 | 29 | 19 | 1 | +54,400 | |
 | **2024** | Parallel execution | 99 | 57 | 41 | 1 | +1,22,625 | |
+| **2024** | CWT | 99 | 57 | 41 | 1 | +1,22,625 | |
 
 | **2025** | z_score |  |  |  |  |  | |
 | **2025** | z_score + fft |  |  |  |  |  | |
@@ -140,44 +145,11 @@ Here is parallel strategy execution result, I have analyzed you do it too, resul
 | **2025** | Markov max persistence | 28 | 17 | 10 | 1 | +9,509 | |
 | **2025** | Shannon Entropy (Removed Markov)  | 48 | 30 | 17 | 1 | +22,054 | |
 | **2025** | Parallel execution | 94 | 59 | 34 | 1 | +71,258 | |
+| **2025** | CWT | 94 | 59 | 34 | 1 | +71,258 | |
 
 | **2026** | After data clean | 33 | 26 | 7 | 0 | -18,113 | |
 | **2026** | Markov | 21 | 15 | 6 | 0 | +2,800 | |
 | **2026** | Markov max persistence | 22 | 16 | 6 | 0 | -183 | |
 | **2026** | Shannon Entropy (Removed Markov)  | 33 | 26 | 7 | 0 | -18,113 | |
 | **2026** | Parallel execution | 55 | 42 | 13 | 0 | -16,246 | |
-
-
-📊 Loading Parallel Strategy Registry Backtest Ledger...
-📈 Total Baseline Z-Score Signals Triggered: 548
-------------------------------------------------------------
-🧬 PROFILE: RAW CORE Z-SCORE SETUP (No Filtering Multi-Matrix)
-   Trades Executed : 548
-   Win Rate        : 37.77% (Targets: 207 | Stops: 338 | Expired: 3)
-   Profit Factor   : 1.28x
-   Avg Days to TP  : 7.6 sessions
-------------------------------------------------------------
-🧬 PROFILE: FILTERED BY FFT CYCLE (Momentum Turning Verified)
-   Trades Executed : 418
-   Win Rate        : 36.84% (Targets: 154 | Stops: 261 | Expired: 3)
-   Profit Factor   : 1.24x
-   Avg Days to TP  : 7.6 sessions
-------------------------------------------------------------
-🧬 PROFILE: FILTERED BY VSA (Institutional Accumulation Confirmed)
-   Trades Executed : 396
-   Win Rate        : 37.88% (Targets: 150 | Stops: 244 | Expired: 2)
-   Profit Factor   : 1.27x
-   Avg Days to TP  : 7.9 sessions
-------------------------------------------------------------
-🧬 PROFILE: FILTERED BY MARKOV OVERLAYS (Protected from State 0 Cascades)
-   Trades Executed : 381
-   Win Rate        : 37.53% (Targets: 143 | Stops: 235 | Expired: 3)
-   Profit Factor   : 1.33x
-   Avg Days to TP  : 7.7 sessions
-------------------------------------------------------------
-🧬 PROFILE: HIGH CONVICTION ENSEMBLE (Conviction Score >= 75.0%)
-   Trades Executed : 206
-   Win Rate        : 37.86% (Targets: 78 | Stops: 126 | Expired: 2)
-   Profit Factor   : 1.32x
-   Avg Days to TP  : 8.0 sessions
-------------------------------------------------------------
+| **2026** | CWT | 55 | 42 | 13 | 0 | -16,246 | |

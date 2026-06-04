@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import json
 import time  
+import numpy as np
 from sqlalchemy import text
 from dotenv import load_dotenv
 from src.veridian_quant.data.db_client import DatabaseClient
@@ -16,182 +17,247 @@ class BacktestEngine:
     Chronological Ledger Loop Engine.
     
     Responsible for executing multi-year business day backtests over pristine historical 
-    market datasets. This module acts strictly as an execution logging layout; it carries 
-    no statistical math or indicator filtering. It loops chronologically, routes dates 
-    directly down to EquityScanner, and converts the multi-strategy nested telemetry payloads 
-    into a flat, multi-dimensional analytical matrix CSV for deep statistical auditing.
+    market datasets. Coordinates daily processing pipelines by loading parameters from 
+    watchlist configurations while eliminating multi-firing signal anomalies via an 
+    in-memory portfolio position registry tracking matrix.
     """
     def __init__(self):
-        # Establish persistence framework connection instance
         self.db = DatabaseClient()
-        
-        # Instantiate the unified quantitative calculation hub.
-        # Mode is passed explicitly as 'BACKTEST' to force the engine to bypass live execution constraints
-        # and gather parallel strategy voting records.
         self.scanner = EquityScanner(self.db.get_engine(), mode='BACKTEST', source_table='prices_ohlc')
 
     def get_watchlist_symbols(self):
         """
-        Loads configured universe ticker targets from root > config > watchlist.json.
-        Combines target lists into a single consolidated execution tracking array.
+        Loads configured universe ticker targets from root > config setup profiles.
         """
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        watchlist_path = os.path.join(current_dir, '..', '..', 'config', 'watchlist.json')
-        watchlist_path = os.path.normpath(watchlist_path)
-
         try:
-            if not os.path.exists(watchlist_path):
-                print(f"❌ File not found at: {watchlist_path}")
-                return []
-
-            with open(watchlist_path, 'r') as f:
+            with open('config/watchlist.json', 'r') as f:
                 data = json.load(f)
                 symbols = data.get('one_minute_targets', []) + data.get('one_day_targets', [])
-                print(f"✅ Loaded {len(symbols)} symbols from watchlist.")
+                
+                if "NIFTY" not in symbols:
+                    symbols.append("NIFTY")
+                    
+                print(f"✅ Loaded {len(symbols)} symbols from watchlist matrix configurations.")
                 return symbols
         except Exception as e:
-            print(f"❌ Error loading watchlist: {e}")
+            print(f"❌ Error loading system backtest active target ticker array: {str(e)}")
             return []
 
-    def verify_outcome(self, inst_key, signal_date, target, stop_loss):
+    def fetch_historical_matrix(self, symbol, end_date):
+        """
+        Pulls sequential historical data by joining the prices ledger with the 
+        instruments metadata table to match human-readable watchlist symbols.
+        """
+        if symbol == "NIFTY":
+            query = text("""
+                SELECT p.timestamp AS date, p.open, p.high, p.low, p.close, p.volume 
+                FROM prices_ohlc p
+                WHERE p.instrument_key = 'NSE_INDEX|Nifty 50' AND p.timestamp::date <= :end_date
+                ORDER BY p.timestamp DESC LIMIT 100;
+            """)
+        else:
+            query = text("""
+                SELECT p.timestamp AS date, p.open, p.high, p.low, p.close, p.volume 
+                FROM prices_ohlc p
+                INNER JOIN instruments i ON p.instrument_key = i.instrument_key
+                WHERE (i.symbol = :symbol OR i.trading_symbol = :symbol)
+                  AND p.timestamp::date <= :end_date
+                ORDER BY p.timestamp DESC LIMIT 100;
+            """)
+            
+        try:
+            with self.db.get_engine().connect() as conn:
+                df = pd.read_sql(query, conn, params={"symbol": symbol, "end_date": end_date})
+                if not df.empty:
+                    df = df.iloc[::-1].reset_index(drop=True)
+                    df['date'] = pd.to_datetime(df['date'])
+                return df
+        except Exception as e:
+            print(f"❌ Structural exception pulling database timeframe matrix slice for [{symbol}]: {str(e)}")
+            return pd.DataFrame()
+
+    def verify_outcome(self, symbol, signal_date, target, stop_loss):
         """
         Chronological Window Audit Track.
-        
-        Evaluates a 30-day forward price matrix following a signal timestamp to find out 
-        whether the profit target boundary or risk stop-loss limit was crossed first.
+        Evaluates a 30-day forward price matrix following a signal timestamp 
+        by joining with metadata to map symbols onto internal table records.
         """
         query = text("""
-            SELECT timestamp, high, low FROM prices_ohlc 
-            WHERE instrument_key = :inst_key AND interval = 'day' AND timestamp > :signal_date
-            ORDER BY timestamp ASC LIMIT 30;
+            SELECT p.timestamp, p.high, p.low 
+            FROM prices_ohlc p
+            INNER JOIN instruments i ON p.instrument_key = i.instrument_key
+            WHERE (i.symbol = :symbol OR i.trading_symbol = :symbol)
+              AND p.timestamp::date > :signal_date
+            ORDER BY p.timestamp ASC LIMIT 30;
         """)
         try:
-            df = pd.read_sql(query, self.db.get_engine(), params={
-                "inst_key": inst_key, 
-                "signal_date": signal_date
-            })
+            with self.db.get_engine().connect() as conn:
+                df = pd.read_sql(query, conn, params={"symbol": symbol, "signal_date": signal_date})
             
-            if df.empty: return "NO_FUTURE_DATA", None, None
+            if df.empty: 
+                return "NO_FUTURE_DATA", None, None
 
             # Loop through future data ticks day-by-day to verify trade exit resolution
             for idx, row in df.iterrows():
-                if row['high'] >= target: return "HIT_TARGET", row['timestamp'], idx + 1
-                if row['low'] <= stop_loss: return "HIT_STOP_LOSS", row['timestamp'], idx + 1
+                if row['high'] >= target: 
+                    return "HIT_TARGET", row['timestamp'], idx + 1
+                if row['low'] <= stop_loss: 
+                    return "HIT_STOP_LOSS", row['timestamp'], idx + 1
+                    
             return "EXPIRED", None, 30
         except Exception as e:
-            print(f"Error verifying outcome: {e}")
+            print(f"❌ Error verifying outcome for [{symbol}] on {signal_date}: {str(e)}")
             return "ERROR", None, None
 
-    def run(self, start_date, end_date):
+    def run_backtest_ledger_loop(self, start_date, end_date):
         """
-        Main Engine Execution Loop.
+        Executes strict forward chronological iteration sequences with continuous position modulation.
+        """
+        print("="*60)
+        print(f"🚀 VERIDIAN QUANT BACKTEST MATRIX ITERATION LOOP ENGINE DEPLOYED")
+        print(f"🗓️ Horizon Scope: {start_date} to {end_date}")
+        print("="*60)
         
-        Advances capital balances over sequential business days, unpacking nested, 
-        parallel strategy matrices dynamically to construct a multi-variant backtest ledger.
-        """
-        # Start performance profile tracking timers
         start_perf_time = time.perf_counter()
         start_time_ist = datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
 
-        # Fixed-unit capital allocation benchmark parameters (₹1,00,000 per asset)
-        INITIAL_BACKTEST_EQUITY = 100000.0
-        current_balance = INITIAL_BACKTEST_EQUITY
-        
+        trading_days = pd.bdate_range(start=start_date, end=end_date)
         symbols = self.get_watchlist_symbols()
-        if not symbols:
-            print("Watchlist is empty. Exiting.")
+        
+        if not symbols or len(symbols) <= 1:
+            print("⚠️ Empty active stock tracking universe asset registry matrix. Aborting loop.")
             return
 
-        query = "SELECT instrument_key, symbol FROM instruments WHERE symbol IN :symbols AND (instrument_key LIKE 'NSE_EQ|%' OR instrument_key LIKE 'NSE_INDEX|%');"
-
-        try:
-            instruments = self.db.execute_query(query, {"symbols": tuple(symbols)})
-        except Exception as e:
-            print(f"❌ Error fetching instruments: {e}")
-            return
-
-        if not instruments:
-            print("No matching instruments found in DB.")
-            return
-
-        print(f"🧐 Scanning {len(instruments)} instruments from {start_date} to {end_date}...")
-        print("⛓️ Parallel Strategy Registry Matrix Engaged. Extracting all metrics simultaneously.")
-
-        # Construct chronological index across business day frequencies
-        test_days = pd.date_range(start=start_date, end=end_date, freq='B')
         results = []
+        initial_balance = 1000000.00  # Shift baseline account scale up for portfolio tracking simulation
+        current_balance = initial_balance
+        base_unit_capital = 100000.00  # Reference sizing unit
 
-        # Chronological Engine Loop (The System Clock)
-        for current_day in test_days:
-            for inst_key, symbol in instruments:
+        # IN-MEMORY REGISTRY: Simulates database recommendation table state tracking
+        active_positions = {}
+
+        for current_day in trading_days:
+            day_str = current_day.strftime('%Y-%m-%d')
+            current_date_obj = current_day.date()
+
+            # 1. Housekeeping: Remove expired or hit positions whose exit boundaries have passed
+            active_positions = {sym: ext_dt for sym, ext_dt in active_positions.items() if ext_dt > current_date_obj}
+
+            print(f"⌛ [BACKTEST LOOP PROGRESS] processing historical slice matrix data timeline window for date node -> [{day_str}]")
+
+            tickers_data_package = {}
+            for symbol in symbols:
+                if symbol in active_positions:
+                    continue
+
+                hist_df = self.fetch_historical_matrix(symbol, day_str)
+                if not hist_df.empty and len(hist_df) >= 35:
+                    tickers_data_package[symbol] = hist_df
+
+            # Always guarantee NIFTY historical depth context is loaded for macro filters
+            if "NIFTY" not in tickers_data_package and "NIFTY" not in active_positions:
+                nifty_df = self.fetch_historical_matrix("NIFTY", day_str)
+                if not nifty_df.empty:
+                    tickers_data_package["NIFTY"] = nifty_df
+
+            if not tickers_data_package or (len(tickers_data_package) == 1 and "NIFTY" in tickers_data_package):
+                continue
+            
+            day_signals = self.scanner.execute_concurrent_analysis(tickers_data_package, day_str)
+            
+            for payload in day_signals:
+                symbol = payload.get("symbol")
                 
-                # Fetch full structural telemetry matrix payload from the unified scanner framework
-                payload = self.scanner.scan_instrument(inst_key, symbol, as_of_date=current_day)
+                if symbol in active_positions:
+                    continue
+
+                entry_price = payload.get("entry_price")
+                target_price = payload.get("target_price")
+                stop_loss_price = payload.get("stop_loss_price")
+                metrics_bag = payload.get("metrics", {})
                 
-                # In Backtest mode, we check only if the base statistical entry setup was reached.
-                # All other signal nodes are tracked and logged simultaneously without dropping rows.
-                if payload and payload.get("core_setup_triggered"):
-                    
-                    # Track future timeline resolution using boundaries computed natively by the scanner
-                    outcome, hit_date, days_taken = self.verify_outcome(
-                        inst_key, current_day, payload['target_price'], payload['stop_loss_price']
-                    )
-                    
-                    entry_price = payload['entry_price']
-                    
-                    # Calculate position size constraints based on static rupee limits
-                    qty = int(INITIAL_BACKTEST_EQUITY // entry_price)
-                    if qty <= 0:
-                        continue
+                # Extract Continuous Conviction metrics to modulate size
+                rawrs_mod = metrics_bag.get("rawrs_modifier", 0.5)
+                strength_score = metrics_bag.get("ensemble_strength_score", 50.0)
+                
+                # --- NEW UNLOCKED CONTINUOUS CONVICTION POSITION MODULATION ENGINE ---
+                # Derive multiplier based smoothly on mathematical features
+                strength_factor = (strength_score / 100.0)
+                conviction_multiplier = (0.6 * rawrs_mod) + (0.4 * strength_factor)
+                
+                # Bound adjustments cleanly between 0.25x and 1.50x of our baseline allocation capital
+                modulated_multiplier = float(np.clip(conviction_multiplier * 2.0, 0.25, 1.50))
+                allocated_capital = base_unit_capital * modulated_multiplier
+                
+                # Adjust capital sizing proportionally if account growth or deep drawdown shifts account scale
+                compounding_scaling_factor = current_balance / initial_balance
+                final_adjusted_capital = allocated_capital * max(0.5, min(2.0, compounding_scaling_factor))
+                
+                # Safeguard rule: protect portfolio logic from risking more than 20% total equity on one ticker
+                if final_adjusted_capital > (current_balance * 0.20):
+                    final_adjusted_capital = current_balance * 0.20
 
-                    # Determine exact exit execution benchmark pricing structures
-                    if outcome == "HIT_TARGET":
-                        exit_price = payload['target_price']
-                    elif outcome == "HIT_STOP_LOSS":
-                        exit_price = payload['stop_loss_price']
-                    else:
-                        exit_price = entry_price  # Expired horizon fallback
-                    
-                    # Compute financial adjustments
-                    pnl_amount = qty * (exit_price - entry_price)
-                    pnl_pct = ((exit_price - entry_price) / entry_price) * 100
-                    current_balance += pnl_amount
-                    
-                    # Create the base flat transaction log row
-                    trade_row = {
-                        'signal_date': current_day.date(),
-                        'symbol': symbol,
-                        'entry_price': round(entry_price, 2),
-                        'target_price': round(payload['target_price'], 2),
-                        'stop_loss_price': round(payload['stop_loss_price'], 2),
-                        'exit_price': round(exit_price, 2),
-                        'pnl_amount': round(pnl_amount, 2),
-                        'pnl_percentage': round(pnl_pct, 2),
-                        'cumulative_balance': round(current_balance, 2),
-                        'outcome': outcome,
-                        'market_regime': payload['market_regime'],
-                        'exit_date_daily': hit_date.date() if hasattr(hit_date, 'date') and hit_date else hit_date,
-                        'days_to_result': days_taken,
-                        'shares_traded': qty
-                    }
-                    
-                    # DYNAMIC TELEMETRY UNPACKING MATRIX
-                    # Unpacks nested 'metrics' dictionaries (e.g., z_score, shannon_entropy, vix_value) 
-                    # into top-level columns automatically to eliminate rigid code dependencies.
-                    for metric_key, metric_value in payload.get("metrics", {}).items():
-                        trade_row[metric_key] = round(metric_value, 4) if isinstance(metric_value, float) else metric_value
-                        
-                    # Unpacks individual strategy boolean 'votes' into clean 1 or 0 binary indicators 
-                    # to enable multi-variable spreadsheet optimization passes.
-                    for vote_key, vote_status in payload.get("votes", {}).items():
-                        trade_row[f"{vote_key}_vote"] = 1 if vote_status else 0
-                    
-                    results.append(trade_row)
-                    
-                    # Enhanced Terminal Diagnostic Logging supporting Stage 2.2 metrics validation tracking
-                    print(f"🎯 [{current_day.date()}] {symbol}: {outcome} | PnL: ₹{pnl_amount:,.2f} | Conviction: {payload.get('metrics', {}).get('ensemble_conviction_score', 0.0)}% | CWT Intensity: {payload.get('metrics', {}).get('wavelet_intensity', 1.0):.2f}")
+                # Run the chronological window audit check against future data
+                outcome, hit_date, days_taken = self.verify_outcome(
+                    symbol, day_str, target_price, stop_loss_price
+                )
+                
+                if hit_date:
+                    exit_date_obj = pd.to_datetime(hit_date).date()
+                else:
+                    exit_date_obj = (current_day + pd.Timedelta(days=30)).date()
 
-        # Output persistence processing
+                active_positions[symbol] = exit_date_obj
+                
+                # Establish execution volume using modulated capital bounds
+                qty = int(final_adjusted_capital // entry_price) if entry_price and entry_price > 0 else 0
+                if qty <= 0:
+                    continue
+                    
+                if outcome == "HIT_TARGET":
+                    exit_price = target_price
+                elif outcome == "HIT_STOP_LOSS":
+                    exit_price = stop_loss_price
+                else:
+                    exit_price = entry_price  # Expired horizon fallback
+                    
+                # Compute financial balance adjustments
+                pnl_amount = qty * (exit_price - entry_price)
+                pnl_pct = ((exit_price - entry_price) / entry_price) * 100 if entry_price else 0.0
+                current_balance += pnl_amount
+                
+                flattened_row = {
+                    "backtest_date": day_str,
+                    "symbol": symbol,
+                    "entry_price": entry_price,
+                    "target_price": target_price,
+                    "stop_loss_price": stop_loss_price,
+                    "exit_price": exit_price,
+                    "outcome": outcome,
+                    "exit_date": exit_date_obj.strftime('%Y-%m-%d'),
+                    "days_to_result": days_taken,
+                    "shares_traded": qty,
+                    "allocated_capital": round(final_adjusted_capital, 2),
+                    "pnl_amount": round(pnl_amount, 2),
+                    "pnl_percentage": round(pnl_pct, 2),
+                    "cumulative_balance": round(current_balance, 2),
+                    "market_regime": payload.get("market_regime"),
+                    "vix_value": metrics_bag.get("vix_value", 15.0),
+                    "nifty_slope": metrics_bag.get("nifty_slope", 0.0),
+                    "z_score": metrics_bag.get("z_score", 0.0),
+                    "expected_move": metrics_bag.get("expected_move", 0.0),
+                    "shannon_entropy": metrics_bag.get("shannon_entropy", 0.0),
+                    "fft_cycle_period": metrics_bag.get("fft_cycle_period", 0.0),
+                    "markov_regime_state": metrics_bag.get("markov_regime_state", 0),
+                    "wavelet_intensity": metrics_bag.get("wavelet_intensity", 1.0),
+                    "rawrs_score": rawrs_mod,
+                    "ensemble_strength_score": strength_score
+                }
+                results.append(flattened_row)
+                
+                print(f"📡 [SIGNAL LOGGED WITH CONVICTION SIZE] Day: {day_str} | Asset: {symbol} | size-mult: {modulated_multiplier:.2f}x | Outcome: {outcome} | "
+                      f"PnL: ₹{pnl_amount:,.2f} | Balance: ₹{current_balance:,.2f}")
+
         if results:
             report = pd.DataFrame(results)
             filename = f"backtest_report_{start_date.replace('-','')}.csv"
@@ -201,7 +267,6 @@ class BacktestEngine:
         else:
             print("No signals found. Check tracking parameters or universe dataset depth.")
 
-        # Complete runtime execution diagnostics reporting profile
         end_perf_time = time.perf_counter()
         end_time_ist = datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
         total_execution_time = end_perf_time - start_perf_time
@@ -212,10 +277,10 @@ class BacktestEngine:
         
         print("\n" + "="*50)
         print(f"🛫 Backtest Pass Started (IST) : {start_time_ist}")
-        print(f"🛬 Backtest Pass Ended (IST)   : {end_time_ist}")
-        print(f"⏱️ Matrix Run Ingestion Time   : {hours} hrs, {minutes} mins, {seconds:.2f} secs")
+        print(f"🛬 Backtest Pass Finished (IST): {end_time_ist}")
+        print(f"⏱️ Total Ledger Search Compute Window: {hours}h {minutes}m {seconds:.2f}s")
         print("="*50 + "\n")
 
 if __name__ == "__main__":
     engine = BacktestEngine()
-    engine.run("2020-01-01", "2026-04-30")
+    engine.run_backtest_ledger_loop("2020-01-01", "2026-04-30")

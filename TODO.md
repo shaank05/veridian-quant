@@ -900,3 +900,20 @@ This becomes:
 - an institutional-grade adaptive intelligence engine,
 NOT:
 - a traditional retail strategy stack.
+
+
+TODO: Capital Allocation & Post-Entry Lifecycle Architecture
+├── [ ] Phase 1: Ingestion Volatility Layer
+│   ├── [ ] Modify `price_ingestion.py` / `equity_recommendation_scan.py` to calculate a rolling 14-period ATR from TimescaleDB historical candles.
+│   └── [ ] Append the calculated `atr` value as a column to the recommendations payload/database table.
+│
+├── [ ] Phase 2: Ex-Ante Position Sizing
+│   ├── [ ] Integrate dynamic ATR risk-sizing math into `backtest_engine.py` to replace flat lot sizing.
+│   └── [ ] Update live order payload builders to compute Quantity = (Risk Budget) / (ATR * Multiplier) at the exact millisecond of entry generation.
+│
+└── [ ] Phase 3: Post-Entry Background Scheduler
+    ├── [ ] Create standalone worker script `portfolio_lifecycle_manager.py`.
+    ├── [ ] Implement active position database scanner to track open trade states.
+    ├── [ ] Build Rule B: Trailing Volatility Stop loop (modifies active SL orders via Upstox API when rawrs conditions are met).
+    ├── [ ] Build Rule C: Time-Decay Early Exit module (fires market close orders for stagnant nodes exceeding time bounds).
+    └── [ ] Schedule the lifecycle manager worker daemon to execute at regular intervals (e.g., hourly/5-min) during market hours.

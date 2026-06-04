@@ -36,7 +36,7 @@ I want to fill prices_ohlc using the price ingestion script and need HISTORICAL_
 start_date = now - timedelta(days=HISTORICAL_LOOKBACK), last timestamp in DB for 1minute interval 
 is 2026-04-30 09:59:00+00  and for 1day is 2026-04-2916 18:30:00+00
 
-Here is CWT result, I have analyzed you do it too, results are same as parallel execution, give total profit and number of trade analysis of 6 years strategy wise
+Here is RAWRS scaling result, I have analyzed you do it too, overall profits have increased but so are losses for 2020 and 2026, number of trades have also increased alot but that could be because earlier implementation of is previously recommended was flawed for backtest, also there are too many expired trades, give total profit and number of trade analysis of 6 years strategy wise
 | Year | Strategy / Filter Setup | Total Recs | Hit SL | Hit Target | Expired | Net Profit/Loss (₹) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | **2020** | z_score |  |  |  |  |  | |
@@ -56,6 +56,7 @@ Here is CWT result, I have analyzed you do it too, results are same as parallel 
 | **2020** | Shannon Entropy (Removed Markov) | 42 | 29 | 13 | 0 | +921 | |
 | **2020** | Parallel execution | 68 | 44 | 24 | 0 | +17,062 | |
 | **2020** | CWT | 68 | 44 | 24 | 0 | +17,062 | |
+| **2020** | RAWRS scaling | 184 | 130 | 54 | 0 | -1,18,571 | |
 
 | **2021** | z_score |  |  |  |  |  | |
 | **2021** | z_score + fft |  |  |  |  |  | |
@@ -74,6 +75,7 @@ Here is CWT result, I have analyzed you do it too, results are same as parallel 
 | **2021** | Shannon Entropy (Removed Markov)  | 42 | 21 | 21 | 0 | +37,641 | |
 | **2021** | Parallel execution | 72 | 38 | 33 | 1 | +31,765 | |
 | **2021** | CWT | 72 | 38 | 33 | 1 | +31,765 | |
+| **2021** | RAWRS scaling | 90 | 43 | 47 | 0 | +1,22,596 | |
 
 | **2022** | z_score |  |  |  |  |  | |
 | **2022** | z_score + fft |  |  |  |  |  | |
@@ -92,6 +94,7 @@ Here is CWT result, I have analyzed you do it too, results are same as parallel 
 | **2022** | Shannon Entropy (Removed Markov)  | 59 | 35 | 24 | 0 | +36,876 | |
 | **2022** | Parallel execution | 97 | 61 | 36 | 0 | +46,221 | |
 | **2022** | CWT | 97 | 61 | 36 | 0 | +46,221 | |
+| **2022** | RAWRS scaling | 115 | 56 | 59 | 0 | +1,61,803 | |
 
 | **2023** | z_score |  |  |  |  |  | |
 | **2023** | z_score + fft |  |  |  |  |  | |
@@ -110,6 +113,7 @@ Here is CWT result, I have analyzed you do it too, results are same as parallel 
 | **2023** | Shannon Entropy (Removed Markov)  | 37 | 19 | 18 | 0 | +49,967 | |
 | **2023** | Parallel execution | 63 | 37 | 26 | 0 | +12,680 | |
 | **2023** | CWT | 63 | 37 | 26 | 0 | +12,680 | |
+| **2023** | RAWRS scaling | 89 | 39 | 45 | 5 | +1,45,655 | |
 
 | **2024** | z_score |  |  |  |  |  | |
 | **2024** | z_score + fft |  |  |  |  |  | |
@@ -128,6 +132,7 @@ Here is CWT result, I have analyzed you do it too, results are same as parallel 
 | **2024** | Shannon Entropy (Removed Markov)  | 49 | 29 | 19 | 1 | +54,400 | |
 | **2024** | Parallel execution | 99 | 57 | 41 | 1 | +1,22,625 | |
 | **2024** | CWT | 99 | 57 | 41 | 1 | +1,22,625 | |
+| **2024** | RAWRS scaling | 129 | 76 | 53 | 0 | +58,831 | |
 
 | **2025** | z_score |  |  |  |  |  | |
 | **2025** | z_score + fft |  |  |  |  |  | |
@@ -146,6 +151,7 @@ Here is CWT result, I have analyzed you do it too, results are same as parallel 
 | **2025** | Shannon Entropy (Removed Markov)  | 48 | 30 | 17 | 1 | +22,054 | |
 | **2025** | Parallel execution | 94 | 59 | 34 | 1 | +71,258 | |
 | **2025** | CWT | 94 | 59 | 34 | 1 | +71,258 | |
+| **2025** | RAWRS scaling | 210 | 30 | 27 | 153 | +63,218 | |
 
 | **2026** | After data clean | 33 | 26 | 7 | 0 | -18,113 | |
 | **2026** | Markov | 21 | 15 | 6 | 0 | +2,800 | |
@@ -153,3 +159,4 @@ Here is CWT result, I have analyzed you do it too, results are same as parallel 
 | **2026** | Shannon Entropy (Removed Markov)  | 33 | 26 | 7 | 0 | -18,113 | |
 | **2026** | Parallel execution | 55 | 42 | 13 | 0 | -16,246 | |
 | **2026** | CWT | 55 | 42 | 13 | 0 | -16,246 | |
+| **2026** | RAWRS scaling | 88 | 18 | 1 | 69 | -48,713 | |

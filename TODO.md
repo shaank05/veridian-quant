@@ -54,7 +54,7 @@ Feature Utility Is Constant
 ---
 
 # 🚀 Immediate Action Items (Current Highest Priority)
-
+# ✅ Completed
 ## 🌊 Priority 1 — RAWRS (Regime-Aware Adaptive Wavelet Response Surface)
 
 ### Objective
@@ -99,7 +99,7 @@ CWT modifies execution conviction probabilistically
 ---
 
 ## 📊 Priority 2 — Conviction-Based Position Sizing Engine
-
+# Pending
 ### Objective
 Replace static capital bricks with:
 - dynamic exposure scaling,
@@ -112,6 +112,9 @@ Replace static capital bricks with:
 - [ ] Scale exposure using Ensemble Conviction Score.
 - [ ] Reduce capital during high entropy/turbulence states.
 - [ ] Increase capital during cohesive high-alignment setups.
+- [ ] Enforce real-world liquid cash ceiling constraints to prevent over-leverage.
+- [ ] Implement Annual Vaulted Compounding (lock capital boundaries per calendar year based on real rolled-over equity).
+- [ ] Build a signal-rejection handler to automatically skip or fractionally fill new trades when available ledger cash hits zero.
 
 ### Proposed Exposure Model
 | Conviction Score | Capital Allocation |

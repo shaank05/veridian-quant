@@ -17,7 +17,7 @@ def test_rolling_mean_close_returns_expected_series() -> None:
 
     result = rolling_mean_close(data, window=3)
 
-    expected = pd.Series([float("nan"), float("nan"), 12.0, 14.0])
+    expected = pd.Series([float("nan"), float("nan"), 12.0, 14.0], name="close")
     pd.testing.assert_series_equal(result, expected)
 
 

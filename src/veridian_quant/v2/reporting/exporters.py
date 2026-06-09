@@ -9,6 +9,16 @@ from typing import Any, Mapping
 
 import pandas as pd
 
+from veridian_quant.v2.reporting.diagnostics import (
+    EXIT_REASON_SUMMARY_COLUMNS,
+    REJECTION_SUMMARY_COLUMNS,
+    SYMBOL_SUMMARY_COLUMNS,
+    YEARLY_SUMMARY_COLUMNS,
+    build_exit_reason_summary_rows,
+    build_rejection_summary_rows,
+    build_symbol_summary_rows,
+    build_yearly_summary_rows,
+)
 from veridian_quant.v2.reporting.metrics import calculate_performance_summary
 
 
@@ -95,6 +105,10 @@ def export_portfolio_backtest_csvs(
         "rejected_signals": output_path / "rejected_signals.csv",
         "equity_curve": output_path / "equity_curve.csv",
         "summary": output_path / "summary.csv",
+        "exit_reason_summary": output_path / "exit_reason_summary.csv",
+        "symbol_summary": output_path / "symbol_summary.csv",
+        "yearly_summary": output_path / "yearly_summary.csv",
+        "rejection_summary": output_path / "rejection_summary.csv",
     }
 
     _write_csv(exports["trade_log"], _trade_rows(result), TRADE_LOG_COLUMNS)
@@ -115,6 +129,26 @@ def export_portfolio_backtest_csvs(
         EQUITY_CURVE_COLUMNS,
     )
     _write_csv(exports["summary"], _summary_rows(result), SUMMARY_COLUMNS)
+    _write_csv(
+        exports["exit_reason_summary"],
+        build_exit_reason_summary_rows(result),
+        EXIT_REASON_SUMMARY_COLUMNS,
+    )
+    _write_csv(
+        exports["symbol_summary"],
+        build_symbol_summary_rows(result),
+        SYMBOL_SUMMARY_COLUMNS,
+    )
+    _write_csv(
+        exports["yearly_summary"],
+        build_yearly_summary_rows(result),
+        YEARLY_SUMMARY_COLUMNS,
+    )
+    _write_csv(
+        exports["rejection_summary"],
+        build_rejection_summary_rows(result),
+        REJECTION_SUMMARY_COLUMNS,
+    )
     return exports
 
 

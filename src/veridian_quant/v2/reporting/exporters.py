@@ -9,6 +9,8 @@ from typing import Any, Mapping
 
 import pandas as pd
 
+from veridian_quant.v2.reporting.metrics import calculate_performance_summary
+
 
 TRADE_LOG_COLUMNS = [
     "trade_id",
@@ -54,7 +56,23 @@ SUMMARY_COLUMNS = [
     "starting_equity",
     "ending_equity",
     "total_net_pnl",
+    "total_return_pct",
+    "cagr_pct",
+    "max_drawdown_pct",
     "total_trades",
+    "winning_trades",
+    "losing_trades",
+    "win_rate_pct",
+    "gross_profit",
+    "gross_loss",
+    "profit_factor",
+    "expectancy",
+    "average_win",
+    "average_loss",
+    "average_net_pnl",
+    "best_trade",
+    "worst_trade",
+    "average_holding_days",
     "total_signals",
     "total_rejected_signals",
     "symbols_count",
@@ -203,24 +221,37 @@ def _equity_curve_rows(result: Any) -> list[dict[str, object]]:
 
 
 def _summary_rows(result: Any) -> list[dict[str, object]]:
-    """Return one summary row with simple counts and totals."""
+    """Return one summary row with portfolio performance metrics."""
 
-    total_net_pnl = sum(
-        (pnl.net_pnl for pnl in result.trade_pnls),
-        result.starting_equity - result.starting_equity,
-    )
+    summary = calculate_performance_summary(result)
     return [
         {
-            "strategy_name": result.strategy_name,
-            "start_date": result.start_date,
-            "end_date": result.end_date,
-            "starting_equity": result.starting_equity,
-            "ending_equity": result.ending_equity,
-            "total_net_pnl": total_net_pnl,
-            "total_trades": len(result.trades),
-            "total_signals": len(result.signals),
-            "total_rejected_signals": len(result.rejected_signals),
-            "symbols_count": len(result.symbols),
+            "strategy_name": summary.strategy_name,
+            "start_date": summary.start_date,
+            "end_date": summary.end_date,
+            "starting_equity": summary.starting_equity,
+            "ending_equity": summary.ending_equity,
+            "total_net_pnl": summary.total_net_pnl,
+            "total_return_pct": summary.total_return_pct,
+            "cagr_pct": summary.cagr_pct,
+            "max_drawdown_pct": summary.max_drawdown_pct,
+            "total_trades": summary.total_trades,
+            "winning_trades": summary.winning_trades,
+            "losing_trades": summary.losing_trades,
+            "win_rate_pct": summary.win_rate_pct,
+            "gross_profit": summary.gross_profit,
+            "gross_loss": summary.gross_loss,
+            "profit_factor": summary.profit_factor,
+            "expectancy": summary.expectancy,
+            "average_win": summary.average_win,
+            "average_loss": summary.average_loss,
+            "average_net_pnl": summary.average_net_pnl,
+            "best_trade": summary.best_trade,
+            "worst_trade": summary.worst_trade,
+            "average_holding_days": summary.average_holding_days,
+            "total_signals": summary.total_signals,
+            "total_rejected_signals": summary.total_rejected_signals,
+            "symbols_count": summary.symbols_count,
         }
     ]
 

@@ -99,8 +99,40 @@ def test_load_symbol_passes_buffered_start_date_to_read_sql() -> None:
         loader.load_symbol("RELIANCE", date(2026, 1, 31), date(2026, 2, 28))
 
     assert captured_params["symbol"] == "RELIANCE"
+    assert captured_params["price_interval"] == "day"
     assert captured_params["start_date"] == date(2026, 1, 21)
     assert captured_params["end_date"] == date(2026, 2, 28)
+
+
+def test_load_symbol_can_use_custom_price_interval() -> None:
+    captured_params = {}
+
+    def fake_read_sql(query, engine, params):
+        captured_params.update(params)
+        return _raw_frame()
+
+    loader = SQLAlchemyDailyOHLCVLoader(
+        engine=object(),
+        price_interval="custom_day",
+    )
+
+    with patch.object(pd, "read_sql", fake_read_sql):
+        loader.load_symbol("RELIANCE", date(2026, 1, 31), date(2026, 2, 28))
+
+    assert captured_params["price_interval"] == "custom_day"
+
+
+def test_price_interval_must_be_non_empty_string() -> None:
+    for price_interval in ("", None):
+        try:
+            SQLAlchemyDailyOHLCVLoader(
+                engine=object(),
+                price_interval=price_interval,
+            )
+        except ValueError as error:
+            assert str(error) == "price_interval must be a non-empty string"
+        else:
+            raise AssertionError("expected invalid price interval to raise ValueError")
 
 
 def test_load_all_available_symbols_returns_mapping_for_discovered_symbols() -> None:
@@ -127,6 +159,7 @@ def test_load_all_available_symbols_returns_mapping_for_discovered_symbols() -> 
 
     assert calls == ["RELIANCE", "TCS"]
     assert discovery_params == {
+        "price_interval": "day",
         "start_date": date(2026, 1, 1),
         "end_date": date(2026, 1, 31),
     }

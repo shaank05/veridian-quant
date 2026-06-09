@@ -2,7 +2,8 @@
 
 This module converts database-backed daily price data into the in-memory
 lowercase OHLCV dataframe shape expected by v2 backtest runners. It does not
-generate signals, run strategies, or perform backtest orchestration.
+generate signals, run strategies, or perform backtest orchestration. The
+SQLAlchemy loader filters ``prices_ohlc.interval = 'day'`` by default.
 """
 
 from abc import ABC, abstractmethod
@@ -70,7 +71,8 @@ class SQLAlchemyDailyOHLCVLoader(DailyOHLCVLoader):
     ``NSE_EQ|`` prefix and excludes non-equity rows unless requested explicitly
     through ``load_symbol`` or ``load_symbols``. Symbol loads query a configurable
     pre-start buffer, so returned dataframes may contain rows before
-    ``start_date`` for indicator warmup.
+    ``start_date`` for indicator warmup. Price rows are filtered by
+    ``prices_ohlc.interval`` and default to daily bars.
     """
 
     def __init__(
@@ -79,13 +81,17 @@ class SQLAlchemyDailyOHLCVLoader(DailyOHLCVLoader):
         price_table: str = "prices_ohlc",
         instrument_table: str = "instruments",
         lookback_buffer_days: int = 120,
+        price_interval: str = "day",
     ) -> None:
         if lookback_buffer_days < 0:
             raise ValueError("lookback_buffer_days must be non-negative")
+        if not isinstance(price_interval, str) or not price_interval:
+            raise ValueError("price_interval must be a non-empty string")
         self.engine = engine
         self.price_table = _validate_identifier(price_table)
         self.instrument_table = _validate_identifier(instrument_table)
         self.lookback_buffer_days = lookback_buffer_days
+        self.price_interval = price_interval
 
     def load_symbol(
         self,
@@ -93,7 +99,7 @@ class SQLAlchemyDailyOHLCVLoader(DailyOHLCVLoader):
         start_date: date,
         end_date: date,
     ) -> pd.DataFrame:
-        """Load normalized OHLCV data, including pre-start warmup rows."""
+        """Load normalized daily OHLCV data, including pre-start warmup rows."""
 
         buffered_start_date = start_date - timedelta(days=self.lookback_buffer_days)
         query = text(
@@ -109,6 +115,7 @@ class SQLAlchemyDailyOHLCVLoader(DailyOHLCVLoader):
             JOIN {self.instrument_table} i
                 ON p.instrument_key = i.instrument_key
             WHERE (i.symbol = :symbol OR i.trading_symbol = :symbol)
+                AND p.interval = :price_interval
                 AND p.timestamp >= :start_date
                 AND p.timestamp <= :end_date
             ORDER BY p.timestamp ASC
@@ -119,6 +126,7 @@ class SQLAlchemyDailyOHLCVLoader(DailyOHLCVLoader):
             self.engine,
             params={
                 "symbol": symbol,
+                "price_interval": self.price_interval,
                 "start_date": buffered_start_date,
                 "end_date": end_date,
             },
@@ -163,7 +171,8 @@ class SQLAlchemyDailyOHLCVLoader(DailyOHLCVLoader):
             FROM {self.price_table} p
             JOIN {self.instrument_table} i
                 ON p.instrument_key = i.instrument_key
-            WHERE p.timestamp >= :start_date
+            WHERE p.interval = :price_interval
+                AND p.timestamp >= :start_date
                 AND p.timestamp <= :end_date
                 AND p.instrument_key LIKE 'NSE_EQ|%'
                 AND COALESCE(i.trading_symbol, i.symbol) IS NOT NULL
@@ -173,7 +182,11 @@ class SQLAlchemyDailyOHLCVLoader(DailyOHLCVLoader):
         df = pd.read_sql(
             query,
             self.engine,
-            params={"start_date": start_date, "end_date": end_date},
+            params={
+                "price_interval": self.price_interval,
+                "start_date": start_date,
+                "end_date": end_date,
+            },
         )
         if "symbol" not in df.columns:
             raise ValueError("missing required columns: symbol")

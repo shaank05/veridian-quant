@@ -11,15 +11,25 @@ from veridian_quant.v2.backtesting.portfolio_runner import (
 )
 from veridian_quant.v2.data.loaders import SQLAlchemyDailyOHLCVLoader
 from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
+from veridian_quant.v2.reporting.progress import ProgressReporter
 
 
 def main(argv: Iterable[str] | None = None) -> int:
     """Run the S1 portfolio backtest CLI."""
 
     args = _parse_args(argv)
+    reporter = ProgressReporter(args.verbosity)
+    reporter.info(
+        "Starting S1 backtest "
+        f"{args.start_date} to {args.end_date} "
+        f"equity={args.starting_equity} "
+        f"risk={args.risk_per_trade} "
+        f"max_positions={args.max_concurrent_positions}"
+    )
     engine = _get_database_engine()
     loader = SQLAlchemyDailyOHLCVLoader(engine=engine)
 
+    reporter.info("Loading OHLCV data...")
     if args.all_symbols:
         data_by_symbol = loader.load_all_available_symbols(
             args.start_date,
@@ -31,7 +41,10 @@ def main(argv: Iterable[str] | None = None) -> int:
             args.start_date,
             args.end_date,
         )
+    reporter.info("Finished loading OHLCV data.")
+    reporter.info(f"Loaded symbols: {len(data_by_symbol)}")
 
+    reporter.info("Running portfolio backtest...")
     result = run_s1_portfolio_backtest(
         data_by_symbol=data_by_symbol,
         start_date=args.start_date,
@@ -46,9 +59,15 @@ def main(argv: Iterable[str] | None = None) -> int:
         reward_risk_ratio=Decimal("2"),
         max_holding_sessions=20,
         round_trip_cost_pct=Decimal("0.004"),
+        progress_reporter=reporter,
     )
+    reporter.info("Finished portfolio backtest.")
     paths = export_portfolio_backtest_csvs(result, args.output_dir)
-    print(f"Wrote {len(paths)} CSV files to {Path(args.output_dir)}")
+    reporter.info(f"CSV export location: {Path(args.output_dir)}")
+    reporter.complete(
+        f"Completed S1 backtest. Wrote {len(paths)} CSV files to "
+        f"{Path(args.output_dir)}"
+    )
     return 0
 
 
@@ -72,6 +91,11 @@ def _parse_args(argv: Iterable[str] | None) -> Namespace:
     parser.add_argument("--symbols")
     parser.add_argument("--all-symbols", action="store_true")
     parser.add_argument("--output-dir", default="reports/v2/s1")
+    parser.add_argument(
+        "--verbosity",
+        choices=["quiet", "normal", "verbose"],
+        default="normal",
+    )
     args = parser.parse_args(list(argv) if argv is not None else None)
 
     if args.all_symbols == bool(args.symbols):

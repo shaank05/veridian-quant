@@ -24,6 +24,7 @@ from veridian_quant.v2.backtesting.setup import build_trade_setup
 from veridian_quant.v2.backtesting.sizing import build_position_plan
 from veridian_quant.v2.backtesting.trade import Trade
 from veridian_quant.v2.data.models import Signal
+from veridian_quant.v2.reporting.progress import NullProgressReporter
 from veridian_quant.v2.strategies.s1_zscore_mean_reversion import (
     STRATEGY_NAME,
     generate_s1_zscore_signals,
@@ -82,9 +83,11 @@ def run_s1_portfolio_backtest(
     reward_risk_ratio: Decimal | int | str | float = Decimal("2"),
     max_holding_sessions: int = 20,
     round_trip_cost_pct: Decimal | int | str | float = Decimal("0.004"),
+    progress_reporter: object | None = None,
 ) -> PortfolioBacktestResult:
     """Run a deterministic multi-symbol S1 research portfolio backtest."""
 
+    progress = progress_reporter or NullProgressReporter()
     ledger = create_portfolio_ledger(starting_equity)
     symbols = tuple(sorted(data_by_symbol))
     data_by_valid_symbol: dict[str, pd.DataFrame] = {}
@@ -109,13 +112,15 @@ def run_s1_portfolio_backtest(
                 if start_date <= signal.generated_on <= end_date
             )
         except ValueError:
-            rejected_signals.append(
+            _append_rejection(
+                rejected_signals,
                 PortfolioRejectedSignal(
                     symbol=symbol,
                     signal_date=None,
                     strategy_name=STRATEGY_NAME,
                     reason="DATA_UNAVAILABLE",
-                )
+                ),
+                progress,
             )
 
     ordered_signals = tuple(sorted(signals, key=_signal_sort_key))
@@ -124,6 +129,7 @@ def run_s1_portfolio_backtest(
     trade_pnls: list[TradePnL] = []
 
     for signal in ordered_signals:
+        progress.signal(signal)
         ledger, pending_trades = _apply_due_trade_pnls(
             ledger=ledger,
             pending_trades=pending_trades,
@@ -131,19 +137,32 @@ def run_s1_portfolio_backtest(
             trades=trades,
             trade_pnls=trade_pnls,
             rejected_signals=rejected_signals,
+            progress_reporter=progress,
         )
 
         active_symbols = {pending.signal.symbol for pending in pending_trades}
         if signal.symbol in active_symbols:
-            rejected_signals.append(_reject(signal, "ACTIVE_SYMBOL_TRADE_EXISTS"))
+            _append_rejection(
+                rejected_signals,
+                _reject(signal, "ACTIVE_SYMBOL_TRADE_EXISTS"),
+                progress,
+            )
             continue
         if len(pending_trades) >= max_concurrent_positions:
-            rejected_signals.append(_reject(signal, "PORTFOLIO_CAPACITY_FULL"))
+            _append_rejection(
+                rejected_signals,
+                _reject(signal, "PORTFOLIO_CAPACITY_FULL"),
+                progress,
+            )
             continue
 
         data = data_by_valid_symbol.get(signal.symbol)
         if data is None:
-            rejected_signals.append(_reject(signal, "DATA_UNAVAILABLE"))
+            _append_rejection(
+                rejected_signals,
+                _reject(signal, "DATA_UNAVAILABLE"),
+                progress,
+            )
             continue
 
         setup = build_trade_setup(
@@ -154,7 +173,11 @@ def run_s1_portfolio_backtest(
             reward_risk_ratio=reward_risk_ratio,
         )
         if setup is None:
-            rejected_signals.append(_reject(signal, "SETUP_UNAVAILABLE"))
+            _append_rejection(
+                rejected_signals,
+                _reject(signal, "SETUP_UNAVAILABLE"),
+                progress,
+            )
             continue
 
         position_plan = build_position_plan(
@@ -163,10 +186,15 @@ def run_s1_portfolio_backtest(
             risk_per_trade=risk_per_trade,
         )
         if position_plan is None:
-            rejected_signals.append(_reject(signal, "POSITION_PLAN_UNAVAILABLE"))
+            _append_rejection(
+                rejected_signals,
+                _reject(signal, "POSITION_PLAN_UNAVAILABLE"),
+                progress,
+            )
             continue
 
         open_trade = create_open_trade(position_plan)
+        progress.trade(position_plan)
         closed_trade = resolve_trade_exit(
             trade=open_trade,
             position_plan=position_plan,
@@ -174,7 +202,11 @@ def run_s1_portfolio_backtest(
             max_holding_sessions=max_holding_sessions,
         )
         if closed_trade is None:
-            rejected_signals.append(_reject(signal, "EXIT_UNAVAILABLE"))
+            _append_rejection(
+                rejected_signals,
+                _reject(signal, "EXIT_UNAVAILABLE"),
+                progress,
+            )
             continue
 
         trade_pnl = calculate_trade_pnl(
@@ -182,7 +214,11 @@ def run_s1_portfolio_backtest(
             round_trip_cost_pct=round_trip_cost_pct,
         )
         if trade_pnl is None:
-            rejected_signals.append(_reject(signal, "PNL_UNAVAILABLE"))
+            _append_rejection(
+                rejected_signals,
+                _reject(signal, "PNL_UNAVAILABLE"),
+                progress,
+            )
             continue
 
         pending_trades.append(
@@ -200,6 +236,7 @@ def run_s1_portfolio_backtest(
         trades=trades,
         trade_pnls=trade_pnls,
         rejected_signals=rejected_signals,
+        progress_reporter=progress,
     )
 
     return PortfolioBacktestResult(
@@ -224,6 +261,7 @@ def _apply_due_trade_pnls(
     trades: list[Trade],
     trade_pnls: list[TradePnL],
     rejected_signals: list[PortfolioRejectedSignal],
+    progress_reporter: object,
 ) -> tuple[PortfolioLedger, list[_PendingTrade]]:
     """Apply pending trade PnLs that closed before the signal date."""
 
@@ -239,14 +277,21 @@ def _apply_due_trade_pnls(
 
         updated_ledger = apply_trade_pnl(ledger, pending.trade_pnl)
         if updated_ledger is None:
-            rejected_signals.append(
-                _reject(pending.signal, "LEDGER_UPDATE_FAILED")
+            _append_rejection(
+                rejected_signals,
+                _reject(pending.signal, "LEDGER_UPDATE_FAILED"),
+                progress_reporter,
             )
             continue
 
         ledger = updated_ledger
         trades.append(pending.trade)
         trade_pnls.append(pending.trade_pnl)
+        progress_reporter.exit(
+            pending.trade,
+            pending.trade_pnl,
+            ledger.current_equity,
+        )
 
     return ledger, remaining
 
@@ -260,6 +305,17 @@ def _reject(signal: Signal, reason: str) -> PortfolioRejectedSignal:
         strategy_name=signal.strategy_name,
         reason=reason,
     )
+
+
+def _append_rejection(
+    rejected_signals: list[PortfolioRejectedSignal],
+    rejected_signal: PortfolioRejectedSignal,
+    progress_reporter: object,
+) -> None:
+    """Append a rejection and emit a progress event."""
+
+    rejected_signals.append(rejected_signal)
+    progress_reporter.rejected(rejected_signal)
 
 
 def _signal_sort_key(signal: Signal) -> tuple[date, float, str]:

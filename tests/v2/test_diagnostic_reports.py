@@ -2,10 +2,12 @@
 
 from datetime import date
 from decimal import Decimal
+from types import SimpleNamespace
 from tempfile import TemporaryDirectory
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from veridian_quant.v2.backtesting.pnl import TradePnL
 from veridian_quant.v2.backtesting.portfolio_runner import (
@@ -16,6 +18,8 @@ from veridian_quant.v2.backtesting.trade import ExitReason
 from veridian_quant.v2.reporting.diagnostics import (
     EXIT_REASON_SUMMARY_COLUMNS,
     REJECTION_SUMMARY_COLUMNS,
+    R_MULTIPLE_BY_EXIT_REASON_COLUMNS,
+    R_MULTIPLE_SUMMARY_COLUMNS,
     SYMBOL_SUMMARY_COLUMNS,
     YEARLY_SUMMARY_COLUMNS,
 )
@@ -29,6 +33,8 @@ def test_diagnostic_csv_files_are_created() -> None:
     assert paths["symbol_summary"].exists()
     assert paths["yearly_summary"].exists()
     assert paths["rejection_summary"].exists()
+    assert paths["r_multiple_summary"].exists()
+    assert paths["r_multiple_by_exit_reason"].exists()
 
 
 def test_exit_reason_summary_groups_trade_pnls_correctly() -> None:
@@ -106,6 +112,8 @@ def test_empty_trade_list_writes_diagnostic_headers_without_crashing() -> None:
         "symbol_summary": SYMBOL_SUMMARY_COLUMNS,
         "yearly_summary": YEARLY_SUMMARY_COLUMNS,
         "rejection_summary": REJECTION_SUMMARY_COLUMNS,
+        "r_multiple_summary": R_MULTIPLE_SUMMARY_COLUMNS,
+        "r_multiple_by_exit_reason": R_MULTIPLE_BY_EXIT_REASON_COLUMNS,
     }
     for key, expected_columns in expected_columns_by_file.items():
         report = pd.read_csv(paths[key])
@@ -125,6 +133,57 @@ def test_existing_exporter_outputs_remain_available() -> None:
         "summary",
     }.issubset(paths)
     assert pd.read_csv(paths["trade_pnl_log"]).loc[0, "net_pnl"] == 100
+
+
+def test_r_multiple_summary_is_empty_when_risk_metadata_is_unavailable() -> None:
+    paths = _export_to_temp_dir(_diagnostic_result())
+
+    summary = pd.read_csv(paths["r_multiple_summary"])
+
+    assert list(summary.columns) == R_MULTIPLE_SUMMARY_COLUMNS
+    assert summary.empty
+
+
+def test_r_multiple_summary_uses_per_share_risk_metadata() -> None:
+    paths = _export_to_temp_dir(_r_multiple_result())
+
+    summary = pd.read_csv(paths["r_multiple_summary"])
+
+    assert list(summary.columns) == R_MULTIPLE_SUMMARY_COLUMNS
+    assert summary.loc[0, "trades_with_r"] == 3
+    assert summary.loc[0, "winning_trades"] == 2
+    assert summary.loc[0, "losing_trades"] == 1
+    assert summary.loc[0, "average_r"] == 1
+    assert summary.loc[0, "average_winner_r"] == 2
+    assert summary.loc[0, "average_loser_r"] == -1
+    assert summary.loc[0, "best_r"] == 3
+    assert summary.loc[0, "worst_r"] == -1
+    assert summary.loc[0, "positive_r_rate_pct"] == pytest.approx(66.6666666667)
+
+
+def test_r_multiple_summary_can_derive_per_share_risk_from_stop_loss_metadata() -> None:
+    paths = _export_to_temp_dir(_r_multiple_result_with_stop_loss())
+
+    summary = pd.read_csv(paths["r_multiple_summary"])
+
+    assert summary.loc[0, "trades_with_r"] == 1
+    assert summary.loc[0, "average_r"] == 2
+
+
+def test_r_multiple_by_exit_reason_groups_calculated_r_values() -> None:
+    paths = _export_to_temp_dir(_r_multiple_result())
+
+    summary = pd.read_csv(paths["r_multiple_by_exit_reason"]).set_index("exit_reason")
+
+    assert list(summary.columns) == R_MULTIPLE_BY_EXIT_REASON_COLUMNS[1:]
+    assert summary.loc["target_hit", "trades_with_r"] == 2
+    assert summary.loc["target_hit", "average_r"] == 2
+    assert summary.loc["target_hit", "average_winner_r"] == 2
+    assert pd.isna(summary.loc["target_hit", "average_loser_r"])
+    assert summary.loc["target_hit", "best_r"] == 3
+    assert summary.loc["target_hit", "worst_r"] == 1
+    assert summary.loc["stop_loss_hit", "trades_with_r"] == 1
+    assert summary.loc["stop_loss_hit", "average_r"] == -1
 
 
 def _export_to_temp_dir(result: PortfolioBacktestResult) -> dict[str, Path]:
@@ -213,6 +272,79 @@ def _empty_result() -> PortfolioBacktestResult:
     )
 
 
+def _r_multiple_result() -> PortfolioBacktestResult:
+    """Build a portfolio result with fake PnL metadata for R diagnostics."""
+
+    return PortfolioBacktestResult(
+        strategy_name="S1_ZSCORE_MEAN_REVERSION",
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+        starting_equity=Decimal("100000"),
+        ending_equity=Decimal("100070"),
+        symbols=("RELIANCE", "TCS"),
+        trade_pnls=(
+            _pnl_with_metadata(
+                trade_id="r-1",
+                symbol="RELIANCE",
+                net_pnl=Decimal("100"),
+                exit_reason=ExitReason.TARGET_HIT,
+                metadata={"per_share_risk": Decimal("10")},
+            ),
+            _pnl_with_metadata(
+                trade_id="r-2",
+                symbol="RELIANCE",
+                net_pnl=Decimal("-100"),
+                exit_reason=ExitReason.STOP_LOSS_HIT,
+                metadata={"per_share_risk": Decimal("10")},
+            ),
+            _pnl_with_metadata(
+                trade_id="r-3",
+                symbol="TCS",
+                net_pnl=Decimal("300"),
+                exit_reason=ExitReason.TARGET_HIT,
+                metadata={"per_share_risk": Decimal("10")},
+            ),
+            _pnl_with_metadata(
+                trade_id="r-4",
+                symbol="TCS",
+                net_pnl=Decimal("50"),
+                exit_reason=ExitReason.DATA_END,
+                metadata={},
+            ),
+        ),
+        trades=(),
+        signals=(),
+        rejected_signals=(),
+        ledger=None,
+    )
+
+
+def _r_multiple_result_with_stop_loss() -> PortfolioBacktestResult:
+    """Build a portfolio result with stop-loss metadata for R diagnostics."""
+
+    return PortfolioBacktestResult(
+        strategy_name="S1_ZSCORE_MEAN_REVERSION",
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+        starting_equity=Decimal("100000"),
+        ending_equity=Decimal("100100"),
+        symbols=("RELIANCE",),
+        trade_pnls=(
+            _pnl_with_metadata(
+                trade_id="r-stop-loss",
+                symbol="RELIANCE",
+                net_pnl=Decimal("100"),
+                exit_reason=ExitReason.TARGET_HIT,
+                metadata={"stop_loss": Decimal("95")},
+            ),
+        ),
+        trades=(),
+        signals=(),
+        rejected_signals=(),
+        ledger=None,
+    )
+
+
 def _pnl(
     trade_id: str,
     symbol: str,
@@ -238,6 +370,34 @@ def _pnl(
         net_pnl=net_pnl,
         net_return_pct=Decimal("0"),
         exit_reason=exit_reason,
+    )
+
+
+def _pnl_with_metadata(
+    trade_id: str,
+    symbol: str,
+    net_pnl: Decimal,
+    exit_reason: ExitReason,
+    metadata: dict[str, Decimal],
+) -> SimpleNamespace:
+    """Build a fake trade PnL carrying optional diagnostic metadata."""
+
+    return SimpleNamespace(
+        trade_id=trade_id,
+        symbol=symbol,
+        strategy_name="S1_ZSCORE_MEAN_REVERSION",
+        entry_date=date(2026, 1, 1),
+        exit_date=date(2026, 1, 5),
+        entry_price=Decimal("100"),
+        exit_price=Decimal("100"),
+        quantity=10,
+        gross_pnl=net_pnl,
+        gross_return_pct=Decimal("0"),
+        total_cost=Decimal("0"),
+        net_pnl=net_pnl,
+        net_return_pct=Decimal("0"),
+        exit_reason=exit_reason,
+        metadata=metadata,
     )
 
 

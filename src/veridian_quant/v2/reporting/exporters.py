@@ -12,9 +12,13 @@ import pandas as pd
 from veridian_quant.v2.reporting.diagnostics import (
     EXIT_REASON_SUMMARY_COLUMNS,
     REJECTION_SUMMARY_COLUMNS,
+    R_MULTIPLE_BY_EXIT_REASON_COLUMNS,
+    R_MULTIPLE_SUMMARY_COLUMNS,
     SYMBOL_SUMMARY_COLUMNS,
     YEARLY_SUMMARY_COLUMNS,
     build_exit_reason_summary_rows,
+    build_r_multiple_by_exit_reason_rows,
+    build_r_multiple_summary_rows,
     build_rejection_summary_rows,
     build_symbol_summary_rows,
     build_yearly_summary_rows,
@@ -109,6 +113,8 @@ def export_portfolio_backtest_csvs(
         "symbol_summary": output_path / "symbol_summary.csv",
         "yearly_summary": output_path / "yearly_summary.csv",
         "rejection_summary": output_path / "rejection_summary.csv",
+        "r_multiple_summary": output_path / "r_multiple_summary.csv",
+        "r_multiple_by_exit_reason": output_path / "r_multiple_by_exit_reason.csv",
     }
 
     _write_csv(exports["trade_log"], _trade_rows(result), TRADE_LOG_COLUMNS)
@@ -148,6 +154,16 @@ def export_portfolio_backtest_csvs(
         exports["rejection_summary"],
         build_rejection_summary_rows(result),
         REJECTION_SUMMARY_COLUMNS,
+    )
+    _write_csv(
+        exports["r_multiple_summary"],
+        build_r_multiple_summary_rows(result),
+        R_MULTIPLE_SUMMARY_COLUMNS,
+    )
+    _write_csv(
+        exports["r_multiple_by_exit_reason"],
+        build_r_multiple_by_exit_reason_rows(result),
+        R_MULTIPLE_BY_EXIT_REASON_COLUMNS,
     )
     return exports
 

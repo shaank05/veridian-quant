@@ -35,6 +35,8 @@ def test_export_portfolio_backtest_csvs_writes_expected_files() -> None:
             "symbol_summary",
             "yearly_summary",
             "rejection_summary",
+            "r_multiple_summary",
+            "r_multiple_by_exit_reason",
         }
         assert all(path.exists() for path in paths.values())
 

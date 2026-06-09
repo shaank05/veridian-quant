@@ -200,6 +200,7 @@ def run_s1_portfolio_backtest(
             position_plan=position_plan,
             data=data,
             max_holding_sessions=max_holding_sessions,
+            backtest_end_date=end_date,
         )
         if closed_trade is None:
             _append_rejection(

@@ -131,6 +131,7 @@ def run_s1_single_symbol_backtest(
             position_plan=position_plan,
             data=backtest_data,
             max_holding_sessions=max_holding_sessions,
+            backtest_end_date=end_date,
         )
         if closed_trade is None:
             rejected_signals.append(_reject(signal, "EXIT_UNAVAILABLE"))

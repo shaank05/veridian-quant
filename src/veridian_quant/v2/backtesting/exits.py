@@ -18,6 +18,7 @@ def resolve_trade_exit(
     position_plan: PositionPlan,
     data: pd.DataFrame,
     max_holding_sessions: int = 20,
+    backtest_end_date: date | None = None,
 ) -> Trade | None:
     """Resolve an open trade exit from one-symbol OHLC data."""
 
@@ -75,11 +76,17 @@ def resolve_trade_exit(
             )
 
     final_row = holding_data.iloc[-1]
+    final_date = _row_date(final_row)
     return _closed_trade(
         trade,
-        _row_date(final_row),
+        final_date,
         _to_decimal(final_row["close"]),
-        ExitReason.TIME_STOP,
+        _final_exit_reason(
+            holding_sessions=len(holding_data),
+            max_holding_sessions=max_holding_sessions,
+            final_date=final_date,
+            backtest_end_date=backtest_end_date,
+        ),
     )
 
 
@@ -114,6 +121,21 @@ def _holding_data(
 
     date_values = data.apply(_row_date, axis=1)
     return data.loc[date_values >= entry_date].head(max_holding_sessions)
+
+
+def _final_exit_reason(
+    holding_sessions: int,
+    max_holding_sessions: int,
+    final_date: date,
+    backtest_end_date: date | None,
+) -> ExitReason:
+    """Classify final-row exits after target/stop checks fail."""
+
+    if holding_sessions >= max_holding_sessions:
+        return ExitReason.TIME_STOP
+    if backtest_end_date is not None and final_date == backtest_end_date:
+        return ExitReason.BACKTEST_END
+    return ExitReason.DATA_END
 
 
 def _validate_input(data: pd.DataFrame) -> None:

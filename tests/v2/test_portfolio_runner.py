@@ -96,7 +96,19 @@ def test_no_data_after_end_date_is_used() -> None:
     assert len(result.trades) == 1
     assert result.trades[0].exit_date == date(2026, 1, 5)
     assert result.trades[0].exit_price == Decimal("9.0")
-    assert result.trades[0].exit_reason == ExitReason.TIME_STOP
+    assert result.trades[0].exit_reason == ExitReason.BACKTEST_END
+
+
+def test_data_ending_before_backtest_end_uses_data_end_reason() -> None:
+    result = _run(
+        {"RELIANCE": _post_window_target_frame().iloc[:5].copy()},
+        end_date=date(2026, 1, 20),
+        atr_multiplier=Decimal("1"),
+    )
+
+    assert len(result.trades) == 1
+    assert result.trades[0].exit_date == date(2026, 1, 5)
+    assert result.trades[0].exit_reason == ExitReason.DATA_END
 
 
 def test_symbol_with_invalid_data_is_rejected_safely() -> None:

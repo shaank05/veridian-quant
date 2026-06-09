@@ -94,7 +94,7 @@ def test_time_stop_exits_at_final_holding_close() -> None:
     assert closed.exit_date == date(2026, 1, 16)
 
 
-def test_fewer_available_sessions_time_stops_at_last_available_close() -> None:
+def test_forced_close_on_backtest_end_date_uses_backtest_end_reason() -> None:
     trade = _open_trade()
     plan = _position_plan()
     data = _frame(
@@ -104,12 +104,53 @@ def test_fewer_available_sessions_time_stops_at_last_available_close() -> None:
         ]
     )
 
+    closed = resolve_trade_exit(
+        trade,
+        plan,
+        data,
+        max_holding_sessions=20,
+        backtest_end_date=date(2026, 1, 16),
+    )
+
+    assert closed is not None
+    assert closed.exit_reason == ExitReason.BACKTEST_END
+    assert closed.exit_price == Decimal("102")
+    assert closed.exit_date == date(2026, 1, 16)
+
+
+def test_data_end_before_backtest_end_uses_data_end_reason() -> None:
+    trade = _open_trade()
+    plan = _position_plan()
+    data = _frame(
+        [
+            _row("2026-01-15", close="101"),
+            _row("2026-01-16", close="102"),
+        ]
+    )
+
+    closed = resolve_trade_exit(
+        trade,
+        plan,
+        data,
+        max_holding_sessions=20,
+        backtest_end_date=date(2026, 1, 20),
+    )
+
+    assert closed is not None
+    assert closed.exit_reason == ExitReason.DATA_END
+    assert closed.exit_price == Decimal("102")
+    assert closed.exit_date == date(2026, 1, 16)
+
+
+def test_data_end_used_when_backtest_end_date_is_unknown() -> None:
+    trade = _open_trade()
+    plan = _position_plan()
+    data = _frame([_row("2026-01-15", close="101")])
+
     closed = resolve_trade_exit(trade, plan, data, max_holding_sessions=20)
 
     assert closed is not None
-    assert closed.exit_reason == ExitReason.TIME_STOP
-    assert closed.exit_price == Decimal("102")
-    assert closed.exit_date == date(2026, 1, 16)
+    assert closed.exit_reason == ExitReason.DATA_END
 
 
 def test_no_data_after_entry_returns_none() -> None:

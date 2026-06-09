@@ -25,6 +25,8 @@ class ExitReason(str, Enum):
     TARGET_HIT = "target_hit"
     STOP_LOSS_HIT = "stop_loss_hit"
     TIME_STOP = "time_stop"
+    BACKTEST_END = "backtest_end"
+    DATA_END = "data_end"
     TARGET_GAP_HIT = "target_gap_hit"
     STOP_GAP_HIT = "stop_gap_hit"
     SIGNAL_EXIT = "signal_exit"

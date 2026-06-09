@@ -1,5 +1,6 @@
 """Unit tests for v2 report CSV exporters."""
 
+from dataclasses import replace
 from datetime import date
 from decimal import Decimal
 from tempfile import TemporaryDirectory
@@ -76,11 +77,23 @@ def test_summary_contains_simple_counts_and_total_net_pnl() -> None:
     assert summary.loc[0, "symbols_count"] == 1
 
 
-def _export_to_temp_dir() -> dict[str, Path]:
+def test_export_serializes_backtest_end_and_data_end_exit_reasons() -> None:
+    paths = _export_to_temp_dir(_result_with_forced_exit_reasons())
+
+    trade_log = pd.read_csv(paths["trade_log"])
+    trade_pnl_log = pd.read_csv(paths["trade_pnl_log"])
+
+    assert trade_log.loc[0, "exit_reason"] == "backtest_end"
+    assert trade_log.loc[1, "exit_reason"] == "data_end"
+    assert trade_pnl_log.loc[0, "exit_reason"] == "backtest_end"
+    assert trade_pnl_log.loc[1, "exit_reason"] == "data_end"
+
+
+def _export_to_temp_dir(result: PortfolioBacktestResult | None = None) -> dict[str, Path]:
     """Export the fake result into a temp directory that persists for the test."""
 
     temp_dir = TemporaryDirectory()
-    paths = export_portfolio_backtest_csvs(_result(), temp_dir.name)
+    paths = export_portfolio_backtest_csvs(result or _result(), temp_dir.name)
     _TEMP_DIRS.append(temp_dir)
     return paths
 
@@ -166,4 +179,59 @@ def _result() -> PortfolioBacktestResult:
             ),
         ),
         ledger=ledger,
+    )
+
+
+def _result_with_forced_exit_reasons() -> PortfolioBacktestResult:
+    """Build a result containing BACKTEST_END and DATA_END exits."""
+
+    base = _result()
+    backtest_end_trade = replace(
+        base.trades[0],
+        exit_reason=ExitReason.BACKTEST_END,
+    )
+    data_end_trade = Trade(
+        trade_id="trade-2",
+        symbol="TCS",
+        entry_date=date(2026, 1, 21),
+        entry_price=Decimal("100"),
+        quantity=100,
+        status=TradeStatus.CLOSED,
+        strategy_name="S1_ZSCORE_MEAN_REVERSION",
+        exit_date=date(2026, 1, 25),
+        exit_price=Decimal("99"),
+        exit_reason=ExitReason.DATA_END,
+    )
+    backtest_end_pnl = replace(
+        base.trade_pnls[0],
+        exit_reason=ExitReason.BACKTEST_END,
+    )
+    data_end_pnl = TradePnL(
+        trade_id="trade-2",
+        symbol="TCS",
+        strategy_name="S1_ZSCORE_MEAN_REVERSION",
+        entry_date=date(2026, 1, 21),
+        exit_date=date(2026, 1, 25),
+        entry_price=Decimal("100"),
+        exit_price=Decimal("99"),
+        quantity=100,
+        gross_pnl=Decimal("-100"),
+        gross_return_pct=Decimal("-1"),
+        total_cost=Decimal("0"),
+        net_pnl=Decimal("-100"),
+        net_return_pct=Decimal("-1"),
+        exit_reason=ExitReason.DATA_END,
+    )
+    return PortfolioBacktestResult(
+        strategy_name=base.strategy_name,
+        start_date=base.start_date,
+        end_date=base.end_date,
+        starting_equity=base.starting_equity,
+        ending_equity=base.ending_equity,
+        symbols=("RELIANCE", "TCS"),
+        trade_pnls=(backtest_end_pnl, data_end_pnl),
+        trades=(backtest_end_trade, data_end_trade),
+        signals=base.signals,
+        rejected_signals=base.rejected_signals,
+        ledger=base.ledger,
     )

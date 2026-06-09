@@ -123,7 +123,7 @@ def test_trade_near_end_date_does_not_use_rows_after_end_date_for_exit() -> None
     assert len(result.trades) == 1
     assert result.trades[0].exit_date == date(2026, 1, 5)
     assert result.trades[0].exit_price == Decimal("9.0")
-    assert result.trades[0].exit_reason == ExitReason.TIME_STOP
+    assert result.trades[0].exit_reason == ExitReason.BACKTEST_END
 
 
 def test_missing_required_columns_raises_clear_value_error() -> None:

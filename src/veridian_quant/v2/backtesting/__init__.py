@@ -14,10 +14,17 @@ from veridian_quant.v2.backtesting.sizing import (
     build_position_plan,
 )
 from veridian_quant.v2.backtesting.setup import TradeSetup, build_trade_setup
+from veridian_quant.v2.backtesting.single_symbol import (
+    RejectedSignal,
+    SingleSymbolBacktestResult,
+    run_s1_single_symbol_backtest,
+)
 
 __all__ = [
     "PositionPlan",
     "PortfolioLedger",
+    "RejectedSignal",
+    "SingleSymbolBacktestResult",
     "TradeSetup",
     "TradePnL",
     "EquityPoint",
@@ -28,4 +35,5 @@ __all__ = [
     "build_position_plan",
     "build_trade_setup",
     "resolve_trade_exit",
+    "run_s1_single_symbol_backtest",
 ]

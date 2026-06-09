@@ -9,6 +9,11 @@ from veridian_quant.v2.backtesting.ledger import (
     create_portfolio_ledger,
 )
 from veridian_quant.v2.backtesting.pnl import TradePnL, calculate_trade_pnl
+from veridian_quant.v2.backtesting.portfolio_runner import (
+    PortfolioBacktestResult,
+    PortfolioRejectedSignal,
+    run_s1_portfolio_backtest,
+)
 from veridian_quant.v2.backtesting.sizing import (
     PositionPlan,
     build_position_plan,
@@ -22,7 +27,9 @@ from veridian_quant.v2.backtesting.single_symbol import (
 
 __all__ = [
     "PositionPlan",
+    "PortfolioBacktestResult",
     "PortfolioLedger",
+    "PortfolioRejectedSignal",
     "RejectedSignal",
     "SingleSymbolBacktestResult",
     "TradeSetup",
@@ -35,5 +42,6 @@ __all__ = [
     "build_position_plan",
     "build_trade_setup",
     "resolve_trade_exit",
+    "run_s1_portfolio_backtest",
     "run_s1_single_symbol_backtest",
 ]

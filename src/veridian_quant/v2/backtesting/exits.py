@@ -20,7 +20,12 @@ def resolve_trade_exit(
     max_holding_sessions: int = 20,
     backtest_end_date: date | None = None,
 ) -> Trade | None:
-    """Resolve an open trade exit from one-symbol OHLC data."""
+    """Resolve an open trade exit from one-symbol OHLC data.
+
+    ``backtest_end_date`` represents the effective final market session for the
+    backtest, which may be earlier than the requested calendar end date because
+    of weekends, holidays, or loaded data boundaries.
+    """
 
     _validate_input(data)
     if max_holding_sessions <= 0:
@@ -129,7 +134,11 @@ def _final_exit_reason(
     final_date: date,
     backtest_end_date: date | None,
 ) -> ExitReason:
-    """Classify final-row exits after target/stop checks fail."""
+    """Classify final-row exits after target/stop checks fail.
+
+    ``backtest_end_date`` is the effective market-session end date, not
+    necessarily the user-requested calendar end date.
+    """
 
     if holding_sessions >= max_holding_sessions:
         return ExitReason.TIME_STOP

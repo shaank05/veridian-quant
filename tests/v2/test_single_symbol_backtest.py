@@ -126,6 +126,19 @@ def test_trade_near_end_date_does_not_use_rows_after_end_date_for_exit() -> None
     assert result.trades[0].exit_reason == ExitReason.BACKTEST_END
 
 
+def test_requested_end_after_last_available_row_uses_effective_market_end() -> None:
+    result = _run(
+        _post_window_target_frame().iloc[:5].copy(),
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 7),
+        atr_multiplier=Decimal("1"),
+    )
+
+    assert len(result.trades) == 1
+    assert result.trades[0].exit_date == date(2026, 1, 5)
+    assert result.trades[0].exit_reason == ExitReason.BACKTEST_END
+
+
 def test_missing_required_columns_raises_clear_value_error() -> None:
     data = pd.DataFrame(
         {

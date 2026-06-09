@@ -142,6 +142,28 @@ def test_data_end_before_backtest_end_uses_data_end_reason() -> None:
     assert closed.exit_date == date(2026, 1, 16)
 
 
+def test_effective_market_end_date_before_requested_calendar_end_is_backtest_end() -> None:
+    trade = _open_trade()
+    plan = _position_plan()
+    data = _frame(
+        [
+            _row("2026-01-15", close="101"),
+            _row("2026-01-16", close="102"),
+        ]
+    )
+
+    closed = resolve_trade_exit(
+        trade,
+        plan,
+        data,
+        max_holding_sessions=20,
+        backtest_end_date=date(2026, 1, 16),
+    )
+
+    assert closed is not None
+    assert closed.exit_reason == ExitReason.BACKTEST_END
+
+
 def test_data_end_used_when_backtest_end_date_is_unknown() -> None:
     trade = _open_trade()
     plan = _position_plan()

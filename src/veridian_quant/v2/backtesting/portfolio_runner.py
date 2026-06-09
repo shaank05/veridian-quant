@@ -123,6 +123,7 @@ def run_s1_portfolio_backtest(
                 progress,
             )
 
+    effective_market_end_date = _effective_market_end_date(data_by_valid_symbol)
     ordered_signals = tuple(sorted(signals, key=_signal_sort_key))
     pending_trades: list[_PendingTrade] = []
     trades: list[Trade] = []
@@ -200,7 +201,7 @@ def run_s1_portfolio_backtest(
             position_plan=position_plan,
             data=data,
             max_holding_sessions=max_holding_sessions,
-            backtest_end_date=end_date,
+            backtest_end_date=effective_market_end_date,
         )
         if closed_trade is None:
             _append_rejection(
@@ -348,10 +349,30 @@ def _sort_chronologically(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def _rows_on_or_before(data: pd.DataFrame, end_date: date) -> pd.DataFrame:
-    """Return rows through the end date while preserving pre-start lookback."""
+    """Return rows through requested calendar end date with lookback rows.
+
+    The requested end date may be a weekend/holiday; exit resolution uses the
+    maximum available row date across valid loaded symbols as the effective
+    market end.
+    """
 
     row_dates = data.apply(_row_date, axis=1)
     return data.loc[row_dates <= end_date]
+
+
+def _effective_market_end_date(
+    data_by_valid_symbol: Mapping[str, pd.DataFrame],
+) -> date | None:
+    """Return the last available trading date across valid symbol data."""
+
+    dates: list[date] = []
+    for data in data_by_valid_symbol.values():
+        if data.empty:
+            continue
+        dates.extend(_row_date(row) for _, row in data.iterrows())
+    if not dates:
+        return None
+    return max(dates)
 
 
 def _row_date(row: pd.Series) -> date:

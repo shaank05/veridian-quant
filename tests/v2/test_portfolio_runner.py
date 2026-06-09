@@ -101,14 +101,30 @@ def test_no_data_after_end_date_is_used() -> None:
 
 def test_data_ending_before_backtest_end_uses_data_end_reason() -> None:
     result = _run(
-        {"RELIANCE": _post_window_target_frame().iloc[:5].copy()},
+        {
+            "RELIANCE": _post_window_target_frame().iloc[:5].copy(),
+            "TCS": _late_signal_frame(),
+        },
         end_date=date(2026, 1, 20),
+        atr_multiplier=Decimal("1"),
+    )
+
+    reliance_trades = [trade for trade in result.trades if trade.symbol == "RELIANCE"]
+    assert len(reliance_trades) == 1
+    assert reliance_trades[0].exit_date == date(2026, 1, 5)
+    assert reliance_trades[0].exit_reason == ExitReason.DATA_END
+
+
+def test_requested_end_after_last_available_row_uses_effective_market_end() -> None:
+    result = _run(
+        {"RELIANCE": _post_window_target_frame().iloc[:5].copy()},
+        end_date=date(2026, 1, 7),
         atr_multiplier=Decimal("1"),
     )
 
     assert len(result.trades) == 1
     assert result.trades[0].exit_date == date(2026, 1, 5)
-    assert result.trades[0].exit_reason == ExitReason.DATA_END
+    assert result.trades[0].exit_reason == ExitReason.BACKTEST_END
 
 
 def test_symbol_with_invalid_data_is_rejected_safely() -> None:

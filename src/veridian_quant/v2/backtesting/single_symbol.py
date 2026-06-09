@@ -78,6 +78,7 @@ def run_s1_single_symbol_backtest(
     _validate_input(data)
     sorted_data = _sort_chronologically(data)
     backtest_data = _rows_on_or_before(sorted_data, end_date)
+    effective_end_date = _last_available_row_date(backtest_data)
     signals = tuple(
         signal
         for signal in generate_s1_zscore_signals(
@@ -131,7 +132,7 @@ def run_s1_single_symbol_backtest(
             position_plan=position_plan,
             data=backtest_data,
             max_holding_sessions=max_holding_sessions,
-            backtest_end_date=end_date,
+            backtest_end_date=effective_end_date,
         )
         if closed_trade is None:
             rejected_signals.append(_reject(signal, "EXIT_UNAVAILABLE"))
@@ -204,10 +205,22 @@ def _sort_chronologically(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def _rows_on_or_before(data: pd.DataFrame, end_date: date) -> pd.DataFrame:
-    """Return rows through the end date while preserving pre-start lookback."""
+    """Return rows through requested calendar end date with lookback rows.
+
+    The requested end date may be a weekend/holiday; downstream exit resolution
+    uses the last available row date as the effective market end.
+    """
 
     row_dates = data.apply(_row_date, axis=1)
     return data.loc[row_dates <= end_date]
+
+
+def _last_available_row_date(data: pd.DataFrame) -> date | None:
+    """Return the last available market-session date in a dataframe."""
+
+    if data.empty:
+        return None
+    return max(_row_date(row) for _, row in data.iterrows())
 
 
 def _row_date(row: pd.Series) -> date:

@@ -686,7 +686,6 @@ Before production deployment, the simplified cost model must be replaced or vali
 
 
 ## 8. Portfolio Rules
-## 8. Portfolio Rules
 
 ### 8.1 Portfolio Philosophy
 
@@ -904,6 +903,26 @@ Portfolio-level reporting is mandatory.
 
 Trade-level reporting alone is insufficient.
 
+---
+
+### 8.16 Portfolio Capacity Release Rule
+
+Portfolio capacity is released only after the trading session on which an existing position exits.
+
+If a position exits on trading day T and a new signal is generated on the same trading day T, the exited position is still considered active for portfolio-capacity evaluation purposes.
+
+Consequently:
+
+Exit Date = T
+Signal Date = T
+
+The new signal does not inherit the released capacity from the exiting position and may be rejected if portfolio capacity is fully utilized.
+
+Capacity becomes available starting from the next trading session.
+
+This conservative convention prevents same-session capital reuse and avoids subtle sequencing and look-ahead biases in daily-bar backtests.
+
+---
 
 ## 9. Performance Metrics
 ### 9.1 Performance Evaluation Philosophy

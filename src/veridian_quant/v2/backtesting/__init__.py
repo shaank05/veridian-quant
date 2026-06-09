@@ -1,6 +1,7 @@
 """Backtesting domain models and planning helpers for Veridian Quant v2."""
 
 from veridian_quant.v2.backtesting.execution import create_open_trade
+from veridian_quant.v2.backtesting.exits import resolve_trade_exit
 from veridian_quant.v2.backtesting.sizing import (
     PositionPlan,
     build_position_plan,
@@ -13,4 +14,5 @@ __all__ = [
     "create_open_trade",
     "build_position_plan",
     "build_trade_setup",
+    "resolve_trade_exit",
 ]

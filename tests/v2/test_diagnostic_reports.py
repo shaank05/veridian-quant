@@ -19,6 +19,9 @@ from veridian_quant.v2.reporting.diagnostics import (
     EXIT_REASON_SUMMARY_COLUMNS,
     REJECTION_SUMMARY_COLUMNS,
     R_MULTIPLE_BY_EXIT_REASON_COLUMNS,
+    R_MULTIPLE_BY_SYMBOL_COLUMNS,
+    R_MULTIPLE_BY_SYMBOL_YEAR_COLUMNS,
+    R_MULTIPLE_BY_YEAR_COLUMNS,
     R_MULTIPLE_SUMMARY_COLUMNS,
     SYMBOL_SUMMARY_COLUMNS,
     YEARLY_SUMMARY_COLUMNS,
@@ -35,6 +38,9 @@ def test_diagnostic_csv_files_are_created() -> None:
     assert paths["rejection_summary"].exists()
     assert paths["r_multiple_summary"].exists()
     assert paths["r_multiple_by_exit_reason"].exists()
+    assert paths["r_multiple_by_symbol"].exists()
+    assert paths["r_multiple_by_year"].exists()
+    assert paths["r_multiple_by_symbol_year"].exists()
 
 
 def test_exit_reason_summary_groups_trade_pnls_correctly() -> None:
@@ -114,6 +120,9 @@ def test_empty_trade_list_writes_diagnostic_headers_without_crashing() -> None:
         "rejection_summary": REJECTION_SUMMARY_COLUMNS,
         "r_multiple_summary": R_MULTIPLE_SUMMARY_COLUMNS,
         "r_multiple_by_exit_reason": R_MULTIPLE_BY_EXIT_REASON_COLUMNS,
+        "r_multiple_by_symbol": R_MULTIPLE_BY_SYMBOL_COLUMNS,
+        "r_multiple_by_year": R_MULTIPLE_BY_YEAR_COLUMNS,
+        "r_multiple_by_symbol_year": R_MULTIPLE_BY_SYMBOL_YEAR_COLUMNS,
     }
     for key, expected_columns in expected_columns_by_file.items():
         report = pd.read_csv(paths[key])
@@ -142,6 +151,13 @@ def test_r_multiple_summary_is_empty_when_risk_metadata_is_unavailable() -> None
 
     assert list(summary.columns) == R_MULTIPLE_SUMMARY_COLUMNS
     assert summary.empty
+    for key in (
+        "r_multiple_by_symbol",
+        "r_multiple_by_year",
+        "r_multiple_by_symbol_year",
+    ):
+        report = pd.read_csv(paths[key])
+        assert report.empty
 
 
 def test_r_multiple_summary_uses_per_share_risk_metadata() -> None:
@@ -184,6 +200,74 @@ def test_r_multiple_by_exit_reason_groups_calculated_r_values() -> None:
     assert summary.loc["target_hit", "worst_r"] == 1
     assert summary.loc["stop_loss_hit", "trades_with_r"] == 1
     assert summary.loc["stop_loss_hit", "average_r"] == -1
+
+
+def test_r_multiple_by_symbol_groups_calculated_r_values() -> None:
+    paths = _export_to_temp_dir(_r_multiple_result())
+
+    summary = pd.read_csv(paths["r_multiple_by_symbol"]).set_index("symbol")
+
+    assert list(summary.columns) == R_MULTIPLE_BY_SYMBOL_COLUMNS[1:]
+    assert list(summary.index) == ["RELIANCE", "TCS"]
+    assert summary.loc["RELIANCE", "trades_with_r"] == 2
+    assert summary.loc["RELIANCE", "winning_trades"] == 1
+    assert summary.loc["RELIANCE", "losing_trades"] == 1
+    assert summary.loc["RELIANCE", "positive_r_rate_pct"] == 50
+    assert summary.loc["RELIANCE", "average_r"] == 0
+    assert summary.loc["RELIANCE", "average_winner_r"] == 1
+    assert summary.loc["RELIANCE", "average_loser_r"] == -1
+    assert summary.loc["RELIANCE", "best_r"] == 1
+    assert summary.loc["RELIANCE", "worst_r"] == -1
+    assert summary.loc["TCS", "trades_with_r"] == 1
+    assert summary.loc["TCS", "positive_r_rate_pct"] == 100
+    assert summary.loc["TCS", "average_r"] == 3
+
+
+def test_r_multiple_by_year_groups_by_trade_exit_year() -> None:
+    paths = _export_to_temp_dir(_r_multiple_result())
+
+    summary = pd.read_csv(paths["r_multiple_by_year"]).set_index("year")
+
+    assert list(summary.columns) == R_MULTIPLE_BY_YEAR_COLUMNS[1:]
+    assert list(summary.index) == [2025, 2026]
+    assert summary.loc[2025, "trades_with_r"] == 2
+    assert summary.loc[2025, "winning_trades"] == 2
+    assert summary.loc[2025, "losing_trades"] == 0
+    assert summary.loc[2025, "positive_r_rate_pct"] == 100
+    assert summary.loc[2025, "average_r"] == 2
+    assert summary.loc[2025, "average_winner_r"] == 2
+    assert pd.isna(summary.loc[2025, "average_loser_r"])
+    assert summary.loc[2025, "best_r"] == 3
+    assert summary.loc[2025, "worst_r"] == 1
+    assert summary.loc[2026, "trades_with_r"] == 1
+    assert summary.loc[2026, "positive_r_rate_pct"] == 0
+    assert summary.loc[2026, "average_r"] == -1
+
+
+def test_r_multiple_by_symbol_year_groups_calculated_r_values() -> None:
+    paths = _export_to_temp_dir(_r_multiple_result())
+
+    summary = pd.read_csv(paths["r_multiple_by_symbol_year"])
+
+    assert list(summary.columns) == R_MULTIPLE_BY_SYMBOL_YEAR_COLUMNS
+    assert summary[["symbol", "year"]].to_dict("records") == [
+        {"symbol": "RELIANCE", "year": 2025},
+        {"symbol": "RELIANCE", "year": 2026},
+        {"symbol": "TCS", "year": 2025},
+    ]
+
+    reliance_2026 = summary[
+        (summary["symbol"] == "RELIANCE") & (summary["year"] == 2026)
+    ].iloc[0]
+    assert reliance_2026["trades_with_r"] == 1
+    assert reliance_2026["winning_trades"] == 0
+    assert reliance_2026["losing_trades"] == 1
+    assert reliance_2026["positive_r_rate_pct"] == 0
+    assert reliance_2026["average_r"] == -1
+    assert pd.isna(reliance_2026["average_winner_r"])
+    assert reliance_2026["average_loser_r"] == -1
+    assert reliance_2026["best_r"] == -1
+    assert reliance_2026["worst_r"] == -1
 
 
 def test_r_multiple_summary_uses_direct_initial_risk_amount_field() -> None:
@@ -298,6 +382,7 @@ def _r_multiple_result() -> PortfolioBacktestResult:
                 net_pnl=Decimal("100"),
                 exit_reason=ExitReason.TARGET_HIT,
                 metadata={"per_share_risk": Decimal("10")},
+                exit_date=date(2025, 12, 31),
             ),
             _pnl_with_metadata(
                 trade_id="r-2",
@@ -305,6 +390,7 @@ def _r_multiple_result() -> PortfolioBacktestResult:
                 net_pnl=Decimal("-100"),
                 exit_reason=ExitReason.STOP_LOSS_HIT,
                 metadata={"per_share_risk": Decimal("10")},
+                exit_date=date(2026, 1, 5),
             ),
             _pnl_with_metadata(
                 trade_id="r-3",
@@ -312,6 +398,7 @@ def _r_multiple_result() -> PortfolioBacktestResult:
                 net_pnl=Decimal("300"),
                 exit_reason=ExitReason.TARGET_HIT,
                 metadata={"per_share_risk": Decimal("10")},
+                exit_date=date(2025, 12, 30),
             ),
             _pnl_with_metadata(
                 trade_id="r-4",
@@ -319,6 +406,7 @@ def _r_multiple_result() -> PortfolioBacktestResult:
                 net_pnl=Decimal("50"),
                 exit_reason=ExitReason.DATA_END,
                 metadata={},
+                exit_date=date(2026, 1, 4),
             ),
         ),
         trades=(),
@@ -429,6 +517,7 @@ def _pnl_with_metadata(
     net_pnl: Decimal,
     exit_reason: ExitReason,
     metadata: dict[str, Decimal],
+    exit_date: date = date(2026, 1, 5),
 ) -> SimpleNamespace:
     """Build a fake trade PnL carrying optional diagnostic metadata."""
 
@@ -437,7 +526,7 @@ def _pnl_with_metadata(
         symbol=symbol,
         strategy_name="S1_ZSCORE_MEAN_REVERSION",
         entry_date=date(2026, 1, 1),
-        exit_date=date(2026, 1, 5),
+        exit_date=exit_date,
         entry_price=Decimal("100"),
         exit_price=Decimal("100"),
         quantity=10,

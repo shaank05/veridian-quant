@@ -70,6 +70,30 @@ R_MULTIPLE_BY_EXIT_REASON_COLUMNS = [
     "best_r",
     "worst_r",
 ]
+R_MULTIPLE_GROUP_COLUMNS = [
+    "trades_with_r",
+    "winning_trades",
+    "losing_trades",
+    "positive_r_rate_pct",
+    "average_r",
+    "average_winner_r",
+    "average_loser_r",
+    "best_r",
+    "worst_r",
+]
+R_MULTIPLE_BY_SYMBOL_COLUMNS = [
+    "symbol",
+    *R_MULTIPLE_GROUP_COLUMNS,
+]
+R_MULTIPLE_BY_YEAR_COLUMNS = [
+    "year",
+    *R_MULTIPLE_GROUP_COLUMNS,
+]
+R_MULTIPLE_BY_SYMBOL_YEAR_COLUMNS = [
+    "symbol",
+    "year",
+    *R_MULTIPLE_GROUP_COLUMNS,
+]
 
 
 def build_exit_reason_summary_rows(result: Any) -> list[dict[str, object]]:
@@ -141,21 +165,7 @@ def build_r_multiple_summary_rows(result: Any) -> list[dict[str, object]]:
     if not r_values:
         return []
 
-    winning_r = tuple(r_value for r_value in r_values if r_value > 0)
-    losing_r = tuple(r_value for r_value in r_values if r_value < 0)
-    return [
-        {
-            "trades_with_r": len(r_values),
-            "winning_trades": len(winning_r),
-            "losing_trades": len(losing_r),
-            "average_r": _average(r_values),
-            "average_winner_r": _average(winning_r),
-            "average_loser_r": _average(losing_r),
-            "best_r": max(r_values),
-            "worst_r": min(r_values),
-            "positive_r_rate_pct": _ratio_pct(len(winning_r), len(r_values)),
-        }
-    ]
+    return [_r_multiple_group_summary(r_values)]
 
 
 def build_r_multiple_by_exit_reason_rows(result: Any) -> list[dict[str, object]]:
@@ -174,6 +184,64 @@ def build_r_multiple_by_exit_reason_rows(result: Any) -> list[dict[str, object]]
             **_r_multiple_group_summary(tuple(r_values)),
         }
         for exit_reason, r_values in sorted(grouped.items())
+    ]
+
+
+def build_r_multiple_by_symbol_rows(result: Any) -> list[dict[str, object]]:
+    """Return R-multiple summary rows grouped by symbol."""
+
+    grouped: dict[str, list[Decimal]] = defaultdict(list)
+    for pnl in result.trade_pnls:
+        r_multiple = _r_multiple(pnl)
+        if r_multiple is None:
+            continue
+        grouped[pnl.symbol].append(r_multiple)
+
+    return [
+        {
+            "symbol": symbol,
+            **_r_multiple_group_summary(tuple(r_values)),
+        }
+        for symbol, r_values in sorted(grouped.items())
+    ]
+
+
+def build_r_multiple_by_year_rows(result: Any) -> list[dict[str, object]]:
+    """Return R-multiple summary rows grouped by trade exit year."""
+
+    grouped: dict[int, list[Decimal]] = defaultdict(list)
+    for pnl in result.trade_pnls:
+        r_multiple = _r_multiple(pnl)
+        if r_multiple is None:
+            continue
+        grouped[pnl.exit_date.year].append(r_multiple)
+
+    return [
+        {
+            "year": year,
+            **_r_multiple_group_summary(tuple(r_values)),
+        }
+        for year, r_values in sorted(grouped.items())
+    ]
+
+
+def build_r_multiple_by_symbol_year_rows(result: Any) -> list[dict[str, object]]:
+    """Return R-multiple summary rows grouped by symbol and trade exit year."""
+
+    grouped: dict[tuple[str, int], list[Decimal]] = defaultdict(list)
+    for pnl in result.trade_pnls:
+        r_multiple = _r_multiple(pnl)
+        if r_multiple is None:
+            continue
+        grouped[(pnl.symbol, pnl.exit_date.year)].append(r_multiple)
+
+    return [
+        {
+            "symbol": symbol,
+            "year": year,
+            **_r_multiple_group_summary(tuple(r_values)),
+        }
+        for (symbol, year), r_values in sorted(grouped.items())
     ]
 
 
@@ -265,6 +333,9 @@ def _r_multiple_group_summary(r_values: tuple[Decimal, ...]) -> dict[str, object
     losing_r = tuple(r_value for r_value in r_values if r_value < 0)
     return {
         "trades_with_r": len(r_values),
+        "winning_trades": len(winning_r),
+        "losing_trades": len(losing_r),
+        "positive_r_rate_pct": _ratio_pct(len(winning_r), len(r_values)),
         "average_r": _average(r_values),
         "average_winner_r": _average(winning_r),
         "average_loser_r": _average(losing_r),

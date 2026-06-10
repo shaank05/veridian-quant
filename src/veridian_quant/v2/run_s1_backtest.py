@@ -12,6 +12,10 @@ from veridian_quant.v2.backtesting.portfolio_runner import (
 from veridian_quant.v2.data.loaders import SQLAlchemyDailyOHLCVLoader
 from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
 from veridian_quant.v2.reporting.progress import ProgressReporter
+from veridian_quant.v2.strategies.variants import (
+    S1_BASELINE,
+    S1_STRATEGY_VARIANTS,
+)
 
 
 NIFTY_50_INSTRUMENT_KEY = "NSE_INDEX|Nifty 50"
@@ -28,7 +32,8 @@ def main(argv: Iterable[str] | None = None) -> int:
         f"{args.start_date} to {args.end_date} "
         f"equity={args.starting_equity} "
         f"risk={args.risk_per_trade} "
-        f"max_positions={args.max_concurrent_positions}"
+        f"max_positions={args.max_concurrent_positions} "
+        f"variant={args.strategy_variant}"
     )
     engine = _get_database_engine()
     loader = SQLAlchemyDailyOHLCVLoader(engine=engine)
@@ -78,6 +83,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         max_holding_sessions=20,
         round_trip_cost_pct=Decimal("0.004"),
         progress_reporter=reporter,
+        strategy_variant=args.strategy_variant,
     )
     reporter.info("Finished portfolio backtest.")
     paths = export_portfolio_backtest_csvs(
@@ -114,6 +120,11 @@ def _parse_args(argv: Iterable[str] | None) -> Namespace:
     parser.add_argument("--symbols")
     parser.add_argument("--all-symbols", action="store_true")
     parser.add_argument("--output-dir", default="reports/v2/s1")
+    parser.add_argument(
+        "--strategy-variant",
+        choices=S1_STRATEGY_VARIANTS,
+        default=S1_BASELINE,
+    )
     parser.add_argument(
         "--verbosity",
         choices=["quiet", "normal", "verbose"],

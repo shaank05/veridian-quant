@@ -86,6 +86,38 @@ def test_metadata_contains_required_signal_context() -> None:
     assert metadata["z_score"] <= -1.0
 
 
+def test_baseline_metadata_enrichment_does_not_change_signal_generation() -> None:
+    data = _frame([10.0, 12.0, 14.0, 8.0], start="2026-01-01")
+
+    direct = generate_s1_zscore_signals(
+        "RELIANCE",
+        data,
+        window=3,
+        entry_threshold=-1.0,
+    )
+    strategy = S1ZScoreMeanReversionStrategy(window=3, entry_threshold=-1.0)
+
+    assert strategy.generate_signals("RELIANCE", data) == direct
+
+
+def test_signal_metadata_contains_signal_date_filter_context() -> None:
+    data = _variant_context_frame(signal_close=80)
+    signals = generate_s1_zscore_signals(
+        "RELIANCE",
+        data,
+        window=3,
+        entry_threshold=-1.0,
+    )
+
+    metadata = signals[0].metadata
+
+    assert signals[0].generated_on == date(2026, 3, 12)
+    assert metadata["stock_drawdown_60d_pct"] == pytest.approx(((80 / 110) - 1) * 100)
+    assert metadata["stock_close_vs_60d_low_pct"] == 0
+    assert metadata["stock_consecutive_down_closes"] == 3
+    assert metadata["stock_atr14_change_10d_pct"] is not None
+
+
 def test_input_dataframe_is_not_mutated() -> None:
     data = _frame([10.0, 12.0, 14.0, 8.0], start="2026-01-01")
     original = data.copy(deep=True)
@@ -145,3 +177,10 @@ def _frame(closes: list[float], start: str) -> pd.DataFrame:
             "volume": [1000 for _ in closes],
         }
     )
+
+
+def _variant_context_frame(signal_close: float) -> pd.DataFrame:
+    """Build long-lookback data with one signal on the final row."""
+
+    closes = [100.0] * 67 + [110.0, 100.0, 95.0, signal_close]
+    return _frame(closes, start="2026-01-01")

@@ -108,6 +108,7 @@ REJECTED_SIGNALS_COLUMNS = ["symbol", "signal_date", "strategy_name", "reason"]
 EQUITY_CURVE_COLUMNS = ["date", "equity", "realized_pnl"]
 SUMMARY_COLUMNS = [
     "strategy_name",
+    "strategy_variant",
     "start_date",
     "end_date",
     "starting_equity",
@@ -469,6 +470,7 @@ def _summary_rows(result: Any) -> list[dict[str, object]]:
     return [
         {
             "strategy_name": summary.strategy_name,
+            "strategy_variant": getattr(result, "strategy_variant", "S1_BASELINE"),
             "start_date": summary.start_date,
             "end_date": summary.end_date,
             "starting_equity": summary.starting_equity,

@@ -9,12 +9,17 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import pandas as pd
+import pytest
 
 from veridian_quant.v2.backtesting.portfolio_runner import (
     run_s1_portfolio_backtest,
 )
 from veridian_quant.v2.reporting.progress import ProgressReporter
-from veridian_quant.v2.run_s1_backtest import main
+from veridian_quant.v2.run_s1_backtest import _parse_args, main
+from veridian_quant.v2.strategies.variants import (
+    S1_AVOID_MESSY_MIDDLE_V1,
+    S1_BASELINE,
+)
 
 
 def test_quiet_mode_produces_minimal_output() -> None:
@@ -51,6 +56,7 @@ def test_normal_mode_includes_startup_and_completion_messages() -> None:
     )
 
     assert "Starting S1 backtest 2026-01-01 to 2026-01-20" in output
+    assert f"variant={S1_BASELINE}" in output
     assert "Loading OHLCV data..." in output
     assert "Finished loading OHLCV data." in output
     assert "Loaded symbols: 1" in output
@@ -115,7 +121,61 @@ def test_running_with_reporter_does_not_alter_result_values() -> None:
     assert with_reporter == without_reporter
 
 
-def _run_cli_with_patches(args: list[str]) -> str:
+def test_cli_default_strategy_variant_is_baseline() -> None:
+    args = _parse_args(
+        [
+            "--start-date",
+            "2026-01-01",
+            "--end-date",
+            "2026-01-20",
+            "--symbols",
+            "RELIANCE",
+        ]
+    )
+
+    assert args.strategy_variant == S1_BASELINE
+
+
+def test_cli_accepts_strategy_variant() -> None:
+    captured = {}
+
+    _run_cli_with_patches(
+        [
+            "--start-date",
+            "2026-01-01",
+            "--end-date",
+            "2026-01-20",
+            "--symbols",
+            "RELIANCE",
+            "--strategy-variant",
+            S1_AVOID_MESSY_MIDDLE_V1,
+        ],
+        captured_kwargs=captured,
+    )
+
+    assert captured["strategy_variant"] == S1_AVOID_MESSY_MIDDLE_V1
+
+
+def test_cli_rejects_invalid_strategy_variant() -> None:
+    with pytest.raises(SystemExit):
+        _parse_args(
+            [
+                "--start-date",
+                "2026-01-01",
+                "--end-date",
+                "2026-01-20",
+                "--symbols",
+                "RELIANCE",
+                "--strategy-variant",
+                "NOPE",
+            ]
+        )
+
+
+def _run_cli_with_patches(
+    args: list[str],
+    captured_kwargs: dict[str, object] | None = None,
+) -> str:
     """Run CLI main with external dependencies patched out."""
 
     output = StringIO()
@@ -131,10 +191,18 @@ def _run_cli_with_patches(args: list[str]) -> str:
         def load_all_available_symbols(self, start_date, end_date):
             return {"RELIANCE": _two_signal_frame()}
 
+        def load_instrument_key(self, instrument_key, start_date, end_date):
+            return _two_signal_frame()
+
+    def fake_run_backtest(**kwargs):
+        if captured_kwargs is not None:
+            captured_kwargs.update(kwargs)
+        return fake_result
+
     with (
         patch("veridian_quant.v2.run_s1_backtest._get_database_engine", lambda: object()),
         patch("veridian_quant.v2.run_s1_backtest.SQLAlchemyDailyOHLCVLoader", FakeLoader),
-        patch("veridian_quant.v2.run_s1_backtest.run_s1_portfolio_backtest", lambda **kwargs: fake_result),
+        patch("veridian_quant.v2.run_s1_backtest.run_s1_portfolio_backtest", fake_run_backtest),
         patch(
             "veridian_quant.v2.run_s1_backtest.export_portfolio_backtest_csvs",
             lambda result, output_dir, **kwargs: {

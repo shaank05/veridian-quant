@@ -29,6 +29,11 @@ from veridian_quant.v2.strategies.s1_zscore_mean_reversion import (
     STRATEGY_NAME,
     generate_s1_zscore_signals,
 )
+from veridian_quant.v2.strategies.variants import (
+    S1_BASELINE,
+    s1_variant_rejection_reason,
+    validate_s1_strategy_variant,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,6 +63,7 @@ class PortfolioBacktestResult:
         default_factory=tuple
     )
     ledger: PortfolioLedger | None = None
+    strategy_variant: str = S1_BASELINE
 
 
 @dataclass(frozen=True, slots=True)
@@ -84,9 +90,11 @@ def run_s1_portfolio_backtest(
     max_holding_sessions: int = 20,
     round_trip_cost_pct: Decimal | int | str | float = Decimal("0.004"),
     progress_reporter: object | None = None,
+    strategy_variant: str = S1_BASELINE,
 ) -> PortfolioBacktestResult:
     """Run a deterministic multi-symbol S1 research portfolio backtest."""
 
+    strategy_variant = validate_s1_strategy_variant(strategy_variant)
     progress = progress_reporter or NullProgressReporter()
     ledger = create_portfolio_ledger(starting_equity)
     symbols = tuple(sorted(data_by_symbol))
@@ -140,6 +148,18 @@ def run_s1_portfolio_backtest(
             rejected_signals=rejected_signals,
             progress_reporter=progress,
         )
+
+        variant_rejection = s1_variant_rejection_reason(
+            signal.metadata,
+            strategy_variant,
+        )
+        if variant_rejection is not None:
+            _append_rejection(
+                rejected_signals,
+                _reject(signal, variant_rejection),
+                progress,
+            )
+            continue
 
         active_symbols = {pending.signal.symbol for pending in pending_trades}
         if signal.symbol in active_symbols:
@@ -253,6 +273,7 @@ def run_s1_portfolio_backtest(
         signals=ordered_signals,
         rejected_signals=tuple(rejected_signals),
         ledger=ledger,
+        strategy_variant=strategy_variant,
     )
 
 

@@ -14,6 +14,17 @@ def create_open_trade(
 ) -> Trade:
     """Create an open research trade from a planned position."""
 
+    initial_risk_amount = position_plan.per_share_risk * position_plan.quantity
+    planned_reward_amount = (
+        abs(position_plan.target_price - position_plan.entry_price)
+        * position_plan.quantity
+    )
+    reward_risk_ratio = (
+        planned_reward_amount / initial_risk_amount
+        if initial_risk_amount > 0
+        else None
+    )
+
     return Trade(
         trade_id=trade_id or _deterministic_trade_id(position_plan),
         symbol=position_plan.symbol,
@@ -25,6 +36,12 @@ def create_open_trade(
         exit_date=None,
         exit_price=None,
         exit_reason=None,
+        stop_loss=position_plan.stop_loss,
+        target_price=position_plan.target_price,
+        per_share_risk=position_plan.per_share_risk,
+        initial_risk_amount=initial_risk_amount,
+        planned_reward_amount=planned_reward_amount,
+        reward_risk_ratio=reward_risk_ratio,
     )
 
 

@@ -186,6 +186,15 @@ def test_r_multiple_by_exit_reason_groups_calculated_r_values() -> None:
     assert summary.loc["stop_loss_hit", "average_r"] == -1
 
 
+def test_r_multiple_summary_uses_direct_initial_risk_amount_field() -> None:
+    paths = _export_to_temp_dir(_r_multiple_result_with_direct_fields())
+
+    summary = pd.read_csv(paths["r_multiple_summary"])
+
+    assert summary.loc[0, "trades_with_r"] == 1
+    assert summary.loc[0, "average_r"] == 2
+
+
 def _export_to_temp_dir(result: PortfolioBacktestResult) -> dict[str, Path]:
     """Export the fake result into a temp directory that persists for the test."""
 
@@ -336,6 +345,47 @@ def _r_multiple_result_with_stop_loss() -> PortfolioBacktestResult:
                 net_pnl=Decimal("100"),
                 exit_reason=ExitReason.TARGET_HIT,
                 metadata={"stop_loss": Decimal("95")},
+            ),
+        ),
+        trades=(),
+        signals=(),
+        rejected_signals=(),
+        ledger=None,
+    )
+
+
+def _r_multiple_result_with_direct_fields() -> PortfolioBacktestResult:
+    """Build a portfolio result with real TradePnL risk fields for R diagnostics."""
+
+    return PortfolioBacktestResult(
+        strategy_name="S1_ZSCORE_MEAN_REVERSION",
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+        starting_equity=Decimal("100000"),
+        ending_equity=Decimal("100100"),
+        symbols=("RELIANCE",),
+        trade_pnls=(
+            TradePnL(
+                trade_id="direct-r",
+                symbol="RELIANCE",
+                strategy_name="S1_ZSCORE_MEAN_REVERSION",
+                entry_date=date(2026, 1, 1),
+                exit_date=date(2026, 1, 5),
+                entry_price=Decimal("100"),
+                exit_price=Decimal("110"),
+                quantity=10,
+                gross_pnl=Decimal("100"),
+                gross_return_pct=Decimal("10"),
+                total_cost=Decimal("0"),
+                net_pnl=Decimal("100"),
+                net_return_pct=Decimal("10"),
+                exit_reason=ExitReason.TARGET_HIT,
+                stop_loss=Decimal("95"),
+                target_price=Decimal("110"),
+                per_share_risk=Decimal("5"),
+                initial_risk_amount=Decimal("50"),
+                planned_reward_amount=Decimal("100"),
+                reward_risk_ratio=Decimal("2"),
             ),
         ),
         trades=(),

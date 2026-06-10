@@ -30,6 +30,12 @@ class TradePnL:
     net_pnl: Decimal
     net_return_pct: Decimal
     exit_reason: ExitReason
+    stop_loss: Decimal | None = None
+    target_price: Decimal | None = None
+    per_share_risk: Decimal | None = None
+    initial_risk_amount: Decimal | None = None
+    planned_reward_amount: Decimal | None = None
+    reward_risk_ratio: Decimal | None = None
 
 
 def calculate_trade_pnl(
@@ -75,6 +81,12 @@ def calculate_trade_pnl(
         net_pnl=net_pnl,
         net_return_pct=net_return_pct,
         exit_reason=trade.exit_reason,
+        stop_loss=trade.stop_loss,
+        target_price=trade.target_price,
+        per_share_risk=trade.per_share_risk,
+        initial_risk_amount=trade.initial_risk_amount,
+        planned_reward_amount=trade.planned_reward_amount,
+        reward_risk_ratio=trade.reward_risk_ratio,
     )
 
 

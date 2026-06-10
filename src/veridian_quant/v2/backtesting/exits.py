@@ -114,6 +114,12 @@ def _closed_trade(
         exit_date=exit_date,
         exit_price=exit_price,
         exit_reason=exit_reason,
+        stop_loss=trade.stop_loss,
+        target_price=trade.target_price,
+        per_share_risk=trade.per_share_risk,
+        initial_risk_amount=trade.initial_risk_amount,
+        planned_reward_amount=trade.planned_reward_amount,
+        reward_risk_ratio=trade.reward_risk_ratio,
     )
 
 

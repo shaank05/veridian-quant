@@ -241,6 +241,32 @@ def test_returned_trade_has_closed_status() -> None:
     assert closed.status == TradeStatus.CLOSED
 
 
+def test_closed_trade_preserves_open_trade_risk_metadata() -> None:
+    trade = replace(
+        _open_trade(),
+        stop_loss=Decimal("95"),
+        target_price=Decimal("110"),
+        per_share_risk=Decimal("5"),
+        initial_risk_amount=Decimal("1000"),
+        planned_reward_amount=Decimal("2000"),
+        reward_risk_ratio=Decimal("2"),
+    )
+
+    closed = resolve_trade_exit(
+        trade,
+        _position_plan(),
+        _frame([_row("2026-01-15")]),
+    )
+
+    assert closed is not None
+    assert closed.stop_loss == trade.stop_loss
+    assert closed.target_price == trade.target_price
+    assert closed.per_share_risk == trade.per_share_risk
+    assert closed.initial_risk_amount == trade.initial_risk_amount
+    assert closed.planned_reward_amount == trade.planned_reward_amount
+    assert closed.reward_risk_ratio == trade.reward_risk_ratio
+
+
 def _open_trade() -> Trade:
     """Build a passive open trade for exit tests."""
 

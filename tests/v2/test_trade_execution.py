@@ -52,6 +52,19 @@ def test_entry_fields_match_position_plan() -> None:
     assert trade.quantity == position_plan.quantity
 
 
+def test_trade_stores_risk_metadata_from_position_plan() -> None:
+    position_plan = _position_plan()
+
+    trade = create_open_trade(position_plan)
+
+    assert trade.stop_loss == position_plan.stop_loss
+    assert trade.target_price == position_plan.target_price
+    assert trade.per_share_risk == position_plan.per_share_risk
+    assert trade.initial_risk_amount == Decimal("1000")
+    assert trade.planned_reward_amount == Decimal("2000")
+    assert trade.reward_risk_ratio == Decimal("2")
+
+
 def test_exit_fields_are_none() -> None:
     trade = create_open_trade(_position_plan())
 

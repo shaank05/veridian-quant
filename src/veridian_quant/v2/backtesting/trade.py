@@ -47,3 +47,9 @@ class Trade:
     exit_date: date | None = None
     exit_price: Decimal | None = None
     exit_reason: ExitReason | None = None
+    stop_loss: Decimal | None = None
+    target_price: Decimal | None = None
+    per_share_risk: Decimal | None = None
+    initial_risk_amount: Decimal | None = None
+    planned_reward_amount: Decimal | None = None
+    reward_risk_ratio: Decimal | None = None

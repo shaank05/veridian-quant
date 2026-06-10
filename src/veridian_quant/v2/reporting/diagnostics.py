@@ -216,18 +216,32 @@ def _r_multiple_values(pnls: tuple[Any, ...]) -> tuple[Decimal, ...]:
 def _r_multiple(pnl: Any) -> Decimal | None:
     """Return realized R multiple, or None when initial risk is unavailable."""
 
-    per_share_risk = _per_share_risk(pnl)
-    quantity = _to_decimal(getattr(pnl, "quantity", None))
-    if per_share_risk is None or quantity is None:
-        return None
-    initial_risk = quantity * per_share_risk
-    if initial_risk <= 0:
+    initial_risk = _initial_risk_amount(pnl)
+    if initial_risk is None or initial_risk <= 0:
         return None
     return pnl.net_pnl / initial_risk
 
 
+def _initial_risk_amount(pnl: Any) -> Decimal | None:
+    """Return planned initial risk from direct fields or legacy metadata."""
+
+    initial_risk = _to_decimal(getattr(pnl, "initial_risk_amount", None))
+    if initial_risk is not None:
+        return initial_risk
+
+    per_share_risk = _per_share_risk(pnl)
+    quantity = _to_decimal(getattr(pnl, "quantity", None))
+    if per_share_risk is None or quantity is None:
+        return None
+    return quantity * per_share_risk
+
+
 def _per_share_risk(pnl: Any) -> Decimal | None:
-    """Return per-share planned risk from optional trade PnL metadata."""
+    """Return per-share planned risk from direct fields or legacy metadata."""
+
+    direct_per_share_risk = _to_decimal(getattr(pnl, "per_share_risk", None))
+    if direct_per_share_risk is not None:
+        return direct_per_share_risk
 
     metadata = getattr(pnl, "metadata", None)
     if metadata is None or not hasattr(metadata, "get"):

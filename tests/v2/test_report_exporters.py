@@ -52,12 +52,35 @@ def test_trade_log_contains_expected_columns() -> None:
         "entry_date",
         "entry_price",
         "quantity",
+        "stop_loss",
+        "target_price",
+        "per_share_risk",
+        "initial_risk_amount",
+        "planned_reward_amount",
+        "reward_risk_ratio",
         "exit_date",
         "exit_price",
         "exit_reason",
         "strategy_name",
     ]
     assert trade_log.loc[0, "exit_reason"] == "target_hit"
+    assert trade_log.loc[0, "initial_risk_amount"] == 1000
+
+
+def test_trade_pnl_log_contains_risk_metadata_columns() -> None:
+    paths = _export_to_temp_dir()
+
+    trade_pnl_log = pd.read_csv(paths["trade_pnl_log"])
+
+    assert {
+        "stop_loss",
+        "target_price",
+        "per_share_risk",
+        "initial_risk_amount",
+        "planned_reward_amount",
+        "reward_risk_ratio",
+    }.issubset(trade_pnl_log.columns)
+    assert trade_pnl_log.loc[0, "planned_reward_amount"] == 2000
 
 
 def test_signal_log_flattens_metadata() -> None:
@@ -121,6 +144,12 @@ def _result() -> PortfolioBacktestResult:
         exit_date=date(2026, 1, 20),
         exit_price=Decimal("110"),
         exit_reason=ExitReason.TARGET_HIT,
+        stop_loss=Decimal("95"),
+        target_price=Decimal("110"),
+        per_share_risk=Decimal("5"),
+        initial_risk_amount=Decimal("1000"),
+        planned_reward_amount=Decimal("2000"),
+        reward_risk_ratio=Decimal("2"),
     )
     trade_pnl = TradePnL(
         trade_id="trade-1",
@@ -137,6 +166,12 @@ def _result() -> PortfolioBacktestResult:
         net_pnl=Decimal("1920"),
         net_return_pct=Decimal("9.6"),
         exit_reason=ExitReason.TARGET_HIT,
+        stop_loss=Decimal("95"),
+        target_price=Decimal("110"),
+        per_share_risk=Decimal("5"),
+        initial_risk_amount=Decimal("1000"),
+        planned_reward_amount=Decimal("2000"),
+        reward_risk_ratio=Decimal("2"),
     )
     signal = Signal(
         symbol="RELIANCE",

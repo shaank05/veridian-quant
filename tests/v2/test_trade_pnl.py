@@ -108,6 +108,28 @@ def test_monetary_fields_are_decimal() -> None:
     assert isinstance(result.net_return_pct, Decimal)
 
 
+def test_trade_pnl_preserves_trade_risk_metadata() -> None:
+    result = calculate_trade_pnl(
+        replace(
+            _closed_trade(),
+            stop_loss=Decimal("95"),
+            target_price=Decimal("110"),
+            per_share_risk=Decimal("5"),
+            initial_risk_amount=Decimal("1000"),
+            planned_reward_amount=Decimal("2000"),
+            reward_risk_ratio=Decimal("2"),
+        )
+    )
+
+    assert result is not None
+    assert result.stop_loss == Decimal("95")
+    assert result.target_price == Decimal("110")
+    assert result.per_share_risk == Decimal("5")
+    assert result.initial_risk_amount == Decimal("1000")
+    assert result.planned_reward_amount == Decimal("2000")
+    assert result.reward_risk_ratio == Decimal("2")
+
+
 def _closed_trade(
     entry_price: Decimal = Decimal("100"),
     exit_price: Decimal = Decimal("110"),

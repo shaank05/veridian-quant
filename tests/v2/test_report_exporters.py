@@ -44,6 +44,13 @@ def test_export_portfolio_backtest_csvs_writes_expected_files() -> None:
             "r_by_stock_trend_context",
             "r_by_nifty_trend_context",
             "r_by_relative_strength_context",
+            "r_by_zscore_depth",
+            "r_by_pre_signal_return_context",
+            "r_by_drawdown_depth_context",
+            "r_by_atr_stretch_context",
+            "r_by_signal_candle_context",
+            "r_by_consecutive_down_closes",
+            "r_by_fresh_low_context",
         }
         assert all(path.exists() for path in paths.values())
 

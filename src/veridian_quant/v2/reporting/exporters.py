@@ -12,9 +12,16 @@ import pandas as pd
 from veridian_quant.v2.reporting.context import (
     R_CONTEXT_BUCKET_COLUMNS,
     TRADE_SIGNAL_CONTEXT_COLUMNS,
+    build_r_by_atr_stretch_context_rows,
+    build_r_by_consecutive_down_closes_rows,
+    build_r_by_drawdown_depth_context_rows,
+    build_r_by_fresh_low_context_rows,
     build_r_by_nifty_trend_context_rows,
+    build_r_by_pre_signal_return_context_rows,
     build_r_by_relative_strength_context_rows,
+    build_r_by_signal_candle_context_rows,
     build_r_by_stock_trend_context_rows,
+    build_r_by_zscore_depth_rows,
     build_trade_signal_context_rows,
 )
 from veridian_quant.v2.reporting.diagnostics import (
@@ -154,6 +161,18 @@ def export_portfolio_backtest_csvs(
         / "r_by_nifty_trend_context.csv",
         "r_by_relative_strength_context": output_path
         / "r_by_relative_strength_context.csv",
+        "r_by_zscore_depth": output_path / "r_by_zscore_depth.csv",
+        "r_by_pre_signal_return_context": output_path
+        / "r_by_pre_signal_return_context.csv",
+        "r_by_drawdown_depth_context": output_path
+        / "r_by_drawdown_depth_context.csv",
+        "r_by_atr_stretch_context": output_path
+        / "r_by_atr_stretch_context.csv",
+        "r_by_signal_candle_context": output_path
+        / "r_by_signal_candle_context.csv",
+        "r_by_consecutive_down_closes": output_path
+        / "r_by_consecutive_down_closes.csv",
+        "r_by_fresh_low_context": output_path / "r_by_fresh_low_context.csv",
     }
 
     _write_csv(exports["trade_log"], _trade_rows(result), TRADE_LOG_COLUMNS)
@@ -243,6 +262,41 @@ def export_portfolio_backtest_csvs(
     _write_csv(
         exports["r_by_relative_strength_context"],
         build_r_by_relative_strength_context_rows(trade_context_rows),
+        R_CONTEXT_BUCKET_COLUMNS,
+    )
+    _write_csv(
+        exports["r_by_zscore_depth"],
+        build_r_by_zscore_depth_rows(trade_context_rows),
+        R_CONTEXT_BUCKET_COLUMNS,
+    )
+    _write_csv(
+        exports["r_by_pre_signal_return_context"],
+        build_r_by_pre_signal_return_context_rows(trade_context_rows),
+        R_CONTEXT_BUCKET_COLUMNS,
+    )
+    _write_csv(
+        exports["r_by_drawdown_depth_context"],
+        build_r_by_drawdown_depth_context_rows(trade_context_rows),
+        R_CONTEXT_BUCKET_COLUMNS,
+    )
+    _write_csv(
+        exports["r_by_atr_stretch_context"],
+        build_r_by_atr_stretch_context_rows(trade_context_rows),
+        R_CONTEXT_BUCKET_COLUMNS,
+    )
+    _write_csv(
+        exports["r_by_signal_candle_context"],
+        build_r_by_signal_candle_context_rows(trade_context_rows),
+        R_CONTEXT_BUCKET_COLUMNS,
+    )
+    _write_csv(
+        exports["r_by_consecutive_down_closes"],
+        build_r_by_consecutive_down_closes_rows(trade_context_rows),
+        R_CONTEXT_BUCKET_COLUMNS,
+    )
+    _write_csv(
+        exports["r_by_fresh_low_context"],
+        build_r_by_fresh_low_context_rows(trade_context_rows),
         R_CONTEXT_BUCKET_COLUMNS,
     )
     return exports

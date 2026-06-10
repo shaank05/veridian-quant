@@ -19,6 +19,16 @@ from veridian_quant.v2.reporting.context import (
     TRADE_SIGNAL_CONTEXT_COLUMNS,
 )
 from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
+from veridian_quant.v2.reporting.filter_simulation import (
+    CANDIDATE_FILTER_SIMULATION_BY_SYMBOL_COLUMNS,
+    CANDIDATE_FILTER_SIMULATION_BY_YEAR_COLUMNS,
+    CANDIDATE_FILTER_SIMULATION_COLUMNS,
+    CANDIDATE_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS,
+    build_candidate_filter_simulation_by_symbol_rows,
+    build_candidate_filter_simulation_by_year_rows,
+    build_candidate_filter_simulation_rejected_trade_rows,
+    build_candidate_filter_simulation_rows,
+)
 
 
 _DEFAULT_NIFTY = object()
@@ -291,6 +301,133 @@ def test_phase21_bucket_reports_are_created_and_summarize_r() -> None:
     assert fresh_low.loc[("stock_close_vs_20d_low_pct", "within_1_pct_of_low"), "trades_with_r"] == 1
 
 
+def test_candidate_filter_reports_are_created_with_required_columns() -> None:
+    paths = _export_to_temp_dir(stock_data_by_symbol={"RELIANCE": _phase21_stock_frame()})
+
+    expected_columns = {
+        "candidate_filter_simulation": CANDIDATE_FILTER_SIMULATION_COLUMNS,
+        "candidate_filter_simulation_by_year": CANDIDATE_FILTER_SIMULATION_BY_YEAR_COLUMNS,
+        "candidate_filter_simulation_by_symbol": CANDIDATE_FILTER_SIMULATION_BY_SYMBOL_COLUMNS,
+        "candidate_filter_simulation_rejected_trades": CANDIDATE_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS,
+    }
+    for key, columns in expected_columns.items():
+        assert paths[key].exists()
+        assert list(pd.read_csv(paths[key]).columns) == columns
+
+
+def test_candidate_filters_keep_and_remove_expected_trades() -> None:
+    rows = build_candidate_filter_simulation_rows(_candidate_filter_context_rows())
+    summary = {row["filter_id"]: row for row in rows}
+
+    assert summary["zscore_gt_minus_3"]["trades_kept"] == 2
+    assert summary["zscore_minus_2_to_minus_2_5_only"]["trades_kept"] == 1
+    assert summary["zscore_exclude_below_minus_3"]["trades_kept"] == 3
+    assert summary["down_closes_gte_3"]["trades_kept"] == 2
+    assert summary["down_closes_gte_4"]["trades_kept"] == 1
+    assert summary["down_closes_not_1_or_2"]["trades_kept"] == 3
+    assert summary["return_5d_below_minus_7"]["trades_kept"] == 2
+    assert summary["return_3d_below_minus_7"]["trades_kept"] == 0
+    assert summary["drawdown_60d_below_minus_20"]["trades_kept"] == 1
+    assert summary["drawdown_60d_shallow_or_deep"]["trades_kept"] == 2
+    assert summary["atr_pct_gte_4"]["trades_kept"] == 2
+    assert summary["exclude_atr_change_10d_gt_20"]["trades_kept"] == 2
+    assert summary["is_60d_low"]["trades_kept"] == 1
+    assert summary["close_within_1pct_60d_low"]["trades_kept"] == 1
+    assert summary["exclude_close_1_to_7pct_above_60d_low"]["trades_kept"] == 3
+    assert summary["broad_best_guess_candidate"]["trades_kept"] == 1
+
+
+def test_candidate_filter_missing_data_semantics() -> None:
+    rows = build_candidate_filter_simulation_rejected_trade_rows(
+        _candidate_filter_context_rows()
+    )
+    rejected = pd.DataFrame(rows)
+
+    keep_missing_rejected = rejected[
+        rejected["filter_id"].eq("return_5d_below_minus_7")
+        & rejected["trade_id"].eq("trade-missing")
+    ]
+    exclude_missing_rejected = rejected[
+        rejected["filter_id"].eq("exclude_return_5d_minus_3_to_minus_7")
+        & rejected["trade_id"].eq("trade-missing")
+    ]
+    combined_missing_rejected = rejected[
+        rejected["filter_id"].eq("broad_best_guess_candidate")
+        & rejected["trade_id"].eq("trade-missing")
+    ]
+
+    assert len(keep_missing_rejected) == 1
+    assert exclude_missing_rejected.empty
+    assert len(combined_missing_rejected) == 1
+
+
+def test_candidate_filter_summary_metrics_are_calculated_for_kept_trades() -> None:
+    rows = build_candidate_filter_simulation_rows(_candidate_filter_context_rows())
+    summary = {row["filter_id"]: row for row in rows}
+
+    row = summary["return_5d_below_minus_7"]
+
+    assert row["trades_kept"] == 2
+    assert row["trades_removed"] == 2
+    assert row["kept_trade_pct"] == 50
+    assert row["winning_trades"] == 1
+    assert row["losing_trades"] == 1
+    assert row["positive_r_rate_pct"] == 50
+    assert row["average_r"] == Decimal("0.75")
+    assert row["average_winner_r"] == 2
+    assert row["average_loser_r"] == Decimal("-0.5")
+    assert row["best_r"] == 2
+    assert row["worst_r"] == Decimal("-0.5")
+    assert row["total_net_pnl"] == 75
+    assert row["average_net_pnl"] == Decimal("37.5")
+    assert row["gross_profit"] == 100
+    assert row["gross_loss"] == -25
+    assert row["profit_factor"] == 4
+    assert row["expectancy"] == Decimal("37.5")
+    assert row["target_hit_trades"] == 1
+    assert row["stop_gap_trades"] == 1
+
+
+def test_candidate_filter_by_year_uses_exit_year_and_by_symbol_groups() -> None:
+    context_rows = _candidate_filter_context_rows()
+    by_year = pd.DataFrame(
+        build_candidate_filter_simulation_by_year_rows(context_rows)
+    ).set_index(["filter_id", "year"])
+    by_symbol = pd.DataFrame(
+        build_candidate_filter_simulation_by_symbol_rows(context_rows)
+    ).set_index(["filter_id", "symbol"])
+
+    assert by_year.loc[("return_5d_below_minus_7", 2026), "trades_kept"] == 1
+    assert by_year.loc[("return_5d_below_minus_7", 2026), "total_net_pnl"] == 100
+    assert by_year.loc[("return_5d_below_minus_7", 2027), "trades_kept"] == 1
+    assert by_year.loc[("return_5d_below_minus_7", 2027), "total_net_pnl"] == -25
+    assert by_symbol.loc[("return_5d_below_minus_7", "RELIANCE"), "trades_kept"] == 2
+    assert by_symbol.loc[("zscore_exclude_below_minus_3", "RELIANCE"), "trades_kept"] == 3
+
+
+def test_candidate_filter_rejected_trade_audit_has_one_row_per_removed_trade() -> None:
+    rows = build_candidate_filter_simulation_rejected_trade_rows(
+        _candidate_filter_context_rows()
+    )
+    rejected = pd.DataFrame(rows)
+    zscore_rejected = rejected[rejected["filter_id"].eq("zscore_gt_minus_3")]
+
+    assert len(zscore_rejected) == 2
+    assert set(zscore_rejected["trade_id"]) == {"trade-deep", "trade-missing"}
+    assert list(zscore_rejected.columns) == CANDIDATE_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS
+
+
+def test_candidate_filter_empty_result_writes_blank_metrics() -> None:
+    rows = build_candidate_filter_simulation_rows(_candidate_filter_context_rows())
+    row = {row["filter_id"]: row for row in rows}["return_3d_below_minus_7"]
+
+    assert row["trades_kept"] == 0
+    assert row["trades_removed"] == 4
+    assert row["average_r"] is None
+    assert row["total_net_pnl"] is None
+    assert row["profit_factor"] is None
+
+
 def _export_to_temp_dir(
     result: PortfolioBacktestResult | None = None,
     stock_data_by_symbol: dict[str, pd.DataFrame] | None = None,
@@ -326,6 +463,101 @@ def _export_to_temp_dir(
 
 
 _TEMP_DIRS: list[TemporaryDirectory] = []
+
+
+def _candidate_filter_context_rows() -> list[dict[str, object]]:
+    """Build completed trade context rows for candidate filter simulation."""
+
+    return [
+        {
+            "trade_id": "trade-capitulation",
+            "symbol": "RELIANCE",
+            "signal_date": date(2026, 1, 20),
+            "entry_date": date(2026, 1, 21),
+            "exit_date": date(2026, 1, 26),
+            "exit_reason": "target_hit",
+            "net_pnl": Decimal("100"),
+            "r_multiple": Decimal("2"),
+            "z_score": Decimal("-2.7"),
+            "stock_consecutive_down_closes": 4,
+            "stock_return_3d_pct": Decimal("-6"),
+            "stock_return_5d_pct": Decimal("-8"),
+            "stock_return_10d_pct": Decimal("-9"),
+            "stock_drawdown_60d_pct": Decimal("-25"),
+            "stock_drawdown_120d_pct": Decimal("-25"),
+            "stock_close_vs_60d_low_pct": Decimal("0.5"),
+            "stock_atr14_pct": Decimal("5"),
+            "stock_atr14_change_10d_pct": Decimal("10"),
+            "stock_is_60d_low": True,
+            "stock_is_120d_low": True,
+        },
+        {
+            "trade_id": "trade-deep",
+            "symbol": "TCS",
+            "signal_date": date(2026, 2, 20),
+            "entry_date": date(2026, 2, 21),
+            "exit_date": date(2026, 2, 25),
+            "exit_reason": "stop_loss_hit",
+            "net_pnl": Decimal("-50"),
+            "r_multiple": Decimal("-1"),
+            "z_score": Decimal("-3.2"),
+            "stock_consecutive_down_closes": 2,
+            "stock_return_3d_pct": Decimal("-5"),
+            "stock_return_5d_pct": Decimal("-5"),
+            "stock_return_10d_pct": Decimal("-5"),
+            "stock_drawdown_60d_pct": Decimal("-10"),
+            "stock_drawdown_120d_pct": Decimal("-10"),
+            "stock_close_vs_60d_low_pct": Decimal("4"),
+            "stock_atr14_pct": Decimal("3"),
+            "stock_atr14_change_10d_pct": Decimal("30"),
+            "stock_is_60d_low": False,
+            "stock_is_120d_low": False,
+        },
+        {
+            "trade_id": "trade-missing",
+            "symbol": "RELIANCE",
+            "signal_date": date(2026, 3, 20),
+            "entry_date": date(2026, 3, 21),
+            "exit_date": date(2026, 3, 28),
+            "exit_reason": "target_gap_hit",
+            "net_pnl": Decimal("25"),
+            "r_multiple": Decimal("0.5"),
+            "z_score": None,
+            "stock_consecutive_down_closes": None,
+            "stock_return_3d_pct": None,
+            "stock_return_5d_pct": None,
+            "stock_return_10d_pct": None,
+            "stock_drawdown_60d_pct": None,
+            "stock_drawdown_120d_pct": None,
+            "stock_close_vs_60d_low_pct": None,
+            "stock_atr14_pct": None,
+            "stock_atr14_change_10d_pct": None,
+            "stock_is_60d_low": None,
+            "stock_is_120d_low": None,
+        },
+        {
+            "trade_id": "trade-high-vol",
+            "symbol": "RELIANCE",
+            "signal_date": date(2027, 1, 20),
+            "entry_date": date(2027, 1, 21),
+            "exit_date": date(2027, 1, 24),
+            "exit_reason": "stop_gap_hit",
+            "net_pnl": Decimal("-25"),
+            "r_multiple": Decimal("-0.5"),
+            "z_score": Decimal("-2.4"),
+            "stock_consecutive_down_closes": 3,
+            "stock_return_3d_pct": Decimal("-6"),
+            "stock_return_5d_pct": Decimal("-9"),
+            "stock_return_10d_pct": Decimal("-10"),
+            "stock_drawdown_60d_pct": Decimal("-3"),
+            "stock_drawdown_120d_pct": Decimal("-3"),
+            "stock_close_vs_60d_low_pct": Decimal("8"),
+            "stock_atr14_pct": Decimal("7"),
+            "stock_atr14_change_10d_pct": Decimal("60"),
+            "stock_is_60d_low": False,
+            "stock_is_120d_low": False,
+        },
+    ]
 
 
 def _result(signals: tuple[Signal, ...] | None = None) -> PortfolioBacktestResult:

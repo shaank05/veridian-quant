@@ -51,6 +51,10 @@ def test_export_portfolio_backtest_csvs_writes_expected_files() -> None:
             "r_by_signal_candle_context",
             "r_by_consecutive_down_closes",
             "r_by_fresh_low_context",
+            "candidate_filter_simulation",
+            "candidate_filter_simulation_by_year",
+            "candidate_filter_simulation_by_symbol",
+            "candidate_filter_simulation_rejected_trades",
         }
         assert all(path.exists() for path in paths.values())
 

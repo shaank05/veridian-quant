@@ -36,6 +36,16 @@ from veridian_quant.v2.reporting.diagnostics import (
     build_yearly_summary_rows,
 )
 from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
+from veridian_quant.v2.reporting.filter_simulation import (
+    CANDIDATE_FILTER_SIMULATION_BY_SYMBOL_COLUMNS,
+    CANDIDATE_FILTER_SIMULATION_BY_YEAR_COLUMNS,
+    CANDIDATE_FILTER_SIMULATION_COLUMNS,
+    CANDIDATE_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS,
+    build_candidate_filter_simulation_by_symbol_rows,
+    build_candidate_filter_simulation_by_year_rows,
+    build_candidate_filter_simulation_rejected_trade_rows,
+    build_candidate_filter_simulation_rows,
+)
 from veridian_quant.v2.reporting.metrics import (
     PerformanceSummary,
     calculate_performance_summary,
@@ -71,6 +81,14 @@ __all__ = [
     "build_r_by_stock_trend_context_rows",
     "build_r_by_zscore_depth_rows",
     "build_trade_signal_context_rows",
+    "CANDIDATE_FILTER_SIMULATION_BY_SYMBOL_COLUMNS",
+    "CANDIDATE_FILTER_SIMULATION_BY_YEAR_COLUMNS",
+    "CANDIDATE_FILTER_SIMULATION_COLUMNS",
+    "CANDIDATE_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS",
+    "build_candidate_filter_simulation_by_symbol_rows",
+    "build_candidate_filter_simulation_by_year_rows",
+    "build_candidate_filter_simulation_rejected_trade_rows",
+    "build_candidate_filter_simulation_rows",
     "calculate_performance_summary",
     "build_exit_reason_summary_rows",
     "build_r_multiple_by_exit_reason_rows",

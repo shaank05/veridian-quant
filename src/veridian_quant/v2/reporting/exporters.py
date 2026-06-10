@@ -44,6 +44,16 @@ from veridian_quant.v2.reporting.diagnostics import (
     build_symbol_summary_rows,
     build_yearly_summary_rows,
 )
+from veridian_quant.v2.reporting.filter_simulation import (
+    CANDIDATE_FILTER_SIMULATION_BY_SYMBOL_COLUMNS,
+    CANDIDATE_FILTER_SIMULATION_BY_YEAR_COLUMNS,
+    CANDIDATE_FILTER_SIMULATION_COLUMNS,
+    CANDIDATE_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS,
+    build_candidate_filter_simulation_by_symbol_rows,
+    build_candidate_filter_simulation_by_year_rows,
+    build_candidate_filter_simulation_rejected_trade_rows,
+    build_candidate_filter_simulation_rows,
+)
 from veridian_quant.v2.reporting.metrics import calculate_performance_summary
 
 
@@ -173,6 +183,14 @@ def export_portfolio_backtest_csvs(
         "r_by_consecutive_down_closes": output_path
         / "r_by_consecutive_down_closes.csv",
         "r_by_fresh_low_context": output_path / "r_by_fresh_low_context.csv",
+        "candidate_filter_simulation": output_path
+        / "candidate_filter_simulation.csv",
+        "candidate_filter_simulation_by_year": output_path
+        / "candidate_filter_simulation_by_year.csv",
+        "candidate_filter_simulation_by_symbol": output_path
+        / "candidate_filter_simulation_by_symbol.csv",
+        "candidate_filter_simulation_rejected_trades": output_path
+        / "candidate_filter_simulation_rejected_trades.csv",
     }
 
     _write_csv(exports["trade_log"], _trade_rows(result), TRADE_LOG_COLUMNS)
@@ -298,6 +316,26 @@ def export_portfolio_backtest_csvs(
         exports["r_by_fresh_low_context"],
         build_r_by_fresh_low_context_rows(trade_context_rows),
         R_CONTEXT_BUCKET_COLUMNS,
+    )
+    _write_csv(
+        exports["candidate_filter_simulation"],
+        build_candidate_filter_simulation_rows(trade_context_rows),
+        CANDIDATE_FILTER_SIMULATION_COLUMNS,
+    )
+    _write_csv(
+        exports["candidate_filter_simulation_by_year"],
+        build_candidate_filter_simulation_by_year_rows(trade_context_rows),
+        CANDIDATE_FILTER_SIMULATION_BY_YEAR_COLUMNS,
+    )
+    _write_csv(
+        exports["candidate_filter_simulation_by_symbol"],
+        build_candidate_filter_simulation_by_symbol_rows(trade_context_rows),
+        CANDIDATE_FILTER_SIMULATION_BY_SYMBOL_COLUMNS,
+    )
+    _write_csv(
+        exports["candidate_filter_simulation_rejected_trades"],
+        build_candidate_filter_simulation_rejected_trade_rows(trade_context_rows),
+        CANDIDATE_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS,
     )
     return exports
 

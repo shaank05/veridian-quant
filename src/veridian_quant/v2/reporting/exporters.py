@@ -9,6 +9,14 @@ from typing import Any, Mapping
 
 import pandas as pd
 
+from veridian_quant.v2.reporting.context import (
+    R_CONTEXT_BUCKET_COLUMNS,
+    TRADE_SIGNAL_CONTEXT_COLUMNS,
+    build_r_by_nifty_trend_context_rows,
+    build_r_by_relative_strength_context_rows,
+    build_r_by_stock_trend_context_rows,
+    build_trade_signal_context_rows,
+)
 from veridian_quant.v2.reporting.diagnostics import (
     EXIT_REASON_SUMMARY_COLUMNS,
     REJECTION_SUMMARY_COLUMNS,
@@ -114,6 +122,8 @@ SUMMARY_COLUMNS = [
 def export_portfolio_backtest_csvs(
     result: Any,
     output_dir: str | Path,
+    stock_data_by_symbol: Mapping[str, pd.DataFrame] | None = None,
+    nifty_data: pd.DataFrame | None = None,
 ) -> dict[str, Path]:
     """Write standard portfolio backtest CSV artifacts and return file paths."""
 
@@ -137,6 +147,13 @@ def export_portfolio_backtest_csvs(
         "r_multiple_by_year": output_path / "r_multiple_by_year.csv",
         "r_multiple_by_symbol_year": output_path
         / "r_multiple_by_symbol_year.csv",
+        "trade_signal_context": output_path / "trade_signal_context.csv",
+        "r_by_stock_trend_context": output_path
+        / "r_by_stock_trend_context.csv",
+        "r_by_nifty_trend_context": output_path
+        / "r_by_nifty_trend_context.csv",
+        "r_by_relative_strength_context": output_path
+        / "r_by_relative_strength_context.csv",
     }
 
     _write_csv(exports["trade_log"], _trade_rows(result), TRADE_LOG_COLUMNS)
@@ -201,6 +218,32 @@ def export_portfolio_backtest_csvs(
         exports["r_multiple_by_symbol_year"],
         build_r_multiple_by_symbol_year_rows(result),
         R_MULTIPLE_BY_SYMBOL_YEAR_COLUMNS,
+    )
+
+    trade_context_rows = build_trade_signal_context_rows(
+        result,
+        stock_data_by_symbol=stock_data_by_symbol,
+        nifty_data=nifty_data,
+    )
+    _write_csv(
+        exports["trade_signal_context"],
+        trade_context_rows,
+        TRADE_SIGNAL_CONTEXT_COLUMNS,
+    )
+    _write_csv(
+        exports["r_by_stock_trend_context"],
+        build_r_by_stock_trend_context_rows(trade_context_rows),
+        R_CONTEXT_BUCKET_COLUMNS,
+    )
+    _write_csv(
+        exports["r_by_nifty_trend_context"],
+        build_r_by_nifty_trend_context_rows(trade_context_rows),
+        R_CONTEXT_BUCKET_COLUMNS,
+    )
+    _write_csv(
+        exports["r_by_relative_strength_context"],
+        build_r_by_relative_strength_context_rows(trade_context_rows),
+        R_CONTEXT_BUCKET_COLUMNS,
     )
     return exports
 

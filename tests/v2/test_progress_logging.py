@@ -137,7 +137,9 @@ def _run_cli_with_patches(args: list[str]) -> str:
         patch("veridian_quant.v2.run_s1_backtest.run_s1_portfolio_backtest", lambda **kwargs: fake_result),
         patch(
             "veridian_quant.v2.run_s1_backtest.export_portfolio_backtest_csvs",
-            lambda result, output_dir: {"summary": Path(output_dir) / "summary.csv"},
+            lambda result, output_dir, **kwargs: {
+                "summary": Path(output_dir) / "summary.csv"
+            },
         ),
         redirect_stdout(output),
     ):

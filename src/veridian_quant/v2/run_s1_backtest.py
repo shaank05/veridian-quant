@@ -14,6 +14,10 @@ from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
 from veridian_quant.v2.reporting.progress import ProgressReporter
 
 
+NIFTY_50_INSTRUMENT_KEY = "NSE_INDEX|Nifty 50"
+CONTEXT_LOOKBACK_BUFFER_DAYS = 365
+
+
 def main(argv: Iterable[str] | None = None) -> int:
     """Run the S1 portfolio backtest CLI."""
 
@@ -28,6 +32,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     )
     engine = _get_database_engine()
     loader = SQLAlchemyDailyOHLCVLoader(engine=engine)
+    loader.lookback_buffer_days = CONTEXT_LOOKBACK_BUFFER_DAYS
 
     reporter.info("Loading OHLCV data...")
     if args.all_symbols:
@@ -43,6 +48,19 @@ def main(argv: Iterable[str] | None = None) -> int:
         )
     reporter.info("Finished loading OHLCV data.")
     reporter.info(f"Loaded symbols: {len(data_by_symbol)}")
+
+    reporter.info("Loading Nifty 50 context data...")
+    try:
+        nifty_data = loader.load_instrument_key(
+            NIFTY_50_INSTRUMENT_KEY,
+            args.start_date,
+            args.end_date,
+        )
+    except Exception as error:  # pragma: no cover - defensive CLI fallback
+        reporter.info(f"Nifty 50 context data unavailable: {error}")
+        nifty_data = None
+    else:
+        reporter.info(f"Loaded Nifty 50 context rows: {len(nifty_data)}")
 
     reporter.info("Running portfolio backtest...")
     result = run_s1_portfolio_backtest(
@@ -62,7 +80,12 @@ def main(argv: Iterable[str] | None = None) -> int:
         progress_reporter=reporter,
     )
     reporter.info("Finished portfolio backtest.")
-    paths = export_portfolio_backtest_csvs(result, args.output_dir)
+    paths = export_portfolio_backtest_csvs(
+        result,
+        args.output_dir,
+        stock_data_by_symbol=data_by_symbol,
+        nifty_data=nifty_data,
+    )
     reporter.info(f"CSV export location: {Path(args.output_dir)}")
     reporter.complete(
         f"Completed S1 backtest. Wrote {len(paths)} CSV files to "

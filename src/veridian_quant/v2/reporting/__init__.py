@@ -1,5 +1,13 @@
 """Reporting helpers for Veridian Quant v2."""
 
+from veridian_quant.v2.reporting.context import (
+    R_CONTEXT_BUCKET_COLUMNS,
+    TRADE_SIGNAL_CONTEXT_COLUMNS,
+    build_r_by_nifty_trend_context_rows,
+    build_r_by_relative_strength_context_rows,
+    build_r_by_stock_trend_context_rows,
+    build_trade_signal_context_rows,
+)
 from veridian_quant.v2.reporting.diagnostics import (
     EXIT_REASON_SUMMARY_COLUMNS,
     REJECTION_SUMMARY_COLUMNS,
@@ -35,6 +43,7 @@ __all__ = [
     "NullProgressReporter",
     "PerformanceSummary",
     "ProgressReporter",
+    "R_CONTEXT_BUCKET_COLUMNS",
     "REJECTION_SUMMARY_COLUMNS",
     "R_MULTIPLE_BY_EXIT_REASON_COLUMNS",
     "R_MULTIPLE_BY_SYMBOL_COLUMNS",
@@ -42,7 +51,12 @@ __all__ = [
     "R_MULTIPLE_BY_YEAR_COLUMNS",
     "R_MULTIPLE_SUMMARY_COLUMNS",
     "SYMBOL_SUMMARY_COLUMNS",
+    "TRADE_SIGNAL_CONTEXT_COLUMNS",
     "YEARLY_SUMMARY_COLUMNS",
+    "build_r_by_nifty_trend_context_rows",
+    "build_r_by_relative_strength_context_rows",
+    "build_r_by_stock_trend_context_rows",
+    "build_trade_signal_context_rows",
     "calculate_performance_summary",
     "build_exit_reason_summary_rows",
     "build_r_multiple_by_exit_reason_rows",

@@ -40,6 +40,10 @@ def test_export_portfolio_backtest_csvs_writes_expected_files() -> None:
             "r_multiple_by_symbol",
             "r_multiple_by_year",
             "r_multiple_by_symbol_year",
+            "trade_signal_context",
+            "r_by_stock_trend_context",
+            "r_by_nifty_trend_context",
+            "r_by_relative_strength_context",
         }
         assert all(path.exists() for path in paths.values())
 

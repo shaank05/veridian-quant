@@ -133,6 +133,44 @@ class SQLAlchemyDailyOHLCVLoader(DailyOHLCVLoader):
         )
         return normalize_ohlcv_dataframe(df)
 
+    def load_instrument_key(
+        self,
+        instrument_key: str,
+        start_date: date,
+        end_date: date,
+    ) -> pd.DataFrame:
+        """Load normalized daily OHLCV data by exact instrument key."""
+
+        buffered_start_date = start_date - timedelta(days=self.lookback_buffer_days)
+        query = text(
+            f"""
+            SELECT
+                p.timestamp AS date,
+                p.open AS open,
+                p.high AS high,
+                p.low AS low,
+                p.close AS close,
+                p.volume AS volume
+            FROM {self.price_table} p
+            WHERE p.instrument_key = :instrument_key
+                AND p.interval = :price_interval
+                AND p.timestamp >= :start_date
+                AND p.timestamp <= :end_date
+            ORDER BY p.timestamp ASC
+            """
+        )
+        df = pd.read_sql(
+            query,
+            self.engine,
+            params={
+                "instrument_key": instrument_key,
+                "price_interval": self.price_interval,
+                "start_date": buffered_start_date,
+                "end_date": end_date,
+            },
+        )
+        return normalize_ohlcv_dataframe(df)
+
     def load_symbols(
         self,
         symbols: Iterable[str],

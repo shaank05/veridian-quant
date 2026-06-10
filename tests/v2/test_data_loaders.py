@@ -122,6 +122,31 @@ def test_load_symbol_can_use_custom_price_interval() -> None:
     assert captured_params["price_interval"] == "custom_day"
 
 
+def test_load_instrument_key_uses_exact_key_and_buffered_start_date() -> None:
+    captured_params = {}
+
+    def fake_read_sql(query, engine, params):
+        captured_params.update(params)
+        return _raw_frame()
+
+    loader = SQLAlchemyDailyOHLCVLoader(
+        engine=object(),
+        lookback_buffer_days=260,
+    )
+
+    with patch.object(pd, "read_sql", fake_read_sql):
+        loader.load_instrument_key(
+            "NSE_INDEX|Nifty 50",
+            date(2026, 1, 31),
+            date(2026, 2, 28),
+        )
+
+    assert captured_params["instrument_key"] == "NSE_INDEX|Nifty 50"
+    assert captured_params["price_interval"] == "day"
+    assert captured_params["start_date"] == date(2025, 5, 16)
+    assert captured_params["end_date"] == date(2026, 2, 28)
+
+
 def test_price_interval_must_be_non_empty_string() -> None:
     for price_interval in ("", None):
         try:

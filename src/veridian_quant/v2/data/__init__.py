@@ -5,6 +5,7 @@ from veridian_quant.v2.data.loaders import (
     SQLAlchemyDailyOHLCVLoader,
     normalize_ohlcv_dataframe,
 )
+from veridian_quant.v2.data.equity_candidates import build_raw_nse_equity_candidates
 from veridian_quant.v2.data.ingestion_config import IngestionConfig
 from veridian_quant.v2.data.instruments import InstrumentResolver, ResolvedInstrument
 from veridian_quant.v2.data.price_ingestion import PriceIngestionRunner
@@ -18,5 +19,6 @@ __all__ = [
     "ResolvedInstrument",
     "SQLAlchemyDailyOHLCVLoader",
     "audit_price_data",
+    "build_raw_nse_equity_candidates",
     "normalize_ohlcv_dataframe",
 ]

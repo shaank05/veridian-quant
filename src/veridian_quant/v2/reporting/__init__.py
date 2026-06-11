@@ -54,6 +54,15 @@ from veridian_quant.v2.reporting.progress import (
     NullProgressReporter,
     ProgressReporter,
 )
+from veridian_quant.v2.reporting.variant_comparison import (
+    VARIANT_COMPARISON_COLUMNS,
+    VARIANT_EXIT_REASON_COLUMNS,
+    VARIANT_REJECTION_COLUMNS,
+    VARIANT_SCORECARD_COLUMNS,
+    VARIANT_SYMBOL_COLUMNS,
+    VARIANT_YEARLY_COLUMNS,
+    compare_strategy_variant_reports,
+)
 
 __all__ = [
     "EXIT_REASON_SUMMARY_COLUMNS",
@@ -70,6 +79,12 @@ __all__ = [
     "SYMBOL_SUMMARY_COLUMNS",
     "TRADE_SIGNAL_CONTEXT_COLUMNS",
     "YEARLY_SUMMARY_COLUMNS",
+    "VARIANT_COMPARISON_COLUMNS",
+    "VARIANT_EXIT_REASON_COLUMNS",
+    "VARIANT_REJECTION_COLUMNS",
+    "VARIANT_SCORECARD_COLUMNS",
+    "VARIANT_SYMBOL_COLUMNS",
+    "VARIANT_YEARLY_COLUMNS",
     "build_r_by_nifty_trend_context_rows",
     "build_r_by_atr_stretch_context_rows",
     "build_r_by_consecutive_down_closes_rows",
@@ -90,6 +105,7 @@ __all__ = [
     "build_candidate_filter_simulation_rejected_trade_rows",
     "build_candidate_filter_simulation_rows",
     "calculate_performance_summary",
+    "compare_strategy_variant_reports",
     "build_exit_reason_summary_rows",
     "build_r_multiple_by_exit_reason_rows",
     "build_r_multiple_by_symbol_rows",

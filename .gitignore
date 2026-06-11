@@ -20,3 +20,4 @@ ENV/
 backtest_report_*.csv
 
 general_delete_afterwards.txt
+PHASE_25.txt

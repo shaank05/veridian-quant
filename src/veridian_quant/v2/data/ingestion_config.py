@@ -14,6 +14,11 @@ DEFAULT_THROTTLE_SECONDS = 0.5
 DEFAULT_MAX_RETRIES = 3
 DEFAULT_BACKOFF_BASE_SECONDS = 5.0
 DEFAULT_LOG_DIR = "logs/v2/ingestion"
+DEFAULT_RUN_DIR = "reports/v2/ingestion_runs"
+DEFAULT_NETWORK_RETRY = "wait"
+DEFAULT_NETWORK_WAIT_SECONDS = 60
+DEFAULT_NETWORK_MAX_WAIT_MINUTES = 0
+DEFAULT_CHUNK_MIN_COVERAGE_PCT = 70.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,6 +33,11 @@ class IngestionConfig:
     max_retries: int
     backoff_base_seconds: float
     log_dir: Path
+    run_dir: Path
+    network_retry: str
+    network_wait_seconds: int
+    network_max_wait_minutes: int
+    chunk_min_coverage_pct: float
 
     @classmethod
     def from_env(cls) -> "IngestionConfig":
@@ -48,6 +58,24 @@ class IngestionConfig:
                 DEFAULT_BACKOFF_BASE_SECONDS,
             ),
             log_dir=Path(_env_str("V2_INGESTION_LOG_DIR", DEFAULT_LOG_DIR)),
+            run_dir=Path(_env_str("V2_INGESTION_RUN_DIR", DEFAULT_RUN_DIR)),
+            network_retry=_env_choice(
+                "V2_INGESTION_NETWORK_RETRY",
+                DEFAULT_NETWORK_RETRY,
+                {"fail-fast", "wait"},
+            ),
+            network_wait_seconds=_env_positive_int(
+                "V2_INGESTION_NETWORK_WAIT_SECONDS",
+                DEFAULT_NETWORK_WAIT_SECONDS,
+            ),
+            network_max_wait_minutes=_env_nonnegative_int(
+                "V2_INGESTION_NETWORK_MAX_WAIT_MINUTES",
+                DEFAULT_NETWORK_MAX_WAIT_MINUTES,
+            ),
+            chunk_min_coverage_pct=_env_float(
+                "V2_INGESTION_CHUNK_MIN_COVERAGE_PCT",
+                DEFAULT_CHUNK_MIN_COVERAGE_PCT,
+            ),
         )
 
     def require_access_token(self, mode: str) -> None:
@@ -69,6 +97,11 @@ class IngestionConfig:
             "max_retries": self.max_retries,
             "backoff_base_seconds": self.backoff_base_seconds,
             "log_dir": str(self.log_dir),
+            "run_dir": str(self.run_dir),
+            "network_retry": self.network_retry,
+            "network_wait_seconds": self.network_wait_seconds,
+            "network_max_wait_minutes": self.network_max_wait_minutes,
+            "chunk_min_coverage_pct": self.chunk_min_coverage_pct,
             "has_access_token": bool(self.access_token),
         }
 
@@ -86,6 +119,10 @@ def _env_str(name: str, default: str) -> str:
 
 
 def _env_int(name: str, default: int) -> int:
+    return _env_positive_int(name, default)
+
+
+def _env_positive_int(name: str, default: int) -> int:
     value = _optional_env(name)
     if value is None:
         return default
@@ -95,6 +132,19 @@ def _env_int(name: str, default: int) -> int:
         raise ValueError(f"{name} must be an integer") from error
     if parsed <= 0:
         raise ValueError(f"{name} must be positive")
+    return parsed
+
+
+def _env_nonnegative_int(name: str, default: int) -> int:
+    value = _optional_env(name)
+    if value is None:
+        return default
+    try:
+        parsed = int(value)
+    except ValueError as error:
+        raise ValueError(f"{name} must be an integer") from error
+    if parsed < 0:
+        raise ValueError(f"{name} must be non-negative")
     return parsed
 
 
@@ -109,3 +159,10 @@ def _env_float(name: str, default: float) -> float:
     if parsed < 0:
         raise ValueError(f"{name} must be non-negative")
     return parsed
+
+
+def _env_choice(name: str, default: str, choices: set[str]) -> str:
+    value = _env_str(name, default)
+    if value not in choices:
+        raise ValueError(f"{name} must be one of: {', '.join(sorted(choices))}")
+    return value

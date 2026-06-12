@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import logging
+import shutil
 import time
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
@@ -12,6 +13,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import pandas as pd
+import requests
 from sqlalchemy import text
 
 from veridian_quant.v2.data.ingestion_config import IngestionConfig
@@ -27,6 +29,26 @@ logger = logging.getLogger(__name__)
 
 SUPPORTED_INTERVALS = frozenset({"day", "1minute"})
 SUPPORTED_MODES = frozenset({"backfill", "incremental", "dry-run"})
+COMPLETED_CHUNK_STATUSES = frozenset(
+    {"INSERTED", "INSERTED_WITH_SKIPS", "SKIPPED_ALREADY_COMPLETE", "NO_CANDLES"}
+)
+STATUS_COLUMNS = (
+    "run_id",
+    "symbol",
+    "instrument_key",
+    "interval",
+    "chunk_start_date",
+    "chunk_end_date",
+    "status",
+    "attempt_count",
+    "candles_received",
+    "candles_inserted",
+    "candles_skipped",
+    "error",
+    "started_at",
+    "finished_at",
+    "updated_at",
+)
 
 UPSERT_PRICES_SQL = """
 INSERT INTO prices_ohlc (
@@ -99,6 +121,10 @@ class IngestionSummary:
     candles_received: int = 0
     candles_inserted: int = 0
     candles_skipped: int = 0
+    chunks_skipped_existing: int = 0
+    status_file_path: str | None = None
+    run_id: str | None = None
+    run_dir: str | None = None
     mode: str = "dry-run"
     interval: str = "day"
     start_date: date | None = None
@@ -116,6 +142,10 @@ class IngestionSummary:
             "candles_received": self.candles_received,
             "candles_inserted": self.candles_inserted,
             "candles_skipped": self.candles_skipped,
+            "chunks_skipped_existing": self.chunks_skipped_existing,
+            "status_file_path": self.status_file_path,
+            "run_id": self.run_id,
+            "run_dir": self.run_dir,
             "mode": self.mode,
             "interval": self.interval,
             "start_date": self.start_date.isoformat() if self.start_date else None,
@@ -148,6 +178,14 @@ class PriceIngestionRunner:
         start_date: date | None = None,
         end_date: date | None = None,
         exchange: str = "NSE_EQ",
+        run_id: str | None = None,
+        run_dir: str | Path | None = None,
+        resume: bool = False,
+        skip_existing_chunks: bool = True,
+        network_retry: str | None = None,
+        network_wait_seconds: int | None = None,
+        network_max_wait_minutes: int | None = None,
+        chunk_min_coverage_pct: float | None = None,
     ) -> IngestionSummary:
         """Run V2 ingestion for requested symbols."""
 
@@ -158,9 +196,18 @@ class PriceIngestionRunner:
 
         requested_symbols = normalize_symbols(symbols)
         effective_end = end_date or datetime.now(timezone.utc).date()
+        effective_run_id = run_id
+        effective_run_dir = Path(run_dir) if run_dir is not None else None
         summary = IngestionSummary(
             requested_symbols=len(requested_symbols),
             unresolved_symbols=[],
+            status_file_path=(
+                str(effective_run_dir / "ingestion_chunk_status.csv")
+                if effective_run_dir is not None
+                else None
+            ),
+            run_id=effective_run_id,
+            run_dir=str(effective_run_dir) if effective_run_dir is not None else None,
             mode=mode,
             interval=interval,
             start_date=start_date,
@@ -180,6 +227,13 @@ class PriceIngestionRunner:
         plans = self._build_plans(instruments, mode, interval, start_date, effective_end)
         summary.instruments_attempted = len(plans)
         summary.chunks_planned = sum(len(chunks) for _, chunks in plans)
+        status_store = (
+            ChunkStatusStore(effective_run_dir / "ingestion_chunk_status.csv", effective_run_id or "")
+            if effective_run_dir is not None and effective_run_id is not None
+            else None
+        )
+        if status_store is not None:
+            status_store.initialize(plans, interval, "DRY_RUN_PLANNED" if mode == "dry-run" else "PENDING")
 
         if mode == "dry-run":
             logger.info("Dry-run complete; no Upstox calls or database writes performed")
@@ -187,6 +241,28 @@ class PriceIngestionRunner:
 
         if self.history_client is None:
             raise ValueError("history_client is required for real ingestion modes")
+
+        completeness_checker = (
+            ChunkCompletenessChecker(self.engine)
+            if skip_existing_chunks and hasattr(self.engine, "connect")
+            else None
+        )
+        effective_network_retry = network_retry or self.config.network_retry
+        effective_network_wait_seconds = (
+            network_wait_seconds
+            if network_wait_seconds is not None
+            else self.config.network_wait_seconds
+        )
+        effective_network_max_wait_minutes = (
+            network_max_wait_minutes
+            if network_max_wait_minutes is not None
+            else self.config.network_max_wait_minutes
+        )
+        effective_chunk_min_coverage_pct = (
+            chunk_min_coverage_pct
+            if chunk_min_coverage_pct is not None
+            else self.config.chunk_min_coverage_pct
+        )
 
         for instrument, chunks in plans:
             logger.info(
@@ -196,14 +272,70 @@ class PriceIngestionRunner:
                 len(chunks),
             )
             for chunk in chunks:
-                result = self.history_client.fetch_candles(
-                    instrument.instrument_key,
+                if resume and status_store is not None and status_store.is_completed(
+                    instrument,
                     interval,
-                    chunk.start_date,
-                    chunk.end_date,
+                    chunk,
+                ):
+                    logger.info(
+                        "Skipping completed status for %s chunk %s..%s",
+                        instrument.symbol,
+                        chunk.start_date,
+                        chunk.end_date,
+                    )
+                    continue
+
+                if completeness_checker is not None:
+                    completeness = completeness_checker.check(
+                        instrument.instrument_key,
+                        interval,
+                        chunk,
+                        effective_chunk_min_coverage_pct,
+                    )
+                    if completeness.is_complete:
+                        summary.chunks_skipped_existing += 1
+                        if status_store is not None:
+                            status_store.update(
+                                instrument,
+                                interval,
+                                chunk,
+                                status="SKIPPED_ALREADY_COMPLETE",
+                                candles_inserted=0,
+                                error="",
+                                finished=True,
+                            )
+                        logger.info(
+                            "Skipping existing chunk for %s %s..%s: %.2f%% coverage",
+                            instrument.symbol,
+                            chunk.start_date,
+                            chunk.end_date,
+                            completeness.coverage_pct,
+                        )
+                        continue
+
+                if status_store is not None:
+                    status_store.mark_started(instrument, interval, chunk)
+
+                result = self._fetch_chunk_with_network_recovery(
+                    instrument,
+                    interval,
+                    chunk,
+                    effective_network_retry,
+                    effective_network_wait_seconds,
+                    effective_network_max_wait_minutes,
+                    status_store,
                 )
                 if not result.ok:
                     summary.chunks_failed += 1
+                    if status_store is not None:
+                        status_store.update(
+                            instrument,
+                            interval,
+                            chunk,
+                            status="FETCH_FAILED_FINAL",
+                            error=result.error or "",
+                            finished=True,
+                        )
                     continue
                 summary.chunks_fetched += 1
                 summary.candles_received += len(result.candles)
@@ -215,6 +347,24 @@ class PriceIngestionRunner:
                 summary.candles_skipped += skipped
                 inserted = self.writer.upsert_candles(valid)
                 summary.candles_inserted += inserted
+                if status_store is not None:
+                    if not result.candles:
+                        status = "NO_CANDLES"
+                    elif skipped:
+                        status = "INSERTED_WITH_SKIPS"
+                    else:
+                        status = "INSERTED"
+                    status_store.update(
+                        instrument,
+                        interval,
+                        chunk,
+                        status=status,
+                        candles_received=len(result.candles),
+                        candles_inserted=inserted,
+                        candles_skipped=skipped,
+                        error="",
+                        finished=True,
+                    )
                 logger.info(
                     "Inserted %s candles for %s chunk %s..%s",
                     inserted,
@@ -227,6 +377,58 @@ class PriceIngestionRunner:
 
         logger.info("Final V2 ingestion summary: %s", summary.to_dict())
         return summary
+
+    def _fetch_chunk_with_network_recovery(
+        self,
+        instrument: ResolvedInstrument,
+        interval: str,
+        chunk: DateChunk,
+        network_retry: str,
+        network_wait_seconds: int,
+        network_max_wait_minutes: int,
+        status_store: "ChunkStatusStore | None",
+    ) -> HistoricalChunkResult:
+        started = time.monotonic()
+        while True:
+            try:
+                return self.history_client.fetch_candles(
+                    instrument.instrument_key,
+                    interval,
+                    chunk.start_date,
+                    chunk.end_date,
+                )
+            except requests.RequestException as error:
+                if (
+                    network_retry == "fail-fast"
+                    or not _is_network_like_error(error)
+                    or _network_wait_exceeded(started, network_max_wait_minutes)
+                ):
+                    return HistoricalChunkResult(
+                        instrument_key=instrument.instrument_key,
+                        interval=interval,
+                        start_date=chunk.start_date,
+                        end_date=chunk.end_date,
+                        candles=[],
+                        ok=False,
+                        error=str(error),
+                    )
+                logger.warning(
+                    "Network error for %s chunk %s..%s; retrying after %ss: %s",
+                    instrument.symbol,
+                    chunk.start_date,
+                    chunk.end_date,
+                    network_wait_seconds,
+                    error,
+                )
+                if status_store is not None:
+                    status_store.update(
+                        instrument,
+                        interval,
+                        chunk,
+                        status="FETCH_FAILED_RETRYABLE",
+                        error=str(error),
+                    )
+                time.sleep(network_wait_seconds)
 
     def _build_plans(
         self,
@@ -310,6 +512,226 @@ class PriceOHLCWriter:
         with self.engine.begin() as conn:
             conn.execute(text(UPSERT_PRICES_SQL), rows)
         return len(rows)
+
+
+@dataclass(frozen=True, slots=True)
+class ChunkCompleteness:
+    existing_rows: int
+    expected_calendar_days: int
+    coverage_pct: float
+    is_complete: bool
+
+
+class ChunkCompletenessChecker:
+    """Calendar-day based completeness check for already-present chunks."""
+
+    def __init__(self, engine: object) -> None:
+        self.engine = engine
+
+    def check(
+        self,
+        instrument_key: str,
+        interval: str,
+        chunk: DateChunk,
+        min_coverage_pct: float,
+    ) -> ChunkCompleteness:
+        expected_days = (chunk.end_date - chunk.start_date).days + 1
+        query = text(
+            """
+            SELECT COUNT(*) AS existing_rows
+            FROM prices_ohlc
+            WHERE instrument_key = :instrument_key
+                AND interval = :interval
+                AND timestamp >= :start_ts
+                AND timestamp < :end_ts
+            """
+        )
+        with self.engine.connect() as conn:
+            existing_rows = int(
+                conn.execute(
+                    query,
+                    {
+                        "instrument_key": instrument_key,
+                        "interval": interval,
+                        "start_ts": datetime.combine(
+                            chunk.start_date,
+                            datetime.min.time(),
+                            tzinfo=timezone.utc,
+                        ),
+                        "end_ts": datetime.combine(
+                            chunk.end_date + timedelta(days=1),
+                            datetime.min.time(),
+                            tzinfo=timezone.utc,
+                        ),
+                    },
+                ).scalar()
+                or 0
+            )
+        coverage_pct = (existing_rows / expected_days * 100) if expected_days else 0.0
+        return ChunkCompleteness(
+            existing_rows=existing_rows,
+            expected_calendar_days=expected_days,
+            coverage_pct=coverage_pct,
+            is_complete=coverage_pct >= min_coverage_pct,
+        )
+
+
+class ChunkStatusStore:
+    """CSV-backed chunk status tracking for resumable ingestion runs."""
+
+    def __init__(self, path: Path, run_id: str) -> None:
+        self.path = path
+        self.run_id = run_id
+        self.rows: dict[tuple[str, str, str, str, str], dict[str, str]] = {}
+        self._load()
+
+    def initialize(
+        self,
+        plans: list[tuple[ResolvedInstrument, list[DateChunk]]],
+        interval: str,
+        status: str,
+    ) -> None:
+        for instrument, chunks in plans:
+            for chunk in chunks:
+                key = self._key(instrument, interval, chunk)
+                if key not in self.rows:
+                    now = _utc_now()
+                    self.rows[key] = {
+                        "run_id": self.run_id,
+                        "symbol": instrument.symbol,
+                        "instrument_key": instrument.instrument_key,
+                        "interval": interval,
+                        "chunk_start_date": chunk.start_date.isoformat(),
+                        "chunk_end_date": chunk.end_date.isoformat(),
+                        "status": status,
+                        "attempt_count": "0",
+                        "candles_received": "0",
+                        "candles_inserted": "0",
+                        "candles_skipped": "0",
+                        "error": "",
+                        "started_at": "",
+                        "finished_at": now if status == "DRY_RUN_PLANNED" else "",
+                        "updated_at": now,
+                    }
+        self.write()
+
+    def is_completed(
+        self,
+        instrument: ResolvedInstrument,
+        interval: str,
+        chunk: DateChunk,
+    ) -> bool:
+        row = self.rows.get(self._key(instrument, interval, chunk))
+        return bool(row and row.get("status") in COMPLETED_CHUNK_STATUSES)
+
+    def mark_started(
+        self,
+        instrument: ResolvedInstrument,
+        interval: str,
+        chunk: DateChunk,
+    ) -> None:
+        row = self._row(instrument, interval, chunk)
+        now = _utc_now()
+        row["status"] = "PENDING"
+        row["started_at"] = row.get("started_at") or now
+        row["attempt_count"] = str(int(row.get("attempt_count") or "0") + 1)
+        row["updated_at"] = now
+        self.write()
+
+    def update(
+        self,
+        instrument: ResolvedInstrument,
+        interval: str,
+        chunk: DateChunk,
+        status: str,
+        candles_received: int | None = None,
+        candles_inserted: int | None = None,
+        candles_skipped: int | None = None,
+        error: str | None = None,
+        finished: bool = False,
+    ) -> None:
+        row = self._row(instrument, interval, chunk)
+        now = _utc_now()
+        row["status"] = status
+        if candles_received is not None:
+            row["candles_received"] = str(candles_received)
+        if candles_inserted is not None:
+            row["candles_inserted"] = str(candles_inserted)
+        if candles_skipped is not None:
+            row["candles_skipped"] = str(candles_skipped)
+        if error is not None:
+            row["error"] = error
+        if finished:
+            row["finished_at"] = now
+        row["updated_at"] = now
+        self.write()
+
+    def write(self) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = self.path.with_suffix(f"{self.path.suffix}.tmp")
+        with temp_path.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=STATUS_COLUMNS)
+            writer.writeheader()
+            for row in sorted(self.rows.values(), key=_status_sort_key):
+                writer.writerow({column: row.get(column, "") for column in STATUS_COLUMNS})
+        shutil.move(str(temp_path), str(self.path))
+
+    def _load(self) -> None:
+        if not self.path.exists():
+            return
+        with self.path.open(newline="", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                key = (
+                    row.get("symbol", ""),
+                    row.get("instrument_key", ""),
+                    row.get("interval", ""),
+                    row.get("chunk_start_date", ""),
+                    row.get("chunk_end_date", ""),
+                )
+                self.rows[key] = {column: row.get(column, "") for column in STATUS_COLUMNS}
+
+    def _row(
+        self,
+        instrument: ResolvedInstrument,
+        interval: str,
+        chunk: DateChunk,
+    ) -> dict[str, str]:
+        key = self._key(instrument, interval, chunk)
+        if key not in self.rows:
+            now = _utc_now()
+            self.rows[key] = {
+                "run_id": self.run_id,
+                "symbol": instrument.symbol,
+                "instrument_key": instrument.instrument_key,
+                "interval": interval,
+                "chunk_start_date": chunk.start_date.isoformat(),
+                "chunk_end_date": chunk.end_date.isoformat(),
+                "status": "PENDING",
+                "attempt_count": "0",
+                "candles_received": "0",
+                "candles_inserted": "0",
+                "candles_skipped": "0",
+                "error": "",
+                "started_at": "",
+                "finished_at": "",
+                "updated_at": now,
+            }
+        return self.rows[key]
+
+    @staticmethod
+    def _key(
+        instrument: ResolvedInstrument,
+        interval: str,
+        chunk: DateChunk,
+    ) -> tuple[str, str, str, str, str]:
+        return (
+            instrument.symbol,
+            instrument.instrument_key,
+            interval,
+            chunk.start_date.isoformat(),
+            chunk.end_date.isoformat(),
+        )
 
 
 def load_symbols_from_sources(
@@ -472,3 +894,29 @@ def _next_start_date(latest: datetime, interval: str) -> date:
     if interval == "day":
         return (latest + timedelta(days=1)).date()
     return (latest + timedelta(seconds=1)).date()
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _status_sort_key(row: dict[str, str]) -> tuple[str, str, str, str]:
+    return (
+        row.get("symbol", ""),
+        row.get("instrument_key", ""),
+        row.get("chunk_start_date", ""),
+        row.get("chunk_end_date", ""),
+    )
+
+
+def _is_network_like_error(error: requests.RequestException) -> bool:
+    return isinstance(error, (requests.ConnectionError, requests.Timeout)) or (
+        isinstance(error, requests.RequestException)
+        and getattr(error, "response", None) is None
+    )
+
+
+def _network_wait_exceeded(started: float, max_wait_minutes: int) -> bool:
+    if max_wait_minutes == 0:
+        return False
+    return (time.monotonic() - started) >= max_wait_minutes * 60

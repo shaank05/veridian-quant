@@ -60,13 +60,31 @@ class UpstoxHistoryClient:
             "Authorization": f"Bearer {self.config.access_token}",
         }
 
-        for attempt in range(self.config.max_retries + 1):
+        network_started = time.monotonic()
+        attempt = 0
+        while True:
             try:
                 response = self.session.get(url, headers=headers, timeout=30)
             except requests.RequestException as error:
+                if (
+                    self.config.network_retry == "wait"
+                    and _is_network_like_error(error)
+                    and not _network_wait_exceeded(
+                        network_started,
+                        self.config.network_max_wait_minutes,
+                    )
+                ):
+                    logger.warning(
+                        "Network error from Upstox; retrying after %ss: %s",
+                        self.config.network_wait_seconds,
+                        error,
+                    )
+                    time.sleep(self.config.network_wait_seconds)
+                    continue
                 if attempt >= self.config.max_retries:
                     return _failed(instrument_key, interval, start_date, end_date, str(error))
                 self._sleep_before_retry(attempt, error)
+                attempt += 1
                 continue
 
             if response.status_code == 429 or 500 <= response.status_code < 600:
@@ -79,6 +97,7 @@ class UpstoxHistoryClient:
                         f"HTTP {response.status_code}: {response.text[:200]}",
                     )
                 self._sleep_before_retry(attempt, f"HTTP {response.status_code}")
+                attempt += 1
                 continue
 
             if response.status_code >= 400:
@@ -143,3 +162,16 @@ def _failed(
         ok=False,
         error=error,
     )
+
+
+def _is_network_like_error(error: requests.RequestException) -> bool:
+    return isinstance(error, (requests.ConnectionError, requests.Timeout)) or (
+        isinstance(error, requests.RequestException)
+        and getattr(error, "response", None) is None
+    )
+
+
+def _network_wait_exceeded(started: float, max_wait_minutes: int) -> bool:
+    if max_wait_minutes == 0:
+        return False
+    return (time.monotonic() - started) >= max_wait_minutes * 60

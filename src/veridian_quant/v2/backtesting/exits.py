@@ -120,6 +120,10 @@ def _closed_trade(
         initial_risk_amount=trade.initial_risk_amount,
         planned_reward_amount=trade.planned_reward_amount,
         reward_risk_ratio=trade.reward_risk_ratio,
+        candidate_ranking_mode=trade.candidate_ranking_mode,
+        candidate_rank=trade.candidate_rank,
+        candidate_score=trade.candidate_score,
+        candidate_pool_size_for_date=trade.candidate_pool_size_for_date,
     )
 
 

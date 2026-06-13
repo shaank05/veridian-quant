@@ -80,6 +80,10 @@ def test_trade_log_contains_expected_columns() -> None:
         "exit_price",
         "exit_reason",
         "strategy_name",
+        "candidate_ranking_mode",
+        "candidate_rank",
+        "candidate_score",
+        "candidate_pool_size_for_date",
     ]
     assert trade_log.loc[0, "exit_reason"] == "target_hit"
     assert trade_log.loc[0, "initial_risk_amount"] == 1000

@@ -10,6 +10,7 @@ from veridian_quant.v2.backtesting.portfolio_runner import (
     run_s1_portfolio_backtest,
 )
 from veridian_quant.v2.backtesting.trade import ExitReason
+from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
 from veridian_quant.v2.strategies.variants import (
     S1_AVOID_MESSY_MIDDLE_V1,
     S1_BASELINE,
@@ -55,6 +56,87 @@ def test_same_day_signals_are_ranked_by_most_negative_zscore_first() -> None:
     assert result.trades[0].symbol == "MORE_NEGATIVE"
     assert result.rejected_signals[0].symbol == "LESS_NEGATIVE"
     assert result.rejected_signals[0].reason == "PORTFOLIO_CAPACITY_FULL"
+
+
+def test_default_candidate_ranking_none_preserves_current_ordering_behavior() -> None:
+    deep = _same_day_signal_frame([10, 20, 21, 5, 6])
+    liquid = _high_volume(_same_day_signal_frame([10, 12, 14, 8, 9]))
+
+    result = _run(
+        {"DEEP": deep, "LIQUID": liquid},
+        max_concurrent_positions=1,
+        candidate_ranking_mode="none",
+    )
+
+    assert [signal.symbol for signal in result.signals[:2]] == ["DEEP", "LIQUID"]
+    assert result.trades[0].symbol == "DEEP"
+    assert result.candidate_ranking_mode == "none"
+
+
+def test_candidate_ranking_s1_v1_ranks_same_day_candidates_before_capacity() -> None:
+    deep = _same_day_signal_frame([10, 20, 21, 5, 6])
+    liquid = _high_volume(_same_day_signal_frame([10, 12, 14, 8, 9]))
+
+    result = _run(
+        {"DEEP": deep, "LIQUID": liquid},
+        max_concurrent_positions=1,
+        candidate_ranking_mode="s1_v1",
+    )
+
+    assert [signal.symbol for signal in result.signals[:2]] == ["LIQUID", "DEEP"]
+    assert result.trades[0].symbol == "LIQUID"
+    assert result.rejected_signals[0].symbol == "DEEP"
+    assert result.rejected_signals[0].reason == "PORTFOLIO_CAPACITY_FULL"
+
+
+def test_candidate_ranking_does_not_reorder_across_entry_dates() -> None:
+    early = _same_day_signal_frame([10, 12, 14, 8, 9])
+    late = _high_volume(_late_signal_frame())
+
+    result = _run(
+        {"EARLY": early, "LATE": late},
+        max_concurrent_positions=5,
+        candidate_ranking_mode="s1_v1",
+    )
+
+    signal_dates = [signal.generated_on for signal in result.signals]
+    assert signal_dates == sorted(signal_dates)
+    assert result.signals[0].symbol == "EARLY"
+
+
+def test_candidate_ranking_is_deterministic() -> None:
+    data = {
+        "DEEP": _same_day_signal_frame([10, 20, 21, 5, 6]),
+        "LIQUID": _high_volume(_same_day_signal_frame([10, 12, 14, 8, 9])),
+    }
+
+    first = _run(data, max_concurrent_positions=1, candidate_ranking_mode="s1_v1")
+    second = _run(data, max_concurrent_positions=1, candidate_ranking_mode="s1_v1")
+
+    assert first.signals == second.signals
+    assert first.trades == second.trades
+    assert first.rejected_signals == second.rejected_signals
+
+
+def test_candidate_ranking_metadata_appears_in_signal_log(tmp_path) -> None:
+    result = _run(
+        {
+            "DEEP": _same_day_signal_frame([10, 20, 21, 5, 6]),
+            "LIQUID": _high_volume(_same_day_signal_frame([10, 12, 14, 8, 9])),
+        },
+        max_concurrent_positions=1,
+        candidate_ranking_mode="s1_v1",
+    )
+
+    paths = export_portfolio_backtest_csvs(result, tmp_path)
+    signal_log = pd.read_csv(paths["signal_log"])
+
+    assert "candidate_ranking_mode" in signal_log.columns
+    assert "candidate_rank" in signal_log.columns
+    assert "candidate_score" in signal_log.columns
+    assert "candidate_pool_size_for_date" in signal_log.columns
+    assert set(signal_log["candidate_ranking_mode"]) == {"s1_v1"}
+    assert set(signal_log["candidate_pool_size_for_date"]) == {2}
 
 
 def test_max_concurrent_positions_is_respected() -> None:
@@ -316,6 +398,7 @@ def _run(
     max_concurrent_positions: int = 5,
     atr_multiplier: Decimal = Decimal("10"),
     strategy_variant: str = S1_BASELINE,
+    candidate_ranking_mode: str = "none",
 ) -> PortfolioBacktestResult:
     """Run the portfolio backtest with compact deterministic settings."""
 
@@ -334,6 +417,7 @@ def _run(
         max_holding_sessions=20,
         round_trip_cost_pct=Decimal("0"),
         strategy_variant=strategy_variant,
+        candidate_ranking_mode=candidate_ranking_mode,
     )
 
 
@@ -372,6 +456,12 @@ def _same_day_signal_frame(closes: list[float]) -> pd.DataFrame:
     """Build data with a signal on the fourth row."""
 
     return _frame(closes)
+
+
+def _high_volume(data: pd.DataFrame) -> pd.DataFrame:
+    output = data.copy(deep=True)
+    output["volume"] = 1_000_000_000_000
+    return output
 
 
 def _variant_signal_frame(

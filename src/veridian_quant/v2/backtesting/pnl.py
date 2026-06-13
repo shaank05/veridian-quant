@@ -36,6 +36,10 @@ class TradePnL:
     initial_risk_amount: Decimal | None = None
     planned_reward_amount: Decimal | None = None
     reward_risk_ratio: Decimal | None = None
+    candidate_ranking_mode: str | None = None
+    candidate_rank: int | None = None
+    candidate_score: float | None = None
+    candidate_pool_size_for_date: int | None = None
 
 
 def calculate_trade_pnl(
@@ -87,6 +91,10 @@ def calculate_trade_pnl(
         initial_risk_amount=trade.initial_risk_amount,
         planned_reward_amount=trade.planned_reward_amount,
         reward_risk_ratio=trade.reward_risk_ratio,
+        candidate_ranking_mode=trade.candidate_ranking_mode,
+        candidate_rank=trade.candidate_rank,
+        candidate_score=trade.candidate_score,
+        candidate_pool_size_for_date=trade.candidate_pool_size_for_date,
     )
 
 

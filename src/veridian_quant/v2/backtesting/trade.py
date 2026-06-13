@@ -53,3 +53,7 @@ class Trade:
     initial_risk_amount: Decimal | None = None
     planned_reward_amount: Decimal | None = None
     reward_risk_ratio: Decimal | None = None
+    candidate_ranking_mode: str | None = None
+    candidate_rank: int | None = None
+    candidate_score: float | None = None
+    candidate_pool_size_for_date: int | None = None

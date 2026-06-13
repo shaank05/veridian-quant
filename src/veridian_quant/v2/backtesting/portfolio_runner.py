@@ -5,13 +5,18 @@ one-symbol OHLCV dataframes. It does not load databases, export files, calculate
 performance metrics, or add non-S1 filters.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date
 from decimal import Decimal
 from typing import Mapping
 
 import pandas as pd
 
+from veridian_quant.v2.backtesting.candidate_ranking import (
+    CANDIDATE_RANKING_NONE,
+    CANDIDATE_RANKING_MODES,
+    rank_entry_candidates,
+)
 from veridian_quant.v2.backtesting.execution import create_open_trade
 from veridian_quant.v2.backtesting.exits import resolve_trade_exit
 from veridian_quant.v2.backtesting.ledger import (
@@ -44,6 +49,10 @@ class PortfolioRejectedSignal:
     signal_date: date | None
     strategy_name: str
     reason: str
+    candidate_ranking_mode: str | None = None
+    candidate_rank: int | None = None
+    candidate_score: float | None = None
+    candidate_pool_size_for_date: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,6 +73,7 @@ class PortfolioBacktestResult:
     )
     ledger: PortfolioLedger | None = None
     strategy_variant: str = S1_BASELINE
+    candidate_ranking_mode: str = CANDIDATE_RANKING_NONE
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,10 +101,12 @@ def run_s1_portfolio_backtest(
     round_trip_cost_pct: Decimal | int | str | float = Decimal("0.004"),
     progress_reporter: object | None = None,
     strategy_variant: str = S1_BASELINE,
+    candidate_ranking_mode: str = CANDIDATE_RANKING_NONE,
 ) -> PortfolioBacktestResult:
     """Run a deterministic multi-symbol S1 research portfolio backtest."""
 
     strategy_variant = validate_s1_strategy_variant(strategy_variant)
+    candidate_ranking_mode = _validate_candidate_ranking_mode(candidate_ranking_mode)
     progress = progress_reporter or NullProgressReporter()
     ledger = create_portfolio_ledger(starting_equity)
     symbols = tuple(sorted(data_by_symbol))
@@ -132,7 +144,11 @@ def run_s1_portfolio_backtest(
             )
 
     effective_market_end_date = _effective_market_end_date(data_by_valid_symbol)
-    ordered_signals = tuple(sorted(signals, key=_signal_sort_key))
+    ordered_signals = rank_entry_candidates(
+        signals=tuple(signals),
+        data_by_symbol=data_by_valid_symbol,
+        mode=candidate_ranking_mode,
+    )
     pending_trades: list[_PendingTrade] = []
     trades: list[Trade] = []
     trade_pnls: list[TradePnL] = []
@@ -231,6 +247,7 @@ def run_s1_portfolio_backtest(
             )
             continue
 
+        closed_trade = _with_trade_ranking_metadata(closed_trade, signal)
         trade_pnl = calculate_trade_pnl(
             trade=closed_trade,
             round_trip_cost_pct=round_trip_cost_pct,
@@ -274,6 +291,7 @@ def run_s1_portfolio_backtest(
         rejected_signals=tuple(rejected_signals),
         ledger=ledger,
         strategy_variant=strategy_variant,
+        candidate_ranking_mode=candidate_ranking_mode,
     )
 
 
@@ -327,6 +345,12 @@ def _reject(signal: Signal, reason: str) -> PortfolioRejectedSignal:
         signal_date=signal.generated_on,
         strategy_name=signal.strategy_name,
         reason=reason,
+        candidate_ranking_mode=signal.metadata.get("candidate_ranking_mode"),
+        candidate_rank=signal.metadata.get("candidate_rank"),
+        candidate_score=signal.metadata.get("candidate_score"),
+        candidate_pool_size_for_date=signal.metadata.get(
+            "candidate_pool_size_for_date"
+        ),
     )
 
 
@@ -349,6 +373,29 @@ def _signal_sort_key(signal: Signal) -> tuple[date, float, str]:
         float(signal.metadata.get("z_score", 0.0)),
         signal.symbol,
     )
+
+
+def _with_trade_ranking_metadata(trade: Trade, signal: Signal) -> Trade:
+    """Return a trade copy with passive candidate-ranking metadata."""
+
+    return replace(
+        trade,
+        candidate_ranking_mode=signal.metadata.get("candidate_ranking_mode"),
+        candidate_rank=signal.metadata.get("candidate_rank"),
+        candidate_score=signal.metadata.get("candidate_score"),
+        candidate_pool_size_for_date=signal.metadata.get(
+            "candidate_pool_size_for_date"
+        ),
+    )
+
+
+def _validate_candidate_ranking_mode(mode: str) -> str:
+    if mode not in CANDIDATE_RANKING_MODES:
+        raise ValueError(
+            f"unsupported candidate ranking mode: {mode}; "
+            f"expected one of {', '.join(CANDIDATE_RANKING_MODES)}"
+        )
+    return mode
 
 
 def _validate_input(data: pd.DataFrame) -> None:

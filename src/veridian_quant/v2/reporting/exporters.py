@@ -73,6 +73,10 @@ TRADE_LOG_COLUMNS = [
     "exit_price",
     "exit_reason",
     "strategy_name",
+    "candidate_ranking_mode",
+    "candidate_rank",
+    "candidate_score",
+    "candidate_pool_size_for_date",
 ]
 TRADE_PNL_LOG_COLUMNS = [
     "trade_id",
@@ -92,6 +96,10 @@ TRADE_PNL_LOG_COLUMNS = [
     "net_pnl",
     "net_return_pct",
     "exit_reason",
+    "candidate_ranking_mode",
+    "candidate_rank",
+    "candidate_score",
+    "candidate_pool_size_for_date",
 ]
 SIGNAL_LOG_COLUMNS = [
     "symbol",
@@ -103,8 +111,24 @@ SIGNAL_LOG_COLUMNS = [
     "zscore_window",
     "entry_threshold",
     "close",
+    "candidate_ranking_mode",
+    "candidate_rank",
+    "candidate_score",
+    "candidate_score_z",
+    "candidate_score_liquidity",
+    "candidate_score_atr",
+    "candidate_pool_size_for_date",
 ]
-REJECTED_SIGNALS_COLUMNS = ["symbol", "signal_date", "strategy_name", "reason"]
+REJECTED_SIGNALS_COLUMNS = [
+    "symbol",
+    "signal_date",
+    "strategy_name",
+    "reason",
+    "candidate_ranking_mode",
+    "candidate_rank",
+    "candidate_score",
+    "candidate_pool_size_for_date",
+]
 EQUITY_CURVE_COLUMNS = ["date", "equity", "realized_pnl"]
 SUMMARY_COLUMNS = [
     "strategy_name",
@@ -375,6 +399,18 @@ def _trade_rows(result: Any) -> list[dict[str, object]]:
             "exit_price": trade.exit_price,
             "exit_reason": _enum_value(trade.exit_reason),
             "strategy_name": trade.strategy_name,
+            "candidate_ranking_mode": getattr(
+                trade,
+                "candidate_ranking_mode",
+                None,
+            ),
+            "candidate_rank": getattr(trade, "candidate_rank", None),
+            "candidate_score": getattr(trade, "candidate_score", None),
+            "candidate_pool_size_for_date": getattr(
+                trade,
+                "candidate_pool_size_for_date",
+                None,
+            ),
         }
         for trade in result.trades
     ]
@@ -406,6 +442,18 @@ def _trade_pnl_rows(result: Any) -> list[dict[str, object]]:
             "net_pnl": pnl.net_pnl,
             "net_return_pct": pnl.net_return_pct,
             "exit_reason": _enum_value(pnl.exit_reason),
+            "candidate_ranking_mode": getattr(
+                pnl,
+                "candidate_ranking_mode",
+                None,
+            ),
+            "candidate_rank": getattr(pnl, "candidate_rank", None),
+            "candidate_score": getattr(pnl, "candidate_score", None),
+            "candidate_pool_size_for_date": getattr(
+                pnl,
+                "candidate_pool_size_for_date",
+                None,
+            ),
         }
         for pnl in result.trade_pnls
     ]
@@ -428,6 +476,17 @@ def _signal_rows(result: Any) -> list[dict[str, object]]:
                 "zscore_window": metadata.get("zscore_window"),
                 "entry_threshold": metadata.get("entry_threshold"),
                 "close": metadata.get("close"),
+                "candidate_ranking_mode": metadata.get("candidate_ranking_mode"),
+                "candidate_rank": metadata.get("candidate_rank"),
+                "candidate_score": metadata.get("candidate_score"),
+                "candidate_score_z": metadata.get("candidate_score_z"),
+                "candidate_score_liquidity": metadata.get(
+                    "candidate_score_liquidity"
+                ),
+                "candidate_score_atr": metadata.get("candidate_score_atr"),
+                "candidate_pool_size_for_date": metadata.get(
+                    "candidate_pool_size_for_date"
+                ),
             }
         )
     return rows
@@ -442,6 +501,18 @@ def _rejected_signal_rows(result: Any) -> list[dict[str, object]]:
             "signal_date": rejected.signal_date,
             "strategy_name": rejected.strategy_name,
             "reason": rejected.reason,
+            "candidate_ranking_mode": getattr(
+                rejected,
+                "candidate_ranking_mode",
+                None,
+            ),
+            "candidate_rank": getattr(rejected, "candidate_rank", None),
+            "candidate_score": getattr(rejected, "candidate_score", None),
+            "candidate_pool_size_for_date": getattr(
+                rejected,
+                "candidate_pool_size_for_date",
+                None,
+            ),
         }
         for rejected in result.rejected_signals
     ]

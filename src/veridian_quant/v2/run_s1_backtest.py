@@ -9,6 +9,7 @@ from typing import Iterable
 from veridian_quant.v2.backtesting.portfolio_runner import (
     run_s1_portfolio_backtest,
 )
+from veridian_quant.v2.backtesting.candidate_ranking import CANDIDATE_RANKING_MODES
 from veridian_quant.v2.data.loaders import SQLAlchemyDailyOHLCVLoader
 from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
 from veridian_quant.v2.reporting.progress import ProgressReporter
@@ -33,7 +34,8 @@ def main(argv: Iterable[str] | None = None) -> int:
         f"equity={args.starting_equity} "
         f"risk={args.risk_per_trade} "
         f"max_positions={args.max_concurrent_positions} "
-        f"variant={args.strategy_variant}"
+        f"variant={args.strategy_variant} "
+        f"candidate_ranking={args.candidate_ranking}"
     )
     engine = _get_database_engine()
     loader = SQLAlchemyDailyOHLCVLoader(engine=engine)
@@ -84,6 +86,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         round_trip_cost_pct=Decimal("0.004"),
         progress_reporter=reporter,
         strategy_variant=args.strategy_variant,
+        candidate_ranking_mode=args.candidate_ranking,
     )
     reporter.info("Finished portfolio backtest.")
     paths = export_portfolio_backtest_csvs(
@@ -124,6 +127,11 @@ def _parse_args(argv: Iterable[str] | None) -> Namespace:
         "--strategy-variant",
         choices=S1_STRATEGY_VARIANTS,
         default=S1_BASELINE,
+    )
+    parser.add_argument(
+        "--candidate-ranking",
+        choices=CANDIDATE_RANKING_MODES,
+        default="none",
     )
     parser.add_argument(
         "--verbosity",

@@ -55,6 +55,13 @@ def test_export_portfolio_backtest_csvs_writes_expected_files() -> None:
             "candidate_filter_simulation_by_year",
             "candidate_filter_simulation_by_symbol",
             "candidate_filter_simulation_rejected_trades",
+            "all_signal_opportunity_log",
+            "accepted_vs_rejected_signal_summary",
+            "counterfactual_rejected_trade_summary",
+            "counterfactual_by_year",
+            "counterfactual_by_symbol",
+            "same_day_candidate_pool_summary",
+            "ranking_feature_diagnostics",
         }
         assert all(path.exists() for path in paths.values())
 

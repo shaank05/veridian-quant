@@ -9,6 +9,10 @@ from typing import Any, Mapping
 
 import pandas as pd
 
+from veridian_quant.v2.reporting.all_signal_opportunity import (
+    OPPORTUNITY_EXPORT_COLUMNS,
+    build_all_signal_opportunity_diagnostics,
+)
 from veridian_quant.v2.reporting.context import (
     R_CONTEXT_BUCKET_COLUMNS,
     TRADE_SIGNAL_CONTEXT_COLUMNS,
@@ -216,6 +220,18 @@ def export_portfolio_backtest_csvs(
         / "candidate_filter_simulation_by_symbol.csv",
         "candidate_filter_simulation_rejected_trades": output_path
         / "candidate_filter_simulation_rejected_trades.csv",
+        "all_signal_opportunity_log": output_path
+        / "all_signal_opportunity_log.csv",
+        "accepted_vs_rejected_signal_summary": output_path
+        / "accepted_vs_rejected_signal_summary.csv",
+        "counterfactual_rejected_trade_summary": output_path
+        / "counterfactual_rejected_trade_summary.csv",
+        "counterfactual_by_year": output_path / "counterfactual_by_year.csv",
+        "counterfactual_by_symbol": output_path / "counterfactual_by_symbol.csv",
+        "same_day_candidate_pool_summary": output_path
+        / "same_day_candidate_pool_summary.csv",
+        "ranking_feature_diagnostics": output_path
+        / "ranking_feature_diagnostics.csv",
     }
 
     _write_csv(exports["trade_log"], _trade_rows(result), TRADE_LOG_COLUMNS)
@@ -362,6 +378,17 @@ def export_portfolio_backtest_csvs(
         build_candidate_filter_simulation_rejected_trade_rows(trade_context_rows),
         CANDIDATE_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS,
     )
+
+    opportunity_diagnostics = build_all_signal_opportunity_diagnostics(
+        result,
+        stock_data_by_symbol=stock_data_by_symbol,
+    )
+    for export_name, columns in OPPORTUNITY_EXPORT_COLUMNS.items():
+        _write_csv(
+            exports[export_name],
+            getattr(opportunity_diagnostics, export_name),
+            columns,
+        )
     return exports
 
 

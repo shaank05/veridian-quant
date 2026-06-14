@@ -55,7 +55,7 @@ Allowed:
 - Z-score
 - ATR or stop-distance sizing for portfolio risk management only
 
-Not Allowed:
+Not Allowed inside S1 signal generation:
 
 - Nifty trend filter
 - India VIX filter
@@ -65,13 +65,17 @@ Not Allowed:
 - Volume filter
 - FFT
 - Wavelets
-- Markov chains
+- Markov chains as an S1 filter or S1 signal component
 - Machine learning
 - Conviction scoring
 
 Reason:
 
 S1 must isolate the pure Z-score mean-reversion hypothesis.
+
+Note:
+
+Markov logic is now allowed as the separate standalone `S2_MARKOV_STATE_TRANSITION` strategy family. It is not part of S1 and is not an S1 filter.
 
 ---
 
@@ -178,20 +182,29 @@ Direction	          Long only
 
 ---
 
-## 10. Ranking Logic 
+## 10. Candidate Ordering and Ranking Experiments
 
-If multiple S1 signals occur on the same date and portfolio capacity is limited, signals are ranked by Z-score severity.
+The original S1 baseline sequencing was intentionally simple.
 
-Priority:
-Most negative Z-score first
+For baseline research, same-day S1 signal ordering used only the information available in the generated signal stream and did not promote a multi-feature ranking model.
 
-Example:
-Symbol	    Z-score	    Priority
-Stock A	    -3.1	        1
-Stock B	    -2.6	        2
-Stock C	    -2.1	        3
+Historical simple ordering rule:
 
-No other ranking variable is allowed in S1.
+- Most negative Z-score first when same-day signals require deterministic ordering.
+
+`candidate-ranking s1_v1` was later implemented as an opt-in capacity-aware ranking experiment.
+
+Result:
+
+- `candidate-ranking s1_v1` was technically valid.
+- It underperformed the unranked S1 baseline.
+- It is parked.
+
+Current decision:
+
+- No S1 ranking method is currently promoted over the unranked baseline.
+- S1 ranking v2 is future research, not current behavior.
+- Future ranking work should be evidence-based and should not be treated as an accepted production rule until audited.
 
 ---
 

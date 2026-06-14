@@ -312,6 +312,40 @@ Need baseline edge first.
 
 ---
 
+# 6.1 Current Strategy Architecture Notes
+
+Veridian Quant v2 now has two standalone research strategy families:
+
+* S1: `S1_ZSCORE_MEAN_REVERSION`
+* S2: `S2_MARKOV_STATE_TRANSITION`
+
+S1 and S2 are independent signal-generation families.
+
+S2 is not an S1 filter.
+
+S1 remains the current benchmark strategy. S2 has been implemented but has not yet been benchmarked on the audited 200-symbol research universe.
+
+Shared components include:
+
+* Trade setup
+* Position sizing
+* Trade creation
+* Exit resolution
+* Trade PnL
+* Portfolio ledger
+* CSV exporters
+* Standard diagnostics where compatible
+
+Current runner architecture:
+
+* The S1 portfolio runner remains unchanged and continues to own S1-specific variants and S1 candidate ranking behavior.
+* S2 currently has a separate Markov portfolio runner.
+* Both runners use the same downstream trade mechanics after signals are generated.
+
+Future strategy combination, voting, meta-ranking, and capital allocation layers are future work. They are not current behavior and must not be treated as accepted production rules.
+
+---
+
 # 7. Acceptance Criteria
 
 A component can enter production candidate status only if:

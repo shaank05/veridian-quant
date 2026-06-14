@@ -181,9 +181,51 @@ Identify stocks that underperform sharply versus benchmark but remain inside a s
 
 ---
 
+# H6 - Opportunity Selection Under Capital Constraints
+
+## Hypothesis
+
+S1's key bottleneck is not only signal generation. It is opportunity selection under capital constraints.
+
+When the strategy generates more valid signals than the portfolio can take, portfolio results depend heavily on which candidates are selected and which are rejected.
+
+## Expected Edge
+
+Improve portfolio performance by ranking, scoring, or voting among same-day candidates without changing the underlying signal-generation rules.
+
+## Current Evidence
+
+All-signal diagnostics show that rejected capacity signals contain hidden winners, but the average rejected capacity signal has weak edge.
+
+This supports future candidate ranking and voting systems, but does not prove that simple ranking is enough.
+
+`candidate-ranking s1_v1` underperformed the unranked S1 baseline, so more evidence or separate strategy families are needed before optimizing S1 ranking further.
+
+Standalone strategies should be tested independently before combining them as votes.
+
+## Candidate Features
+
+* Signal depth
+* Volatility-adjusted displacement
+* Liquidity
+* Same-day candidate pool context
+* Historical same-state outcomes
+* Regime context
+* Strategy-family agreement
+
+## When It May Fail
+
+* Ranking features are noisy.
+* Winners are not predictable from signal-time data.
+* Hard filters remove too many profitable trades.
+* Ranking overfits one universe or period.
+* Capacity constraints change in live deployment.
+
+---
+
 # Rejected or Deferred Hypotheses
 
-The following are not part of Phase 1.
+The following are not accepted production rules.
 
 ## Exact Price Prediction
 
@@ -201,7 +243,7 @@ Reason:
 
 Machine learning may be useful later, but only after clean baselines and audit framework are established.
 
-## FFT / Wavelet / Markov-Based Entry
+## FFT / Wavelet Entry
 
 Deferred.
 
@@ -211,14 +253,28 @@ These may be researched later, but they must independently prove contribution be
 
 ---
 
-# Phase 1 Priority
+## Markov-Based Entry
 
-The first research priority is:
+Research implementation exists as standalone S2 Markov State Transition.
 
-## H1 + H2 + H3
+Status:
+
+Implemented, not yet benchmarked on the audited 200-symbol research universe, and not accepted as a production rule.
+
+Reason:
+
+Markov logic must prove standalone contribution before it can be compared with or combined with S1.
+
+---
+
+# Current Priority
+
+The current research priority is:
+
+## H1 + H3 + H6, plus standalone S2 evaluation
 
 Meaning:
 
-A simple volatility-normalized mean reversion strategy with basic regime awareness.
+S1 remains the current volatility-normalized mean-reversion benchmark, while opportunity selection under capital constraints is now a core research problem.
 
-No advanced ensemble components are allowed until this baseline is validated.
+S2 Markov State Transition should be tested independently before any S1/S2 voting, meta-ranking, or ensemble behavior is considered.

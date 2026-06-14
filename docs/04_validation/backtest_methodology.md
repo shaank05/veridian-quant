@@ -830,6 +830,37 @@ If more signals are generated than available portfolio capacity:
 
 ---
 
+### 8.10.1 Counterfactual Rejected-Signal Simulation
+
+Some research reports may simulate what would have happened if capacity-rejected signals had been taken.
+
+These rows must be labeled as counterfactual diagnostics.
+
+Counterfactual rejected-signal PnL is not actual portfolio PnL.
+
+It ignores portfolio capital constraints and ledger effects. It does not update the portfolio ledger, does not consume capacity, and does not change the real trade list.
+
+Counterfactual simulation is used only to evaluate opportunity quality and future ranking hypotheses.
+
+It may use future prices only after the signal date, exactly like normal exit resolution for a real backtest trade.
+
+Counterfactual PnL must not be mixed into actual portfolio performance metrics such as summary return, gross profit, gross loss, profit factor, drawdown, or equity curve.
+
+Allowed uses:
+
+- Estimate whether rejected capacity signals were better or worse than accepted trades.
+- Diagnose same-day candidate pools.
+- Evaluate future ranking or voting hypotheses.
+
+Not allowed:
+
+- Reporting counterfactual PnL as portfolio PnL.
+- Treating counterfactual wins as executable trades.
+- Using counterfactual outcomes to change historical signal generation.
+- Using counterfactual outcomes as accepted production rules.
+
+---
+
 ### 8.11 Position Independence
 
 Each position is evaluated independently.

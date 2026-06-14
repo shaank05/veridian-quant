@@ -246,7 +246,55 @@ Performance should not depend on one fragile parameter combination.
 
 ---
 
-## 14. References
+## 14. Current Research Findings
+
+S1 baseline remains the current Veridian Quant v2 benchmark.
+
+Current benchmark:
+
+- Strategy: `S1_BASELINE`
+- Universe: audited 200-symbol research universe
+- Period: 2020-01-01 to 2026-04-30
+- Net PnL: approximately +579K
+- Gross profit: approximately +4.64M
+- Gross loss: approximately -4.06M
+- Profit factor: approximately 1.143
+- Max drawdown: approximately 23.52%
+- Trades: 535
+- Total signals: 7,476
+- Rejected signals: 6,941
+- Portfolio capacity rejections: 6,726
+
+Important findings:
+
+- The 200-symbol universe materially outperformed the 100-symbol universe.
+- S1 hard-filter variants did not generalize reliably.
+- `S1_AVOID_MESSY_MIDDLE_V1` performed badly on the broader universe despite earlier promise.
+- `S1_BROAD_BEST_GUESS` was conservative but did not outperform the 200-symbol baseline.
+- `candidate-ranking s1_v1` was technically valid but underperformed the unranked baseline.
+- S1 ranking optimization is parked for now.
+
+Research interpretation:
+
+- S1 is useful as the current benchmark, not as a final strategy.
+- Future S1 improvements should likely use evidence-based votes or scoring rather than premature hard filters.
+- Capacity-aware opportunity selection is a major open problem, but S1 ranking v1 is not enough evidence to justify more S1-only optimization immediately.
+
+---
+
+## 15. Parked / Future S1 Work
+
+The following are future research directions, not accepted production rules:
+
+- S1 candidate ranking v2
+- Feature-combination diagnostics
+- Evidence-based vote/scoring systems
+- Defensive regime layer for difficult 2026-like conditions
+- Meta-ranking or capital allocation across multiple standalone strategy families
+
+---
+
+## 16. References
 This strategy inherits rules and constraints from:
 - `docs/00_foundation/v2_design_document.md`
 - `docs/00_foundation/v2_research_roadmap.md`

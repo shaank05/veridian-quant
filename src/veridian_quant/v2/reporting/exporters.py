@@ -122,6 +122,19 @@ SIGNAL_LOG_COLUMNS = [
     "candidate_score_liquidity",
     "candidate_score_atr",
     "candidate_pool_size_for_date",
+    "strategy_family",
+    "state_label",
+    "state_lookback_sessions",
+    "state_observation_count",
+    "forward_return_sessions",
+    "positive_return_threshold_pct",
+    "positive_transition_probability",
+    "average_forward_return_pct",
+    "median_forward_return_pct",
+    "current_5d_return_pct",
+    "current_atr_pct",
+    "current_drawdown_60d_pct",
+    "current_close_vs_60d_low_pct",
 ]
 REJECTED_SIGNALS_COLUMNS = [
     "symbol",
@@ -513,6 +526,37 @@ def _signal_rows(result: Any) -> list[dict[str, object]]:
                 "candidate_score_atr": metadata.get("candidate_score_atr"),
                 "candidate_pool_size_for_date": metadata.get(
                     "candidate_pool_size_for_date"
+                ),
+                "strategy_family": metadata.get("strategy_family"),
+                "state_label": metadata.get("state_label"),
+                "state_lookback_sessions": metadata.get(
+                    "state_lookback_sessions"
+                ),
+                "state_observation_count": metadata.get(
+                    "state_observation_count"
+                ),
+                "forward_return_sessions": metadata.get(
+                    "forward_return_sessions"
+                ),
+                "positive_return_threshold_pct": metadata.get(
+                    "positive_return_threshold_pct"
+                ),
+                "positive_transition_probability": metadata.get(
+                    "positive_transition_probability"
+                ),
+                "average_forward_return_pct": metadata.get(
+                    "average_forward_return_pct"
+                ),
+                "median_forward_return_pct": metadata.get(
+                    "median_forward_return_pct"
+                ),
+                "current_5d_return_pct": metadata.get("current_5d_return_pct"),
+                "current_atr_pct": metadata.get("current_atr_pct"),
+                "current_drawdown_60d_pct": metadata.get(
+                    "current_drawdown_60d_pct"
+                ),
+                "current_close_vs_60d_low_pct": metadata.get(
+                    "current_close_vs_60d_low_pct"
                 ),
             }
         )

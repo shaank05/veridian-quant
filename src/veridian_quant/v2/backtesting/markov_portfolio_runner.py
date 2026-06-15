@@ -23,10 +23,19 @@ from veridian_quant.v2.backtesting.setup import build_trade_setup
 from veridian_quant.v2.backtesting.sizing import build_position_plan
 from veridian_quant.v2.data.models import Signal
 from veridian_quant.v2.reporting.progress import NullProgressReporter
+from veridian_quant.v2.strategies.s2_markov_filters import (
+    MARKOV_SIGNAL_FILTER_NONE,
+    apply_markov_signal_filter,
+    markov_strategy_variant,
+    validate_markov_signal_filter,
+)
 from veridian_quant.v2.strategies.s2_markov_state_transition import (
     STRATEGY_NAME,
     generate_s2_markov_signals,
 )
+
+
+S2_MARKOV_SIGNAL_FILTERED_REASON = "S2_MARKOV_SIGNAL_FILTERED"
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,9 +66,11 @@ def run_s2_markov_portfolio_backtest(
     max_holding_sessions: int = 20,
     round_trip_cost_pct: Decimal | int | str | float = Decimal("0.004"),
     progress_reporter: object | None = None,
+    markov_signal_filter: str = MARKOV_SIGNAL_FILTER_NONE,
 ) -> PortfolioBacktestResult:
     """Run a deterministic multi-symbol S2 Markov research backtest."""
 
+    markov_signal_filter = validate_markov_signal_filter(markov_signal_filter)
     progress = progress_reporter or NullProgressReporter()
     ledger = create_portfolio_ledger(starting_equity)
     symbols = tuple(sorted(data_by_symbol))
@@ -90,12 +101,29 @@ def run_s2_markov_portfolio_backtest(
                 ),
             )
             total_generated_signals += len(generated_signals)
-            filtered_signals = [
+            window_signals = [
                 signal
                 for signal in generated_signals
                 if start_date <= signal.generated_on <= end_date
             ]
-            signals.extend(filtered_signals)
+            if markov_signal_filter == MARKOV_SIGNAL_FILTER_NONE:
+                signals.extend(window_signals)
+            else:
+                for signal in window_signals:
+                    decision = apply_markov_signal_filter(
+                        signal,
+                        markov_signal_filter,
+                    )
+                    signals.append(decision.signal)
+                    if not decision.kept:
+                        _append_rejection(
+                            rejected_signals,
+                            _reject(
+                                decision.signal,
+                                S2_MARKOV_SIGNAL_FILTERED_REASON,
+                            ),
+                            progress,
+                        )
             progress.info(
                 f"Generated S2 signals for {symbol}: rows={len(backtest_data)} "
                 f"signals={len(generated_signals)} "
@@ -120,16 +148,21 @@ def run_s2_markov_portfolio_backtest(
         f"signals_in_backtest_window={len(signals)}"
     )
     effective_market_end_date = _effective_market_end_date(data_by_valid_symbol)
-    ordered_signals = tuple(
+    ordered_all_signals = tuple(
         sorted(signals, key=lambda signal: (signal.generated_on, signal.symbol))
     )
-    progress.info(f"Total ordered S2 signals: {len(ordered_signals)}")
+    ordered_execution_signals = tuple(
+        signal
+        for signal in ordered_all_signals
+        if signal.metadata.get("markov_filter_decision") != "filtered"
+    )
+    progress.info(f"Total ordered S2 signals: {len(ordered_execution_signals)}")
     pending_trades: list[_PendingTrade] = []
     trades = []
     trade_pnls = []
     execution_started = perf_counter()
 
-    for signal in ordered_signals:
+    for signal in ordered_execution_signals:
         progress.signal(signal)
         ledger, pending_trades = _apply_due_trade_pnls(
             ledger=ledger,
@@ -257,10 +290,10 @@ def run_s2_markov_portfolio_backtest(
         symbols=symbols,
         trade_pnls=tuple(trade_pnls),
         trades=tuple(trades),
-        signals=ordered_signals,
+        signals=ordered_all_signals,
         rejected_signals=tuple(rejected_signals),
         ledger=ledger,
-        strategy_variant=STRATEGY_NAME,
+        strategy_variant=markov_strategy_variant(STRATEGY_NAME, markov_signal_filter),
     )
 
 
@@ -310,6 +343,8 @@ def _reject(signal: Signal, reason: str) -> PortfolioRejectedSignal:
         signal_date=signal.generated_on,
         strategy_name=signal.strategy_name,
         reason=reason,
+        markov_signal_filter=signal.metadata.get("markov_signal_filter"),
+        markov_filter_decision=signal.metadata.get("markov_filter_decision"),
     )
 
 

@@ -13,6 +13,9 @@ from veridian_quant.v2.backtesting.markov_portfolio_runner import (
 from veridian_quant.v2.data.loaders import SQLAlchemyDailyOHLCVLoader
 from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
 from veridian_quant.v2.reporting.progress import ProgressReporter
+from veridian_quant.v2.strategies.s2_markov_filters import (
+    MARKOV_SIGNAL_FILTERS,
+)
 
 
 NIFTY_50_INSTRUMENT_KEY = "NSE_INDEX|Nifty 50"
@@ -30,7 +33,8 @@ def main(argv: Iterable[str] | None = None) -> int:
         f"{args.start_date} to {args.end_date} "
         f"equity={args.starting_equity} "
         f"risk={args.risk_per_trade} "
-        f"max_positions={args.max_concurrent_positions}"
+        f"max_positions={args.max_concurrent_positions} "
+        f"markov_signal_filter={args.markov_signal_filter}"
     )
     setup_started = perf_counter()
     engine = _get_database_engine()
@@ -99,6 +103,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         max_holding_sessions=20,
         round_trip_cost_pct=Decimal("0.004"),
         progress_reporter=reporter,
+        markov_signal_filter=args.markov_signal_filter,
     )
     reporter.info(
         f"Finished S2 portfolio backtest in "
@@ -111,6 +116,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         stock_data_by_symbol=data_by_symbol,
         nifty_data=nifty_data,
         progress_reporter=reporter,
+        include_all_signal_diagnostics=not args.skip_all_signal_diagnostics,
     )
     reporter.info(
         f"Finished CSV export in {perf_counter() - export_started:.2f}s"
@@ -173,6 +179,15 @@ def _parse_args(argv: Iterable[str] | None) -> Namespace:
         "--verbosity",
         choices=["quiet", "normal", "verbose"],
         default="normal",
+    )
+    parser.add_argument(
+        "--markov-signal-filter",
+        choices=MARKOV_SIGNAL_FILTERS,
+        default="none",
+    )
+    parser.add_argument(
+        "--skip-all-signal-diagnostics",
+        action="store_true",
     )
     args = parser.parse_args(list(argv) if argv is not None else None)
 

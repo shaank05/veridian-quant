@@ -150,6 +150,8 @@ SIGNAL_LOG_COLUMNS = [
     "current_atr_pct",
     "current_drawdown_60d_pct",
     "current_close_vs_60d_low_pct",
+    "markov_signal_filter",
+    "markov_filter_decision",
 ]
 REJECTED_SIGNALS_COLUMNS = [
     "symbol",
@@ -160,6 +162,8 @@ REJECTED_SIGNALS_COLUMNS = [
     "candidate_rank",
     "candidate_score",
     "candidate_pool_size_for_date",
+    "markov_signal_filter",
+    "markov_filter_decision",
 ]
 EQUITY_CURVE_COLUMNS = ["date", "equity", "realized_pnl"]
 SUMMARY_COLUMNS = [
@@ -199,6 +203,7 @@ def export_portfolio_backtest_csvs(
     stock_data_by_symbol: Mapping[str, pd.DataFrame] | None = None,
     nifty_data: pd.DataFrame | None = None,
     progress_reporter: object | None = None,
+    include_all_signal_diagnostics: bool = True,
 ) -> dict[str, Path]:
     """Write standard portfolio backtest CSV artifacts and return file paths."""
 
@@ -493,22 +498,27 @@ def export_portfolio_backtest_csvs(
         s2_filter_started,
     )
 
-    opportunity_started = perf_counter()
-    opportunity_diagnostics = build_all_signal_opportunity_diagnostics(
-        result,
-        stock_data_by_symbol=stock_data_by_symbol,
-    )
-    for export_name, columns in OPPORTUNITY_EXPORT_COLUMNS.items():
-        _write_csv(
-            exports[export_name],
-            getattr(opportunity_diagnostics, export_name),
-            columns,
+    if include_all_signal_diagnostics:
+        opportunity_started = perf_counter()
+        opportunity_diagnostics = build_all_signal_opportunity_diagnostics(
+            result,
+            stock_data_by_symbol=stock_data_by_symbol,
         )
-    _log_elapsed(
-        progress_reporter,
-        "Finished all-signal opportunity diagnostics",
-        opportunity_started,
-    )
+        for export_name, columns in OPPORTUNITY_EXPORT_COLUMNS.items():
+            _write_csv(
+                exports[export_name],
+                getattr(opportunity_diagnostics, export_name),
+                columns,
+            )
+        _log_elapsed(
+            progress_reporter,
+            "Finished all-signal opportunity diagnostics",
+            opportunity_started,
+        )
+    else:
+        for export_name, columns in OPPORTUNITY_EXPORT_COLUMNS.items():
+            _write_csv(exports[export_name], [], columns)
+        _log_info(progress_reporter, "Skipped all-signal opportunity diagnostics")
     _log_elapsed(progress_reporter, "Finished total CSV export", export_started)
     return exports
 
@@ -533,6 +543,12 @@ def _log_elapsed(
     if progress_reporter is None or not hasattr(progress_reporter, "info"):
         return
     progress_reporter.info(f"{message} in {perf_counter() - started:.2f}s")
+
+
+def _log_info(progress_reporter: object | None, message: str) -> None:
+    if progress_reporter is None or not hasattr(progress_reporter, "info"):
+        return
+    progress_reporter.info(message)
 
 
 def _trade_rows(result: Any) -> list[dict[str, object]]:
@@ -678,6 +694,8 @@ def _signal_rows(result: Any) -> list[dict[str, object]]:
                 "current_close_vs_60d_low_pct": metadata.get(
                     "current_close_vs_60d_low_pct"
                 ),
+                "markov_signal_filter": metadata.get("markov_signal_filter"),
+                "markov_filter_decision": metadata.get("markov_filter_decision"),
             }
         )
     return rows
@@ -702,6 +720,16 @@ def _rejected_signal_rows(result: Any) -> list[dict[str, object]]:
             "candidate_pool_size_for_date": getattr(
                 rejected,
                 "candidate_pool_size_for_date",
+                None,
+            ),
+            "markov_signal_filter": getattr(
+                rejected,
+                "markov_signal_filter",
+                None,
+            ),
+            "markov_filter_decision": getattr(
+                rejected,
+                "markov_filter_decision",
                 None,
             ),
         }

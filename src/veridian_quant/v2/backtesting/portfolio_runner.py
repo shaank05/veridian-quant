@@ -53,6 +53,8 @@ class PortfolioRejectedSignal:
     candidate_rank: int | None = None
     candidate_score: float | None = None
     candidate_pool_size_for_date: int | None = None
+    markov_signal_filter: str | None = None
+    markov_filter_decision: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

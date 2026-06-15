@@ -59,6 +59,20 @@ from veridian_quant.v2.reporting.filter_simulation import (
     build_candidate_filter_simulation_rows,
 )
 from veridian_quant.v2.reporting.metrics import calculate_performance_summary
+from veridian_quant.v2.reporting.s2_markov_filter_simulation import (
+    S2_MARKOV_FILTER_SIMULATION_BY_SYMBOL_COLUMNS,
+    S2_MARKOV_FILTER_SIMULATION_BY_YEAR_COLUMNS,
+    S2_MARKOV_FILTER_SIMULATION_COLUMNS,
+    S2_MARKOV_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS,
+    S2_MARKOV_STATE_COMPONENT_SUMMARY_COLUMNS,
+    S2_MARKOV_STATE_LABEL_SUMMARY_COLUMNS,
+    build_s2_markov_filter_simulation_by_symbol_rows,
+    build_s2_markov_filter_simulation_by_year_rows,
+    build_s2_markov_filter_simulation_rejected_trade_rows,
+    build_s2_markov_filter_simulation_rows,
+    build_s2_markov_state_component_summary_rows,
+    build_s2_markov_state_label_summary_rows,
+)
 
 
 TRADE_LOG_COLUMNS = [
@@ -233,6 +247,18 @@ def export_portfolio_backtest_csvs(
         / "candidate_filter_simulation_by_symbol.csv",
         "candidate_filter_simulation_rejected_trades": output_path
         / "candidate_filter_simulation_rejected_trades.csv",
+        "s2_markov_filter_simulation": output_path
+        / "s2_markov_filter_simulation.csv",
+        "s2_markov_filter_simulation_by_year": output_path
+        / "s2_markov_filter_simulation_by_year.csv",
+        "s2_markov_filter_simulation_by_symbol": output_path
+        / "s2_markov_filter_simulation_by_symbol.csv",
+        "s2_markov_filter_simulation_rejected_trades": output_path
+        / "s2_markov_filter_simulation_rejected_trades.csv",
+        "s2_markov_state_component_summary": output_path
+        / "s2_markov_state_component_summary.csv",
+        "s2_markov_state_label_summary": output_path
+        / "s2_markov_state_label_summary.csv",
         "all_signal_opportunity_log": output_path
         / "all_signal_opportunity_log.csv",
         "accepted_vs_rejected_signal_summary": output_path
@@ -390,6 +416,36 @@ def export_portfolio_backtest_csvs(
         exports["candidate_filter_simulation_rejected_trades"],
         build_candidate_filter_simulation_rejected_trade_rows(trade_context_rows),
         CANDIDATE_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_markov_filter_simulation"],
+        build_s2_markov_filter_simulation_rows(trade_context_rows),
+        S2_MARKOV_FILTER_SIMULATION_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_markov_filter_simulation_by_year"],
+        build_s2_markov_filter_simulation_by_year_rows(trade_context_rows),
+        S2_MARKOV_FILTER_SIMULATION_BY_YEAR_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_markov_filter_simulation_by_symbol"],
+        build_s2_markov_filter_simulation_by_symbol_rows(trade_context_rows),
+        S2_MARKOV_FILTER_SIMULATION_BY_SYMBOL_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_markov_filter_simulation_rejected_trades"],
+        build_s2_markov_filter_simulation_rejected_trade_rows(trade_context_rows),
+        S2_MARKOV_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_markov_state_component_summary"],
+        build_s2_markov_state_component_summary_rows(trade_context_rows),
+        S2_MARKOV_STATE_COMPONENT_SUMMARY_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_markov_state_label_summary"],
+        build_s2_markov_state_label_summary_rows(trade_context_rows),
+        S2_MARKOV_STATE_LABEL_SUMMARY_COLUMNS,
     )
 
     opportunity_diagnostics = build_all_signal_opportunity_diagnostics(

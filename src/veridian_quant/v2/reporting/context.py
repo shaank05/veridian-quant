@@ -46,6 +46,16 @@ TRADE_SIGNAL_CONTEXT_COLUMNS = [
     "z_score_prior_3d",
     "z_score_change_1d",
     "z_score_change_3d",
+    "strategy_family",
+    "state_label",
+    "state_observation_count",
+    "positive_transition_probability",
+    "average_forward_return_pct",
+    "median_forward_return_pct",
+    "current_5d_return_pct",
+    "current_atr_pct",
+    "current_drawdown_60d_pct",
+    "current_close_vs_60d_low_pct",
     "stock_open",
     "stock_high",
     "stock_low",
@@ -169,6 +179,26 @@ def build_trade_signal_context_rows(
             "z_score_prior_3d": metadata.get("z_score_prior_3d"),
             "z_score_change_1d": metadata.get("z_score_change_1d"),
             "z_score_change_3d": metadata.get("z_score_change_3d"),
+            "strategy_family": metadata.get("strategy_family"),
+            "state_label": metadata.get("state_label"),
+            "state_observation_count": metadata.get("state_observation_count"),
+            "positive_transition_probability": metadata.get(
+                "positive_transition_probability"
+            ),
+            "average_forward_return_pct": metadata.get(
+                "average_forward_return_pct"
+            ),
+            "median_forward_return_pct": metadata.get(
+                "median_forward_return_pct"
+            ),
+            "current_5d_return_pct": metadata.get("current_5d_return_pct"),
+            "current_atr_pct": metadata.get("current_atr_pct"),
+            "current_drawdown_60d_pct": metadata.get(
+                "current_drawdown_60d_pct"
+            ),
+            "current_close_vs_60d_low_pct": metadata.get(
+                "current_close_vs_60d_low_pct"
+            ),
         }
         row.update(_prefixed_context("stock", stock_context))
         row.update(_prefixed_context("nifty", nifty_context))

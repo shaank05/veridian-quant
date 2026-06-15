@@ -94,6 +94,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         args.output_dir,
         stock_data_by_symbol=data_by_symbol,
         nifty_data=nifty_data,
+        progress_reporter=reporter,
     )
     reporter.info(f"CSV export location: {Path(args.output_dir)}")
     reporter.complete(

@@ -3,6 +3,7 @@
 from dataclasses import dataclass, replace
 from datetime import date
 from decimal import Decimal
+from time import perf_counter
 from typing import Mapping
 
 import pandas as pd
@@ -65,6 +66,8 @@ def run_s2_markov_portfolio_backtest(
     data_by_valid_symbol: dict[str, pd.DataFrame] = {}
     rejected_signals: list[PortfolioRejectedSignal] = []
     signals: list[Signal] = []
+    total_generated_signals = 0
+    signal_generation_started = perf_counter()
 
     for symbol in symbols:
         data = data_by_symbol[symbol]
@@ -73,21 +76,30 @@ def run_s2_markov_portfolio_backtest(
             sorted_data = _sort_chronologically(data)
             backtest_data = _rows_on_or_before(sorted_data, end_date)
             data_by_valid_symbol[symbol] = backtest_data
-            signals.extend(
+            symbol_started = perf_counter()
+            generated_signals = generate_s2_markov_signals(
+                symbol=symbol,
+                data=backtest_data,
+                state_lookback_sessions=state_lookback_sessions,
+                min_state_observations=min_state_observations,
+                forward_return_sessions=forward_return_sessions,
+                positive_return_threshold_pct=positive_return_threshold_pct,
+                signal_probability_threshold=signal_probability_threshold,
+                signal_average_forward_return_threshold_pct=(
+                    signal_average_forward_return_threshold_pct
+                ),
+            )
+            total_generated_signals += len(generated_signals)
+            filtered_signals = [
                 signal
-                for signal in generate_s2_markov_signals(
-                    symbol=symbol,
-                    data=backtest_data,
-                    state_lookback_sessions=state_lookback_sessions,
-                    min_state_observations=min_state_observations,
-                    forward_return_sessions=forward_return_sessions,
-                    positive_return_threshold_pct=positive_return_threshold_pct,
-                    signal_probability_threshold=signal_probability_threshold,
-                    signal_average_forward_return_threshold_pct=(
-                        signal_average_forward_return_threshold_pct
-                    ),
-                )
+                for signal in generated_signals
                 if start_date <= signal.generated_on <= end_date
+            ]
+            signals.extend(filtered_signals)
+            progress.info(
+                f"Generated S2 signals for {symbol}: rows={len(backtest_data)} "
+                f"signals={len(generated_signals)} "
+                f"in {perf_counter() - symbol_started:.2f}s"
             )
         except ValueError:
             _append_rejection(
@@ -101,13 +113,21 @@ def run_s2_markov_portfolio_backtest(
                 progress,
             )
 
+    progress.info(
+        "Finished S2 signal generation in "
+        f"{perf_counter() - signal_generation_started:.2f}s; "
+        f"total_generated_signals={total_generated_signals}; "
+        f"signals_in_backtest_window={len(signals)}"
+    )
     effective_market_end_date = _effective_market_end_date(data_by_valid_symbol)
     ordered_signals = tuple(
         sorted(signals, key=lambda signal: (signal.generated_on, signal.symbol))
     )
+    progress.info(f"Total ordered S2 signals: {len(ordered_signals)}")
     pending_trades: list[_PendingTrade] = []
     trades = []
     trade_pnls = []
+    execution_started = perf_counter()
 
     for signal in ordered_signals:
         progress.signal(signal)
@@ -221,6 +241,11 @@ def run_s2_markov_portfolio_backtest(
         trade_pnls=trade_pnls,
         rejected_signals=rejected_signals,
         progress_reporter=progress,
+    )
+    progress.info(
+        "Finished S2 portfolio execution in "
+        f"{perf_counter() - execution_started:.2f}s; "
+        f"accepted_trades={len(trades)}; rejected_signals={len(rejected_signals)}"
     )
 
     return PortfolioBacktestResult(

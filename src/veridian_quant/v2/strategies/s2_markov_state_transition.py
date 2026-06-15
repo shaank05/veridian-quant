@@ -9,6 +9,7 @@ transition statistics.
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from collections import defaultdict, deque
 from statistics import median
 from types import MappingProxyType
 
@@ -52,18 +53,40 @@ class S2MarkovStateTransitionStrategy:
 
         working = data.copy(deep=True).reset_index(drop=True)
         state_frame = build_state_frame(working)
+        close_values = working["close"].tolist()
+        row_dates = [_row_date(row) for _, row in working.iterrows()]
+        state_labels = state_frame["state_label"].tolist()
+        current_5d_returns = state_frame["current_5d_return_pct"].tolist()
+        current_atr_values = state_frame["current_atr_pct"].tolist()
+        current_drawdowns = state_frame["current_drawdown_60d_pct"].tolist()
+        current_low_distances = state_frame[
+            "current_close_vs_60d_low_pct"
+        ].tolist()
+        forward_returns = _forward_returns(
+            close_values,
+            self.forward_return_sessions,
+        )
+        observations_by_state: dict[str, deque[tuple[int, float]]] = defaultdict(
+            deque
+        )
+
         signals: list[Signal] = []
         for current_index, row in working.iterrows():
-            state_label = state_frame.loc[current_index, "state_label"]
-            if state_label is None:
-                continue
-            prior_returns = _prior_same_state_forward_returns(
-                state_frame=state_frame,
-                close=working["close"],
+            _add_newly_matured_observation(
                 current_index=current_index,
-                state_label=state_label,
-                state_lookback_sessions=self.state_lookback_sessions,
                 forward_return_sessions=self.forward_return_sessions,
+                state_labels=state_labels,
+                forward_returns=forward_returns,
+                observations_by_state=observations_by_state,
+            )
+            state_label = state_labels[current_index]
+            if state_label is None or pd.isna(state_label):
+                continue
+            prior_returns = _active_prior_returns(
+                observations_by_state=observations_by_state,
+                current_index=current_index,
+                state_lookback_sessions=self.state_lookback_sessions,
+                state_label=state_label,
             )
             if len(prior_returns) < self.min_state_observations:
                 continue
@@ -83,7 +106,7 @@ class S2MarkovStateTransitionStrategy:
                 Signal(
                     symbol=symbol,
                     signal_type=SignalType.LONG,
-                    generated_on=_row_date(row),
+                    generated_on=row_dates[current_index],
                     strategy_name=self.strategy_name,
                     reason=(
                         "S2 same-state transition statistics met long "
@@ -107,25 +130,16 @@ class S2MarkovStateTransitionStrategy:
                             "average_forward_return_pct": average_return,
                             "median_forward_return_pct": median_return,
                             "current_5d_return_pct": _blank_nan(
-                                state_frame.loc[
-                                    current_index,
-                                    "current_5d_return_pct",
-                                ]
+                                current_5d_returns[current_index]
                             ),
                             "current_atr_pct": _blank_nan(
-                                state_frame.loc[current_index, "current_atr_pct"]
+                                current_atr_values[current_index]
                             ),
                             "current_drawdown_60d_pct": _blank_nan(
-                                state_frame.loc[
-                                    current_index,
-                                    "current_drawdown_60d_pct",
-                                ]
+                                current_drawdowns[current_index]
                             ),
                             "current_close_vs_60d_low_pct": _blank_nan(
-                                state_frame.loc[
-                                    current_index,
-                                    "current_close_vs_60d_low_pct",
-                                ]
+                                current_low_distances[current_index]
                             ),
                             "close": float(row["close"]),
                         }
@@ -217,6 +231,58 @@ def _prior_same_state_forward_returns(
             continue
         prior_returns.append(float(((exit_close / entry_close) - 1) * 100))
     return prior_returns
+
+
+def _forward_returns(
+    close_values: list[object],
+    forward_return_sessions: int,
+) -> list[float | None]:
+    """Return valid forward return percentages for each possible prior row."""
+
+    returns: list[float | None] = [None] * len(close_values)
+    for prior_index, entry_close in enumerate(close_values):
+        forward_index = prior_index + forward_return_sessions
+        if forward_index >= len(close_values):
+            continue
+        exit_close = close_values[forward_index]
+        if pd.isna(entry_close) or pd.isna(exit_close) or entry_close <= 0:
+            continue
+        returns[prior_index] = float(((exit_close / entry_close) - 1) * 100)
+    return returns
+
+
+def _add_newly_matured_observation(
+    current_index: int,
+    forward_return_sessions: int,
+    state_labels: list[str | None],
+    forward_returns: list[float | None],
+    observations_by_state: dict[str, deque[tuple[int, float]]],
+) -> None:
+    """Add the newest prior observation whose forward outcome is known."""
+
+    prior_index = current_index - forward_return_sessions - 1
+    if prior_index < 0:
+        return
+    state_label = state_labels[prior_index]
+    forward_return = forward_returns[prior_index]
+    if state_label is None or pd.isna(state_label) or forward_return is None:
+        return
+    observations_by_state[state_label].append((prior_index, forward_return))
+
+
+def _active_prior_returns(
+    observations_by_state: dict[str, deque[tuple[int, float]]],
+    current_index: int,
+    state_lookback_sessions: int,
+    state_label: str,
+) -> list[float]:
+    """Return same-state prior returns inside the current lookback window."""
+
+    observations = observations_by_state[state_label]
+    oldest_valid_index = current_index - state_lookback_sessions
+    while observations and observations[0][0] < oldest_valid_index:
+        observations.popleft()
+    return [forward_return for _, forward_return in observations]
 
 
 def _state_label(

@@ -5,6 +5,7 @@ strategies, load data, calculate metrics, or mutate backtest outputs.
 """
 
 from pathlib import Path
+from time import perf_counter
 from typing import Any, Mapping
 
 import pandas as pd
@@ -197,9 +198,11 @@ def export_portfolio_backtest_csvs(
     output_dir: str | Path,
     stock_data_by_symbol: Mapping[str, pd.DataFrame] | None = None,
     nifty_data: pd.DataFrame | None = None,
+    progress_reporter: object | None = None,
 ) -> dict[str, Path]:
     """Write standard portfolio backtest CSV artifacts and return file paths."""
 
+    export_started = perf_counter()
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
@@ -273,6 +276,7 @@ def export_portfolio_backtest_csvs(
         / "ranking_feature_diagnostics.csv",
     }
 
+    standard_started = perf_counter()
     _write_csv(exports["trade_log"], _trade_rows(result), TRADE_LOG_COLUMNS)
     _write_csv(
         exports["trade_pnl_log"],
@@ -291,6 +295,12 @@ def export_portfolio_backtest_csvs(
         EQUITY_CURVE_COLUMNS,
     )
     _write_csv(exports["summary"], _summary_rows(result), SUMMARY_COLUMNS)
+    _log_elapsed(
+        progress_reporter,
+        "Finished standard trade/signal/equity/summary exports",
+        standard_started,
+    )
+    diagnostic_started = perf_counter()
     _write_csv(
         exports["exit_reason_summary"],
         build_exit_reason_summary_rows(result),
@@ -311,6 +321,12 @@ def export_portfolio_backtest_csvs(
         build_rejection_summary_rows(result),
         REJECTION_SUMMARY_COLUMNS,
     )
+    _log_elapsed(
+        progress_reporter,
+        "Finished standard diagnostic exports",
+        diagnostic_started,
+    )
+    r_multiple_started = perf_counter()
     _write_csv(
         exports["r_multiple_summary"],
         build_r_multiple_summary_rows(result),
@@ -336,7 +352,13 @@ def export_portfolio_backtest_csvs(
         build_r_multiple_by_symbol_year_rows(result),
         R_MULTIPLE_BY_SYMBOL_YEAR_COLUMNS,
     )
+    _log_elapsed(
+        progress_reporter,
+        "Finished R multiple diagnostics",
+        r_multiple_started,
+    )
 
+    trade_context_started = perf_counter()
     trade_context_rows = build_trade_signal_context_rows(
         result,
         stock_data_by_symbol=stock_data_by_symbol,
@@ -347,6 +369,12 @@ def export_portfolio_backtest_csvs(
         trade_context_rows,
         TRADE_SIGNAL_CONTEXT_COLUMNS,
     )
+    _log_elapsed(
+        progress_reporter,
+        "Finished trade signal context build/export",
+        trade_context_started,
+    )
+    r_context_started = perf_counter()
     _write_csv(
         exports["r_by_stock_trend_context"],
         build_r_by_stock_trend_context_rows(trade_context_rows),
@@ -397,6 +425,12 @@ def export_portfolio_backtest_csvs(
         build_r_by_fresh_low_context_rows(trade_context_rows),
         R_CONTEXT_BUCKET_COLUMNS,
     )
+    _log_elapsed(
+        progress_reporter,
+        "Finished R context reports",
+        r_context_started,
+    )
+    candidate_filter_started = perf_counter()
     _write_csv(
         exports["candidate_filter_simulation"],
         build_candidate_filter_simulation_rows(trade_context_rows),
@@ -417,6 +451,12 @@ def export_portfolio_backtest_csvs(
         build_candidate_filter_simulation_rejected_trade_rows(trade_context_rows),
         CANDIDATE_FILTER_SIMULATION_REJECTED_TRADES_COLUMNS,
     )
+    _log_elapsed(
+        progress_reporter,
+        "Finished candidate filter simulation",
+        candidate_filter_started,
+    )
+    s2_filter_started = perf_counter()
     _write_csv(
         exports["s2_markov_filter_simulation"],
         build_s2_markov_filter_simulation_rows(trade_context_rows),
@@ -447,7 +487,13 @@ def export_portfolio_backtest_csvs(
         build_s2_markov_state_label_summary_rows(trade_context_rows),
         S2_MARKOV_STATE_LABEL_SUMMARY_COLUMNS,
     )
+    _log_elapsed(
+        progress_reporter,
+        "Finished S2 Markov filter simulation",
+        s2_filter_started,
+    )
 
+    opportunity_started = perf_counter()
     opportunity_diagnostics = build_all_signal_opportunity_diagnostics(
         result,
         stock_data_by_symbol=stock_data_by_symbol,
@@ -458,6 +504,12 @@ def export_portfolio_backtest_csvs(
             getattr(opportunity_diagnostics, export_name),
             columns,
         )
+    _log_elapsed(
+        progress_reporter,
+        "Finished all-signal opportunity diagnostics",
+        opportunity_started,
+    )
+    _log_elapsed(progress_reporter, "Finished total CSV export", export_started)
     return exports
 
 
@@ -469,6 +521,18 @@ def _write_csv(
     """Write rows to CSV, preserving headers for empty outputs."""
 
     pd.DataFrame(rows, columns=columns).to_csv(path, index=False)
+
+
+def _log_elapsed(
+    progress_reporter: object | None,
+    message: str,
+    started: float,
+) -> None:
+    """Log elapsed export time when a reporter is supplied."""
+
+    if progress_reporter is None or not hasattr(progress_reporter, "info"):
+        return
+    progress_reporter.info(f"{message} in {perf_counter() - started:.2f}s")
 
 
 def _trade_rows(result: Any) -> list[dict[str, object]]:

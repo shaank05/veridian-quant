@@ -4,6 +4,7 @@ from argparse import ArgumentParser, ArgumentTypeError, Namespace
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
+from time import perf_counter
 from typing import Iterable
 
 from veridian_quant.v2.backtesting.markov_portfolio_runner import (
@@ -21,6 +22,7 @@ CONTEXT_LOOKBACK_BUFFER_DAYS = 365
 def main(argv: Iterable[str] | None = None) -> int:
     """Run the S2 Markov portfolio backtest CLI."""
 
+    total_started = perf_counter()
     args = _parse_args(argv)
     reporter = ProgressReporter(args.verbosity)
     reporter.info(
@@ -30,11 +32,17 @@ def main(argv: Iterable[str] | None = None) -> int:
         f"risk={args.risk_per_trade} "
         f"max_positions={args.max_concurrent_positions}"
     )
+    setup_started = perf_counter()
     engine = _get_database_engine()
     loader = SQLAlchemyDailyOHLCVLoader(engine=engine)
     loader.lookback_buffer_days = CONTEXT_LOOKBACK_BUFFER_DAYS
+    reporter.info(
+        f"Finished database engine/loader setup in "
+        f"{perf_counter() - setup_started:.2f}s"
+    )
 
     reporter.info("Loading OHLCV data...")
+    load_started = perf_counter()
     if args.all_symbols:
         data_by_symbol = loader.load_all_available_symbols(
             args.start_date,
@@ -46,9 +54,13 @@ def main(argv: Iterable[str] | None = None) -> int:
             args.start_date,
             args.end_date,
         )
+    reporter.info(
+        f"Finished OHLCV data loading in {perf_counter() - load_started:.2f}s"
+    )
     reporter.info(f"Loaded symbols: {len(data_by_symbol)}")
 
     reporter.info("Loading Nifty 50 context data...")
+    nifty_started = perf_counter()
     try:
         nifty_data = loader.load_instrument_key(
             NIFTY_50_INSTRUMENT_KEY,
@@ -60,8 +72,12 @@ def main(argv: Iterable[str] | None = None) -> int:
         nifty_data = None
     else:
         reporter.info(f"Loaded Nifty 50 context rows: {len(nifty_data)}")
+    reporter.info(
+        f"Finished Nifty context loading in {perf_counter() - nifty_started:.2f}s"
+    )
 
     reporter.info("Running S2 Markov portfolio backtest...")
+    backtest_started = perf_counter()
     result = run_s2_markov_portfolio_backtest(
         data_by_symbol=data_by_symbol,
         start_date=args.start_date,
@@ -84,11 +100,24 @@ def main(argv: Iterable[str] | None = None) -> int:
         round_trip_cost_pct=Decimal("0.004"),
         progress_reporter=reporter,
     )
+    reporter.info(
+        f"Finished S2 portfolio backtest in "
+        f"{perf_counter() - backtest_started:.2f}s"
+    )
+    export_started = perf_counter()
     paths = export_portfolio_backtest_csvs(
         result,
         args.output_dir,
         stock_data_by_symbol=data_by_symbol,
         nifty_data=nifty_data,
+        progress_reporter=reporter,
+    )
+    reporter.info(
+        f"Finished CSV export in {perf_counter() - export_started:.2f}s"
+    )
+    reporter.info(
+        f"Finished total S2 CLI runtime in "
+        f"{perf_counter() - total_started:.2f}s"
     )
     reporter.complete(
         f"Completed S2 Markov backtest. Wrote {len(paths)} CSV files to "

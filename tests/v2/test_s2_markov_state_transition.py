@@ -2,8 +2,10 @@
 
 from datetime import date
 from decimal import Decimal
+from statistics import median
 
 import pandas as pd
+import pytest
 
 from veridian_quant.v2.backtesting.markov_portfolio_runner import (
     run_s2_markov_portfolio_backtest,
@@ -11,6 +13,7 @@ from veridian_quant.v2.backtesting.markov_portfolio_runner import (
 from veridian_quant.v2.run_s2_markov_backtest import _parse_args
 from veridian_quant.v2.strategies.s2_markov_state_transition import (
     STRATEGY_NAME,
+    S2MarkovStateTransitionStrategy,
     build_state_frame,
     generate_s2_markov_signals,
 )
@@ -242,6 +245,50 @@ def test_s2_portfolio_run_works_with_synthetic_multi_symbol_data() -> None:
     assert result.ledger is not None
 
 
+def test_optimized_signal_generation_matches_reference_on_trend_data() -> None:
+    _assert_optimized_matches_reference(
+        _trend_frame(140),
+        forward_return_sessions=2,
+        state_lookback_sessions=80,
+    )
+
+
+def test_optimized_signal_generation_matches_reference_on_mixed_state_data() -> None:
+    _assert_optimized_matches_reference(
+        _mixed_state_frame(220),
+        forward_return_sessions=5,
+        state_lookback_sessions=60,
+        min_state_observations=2,
+        signal_probability_threshold=0.40,
+        signal_average_forward_return_threshold_pct=-1.0,
+    )
+
+
+def test_optimized_signal_generation_matches_reference_with_missing_rows() -> None:
+    data = _mixed_state_frame(180)
+    data.loc[75, "close"] = pd.NA
+
+    _assert_optimized_matches_reference(
+        data,
+        forward_return_sessions=3,
+        state_lookback_sessions=70,
+        min_state_observations=2,
+        signal_probability_threshold=0.40,
+        signal_average_forward_return_threshold_pct=-2.0,
+    )
+
+
+def test_performance_smoke_outputs_match_reference_on_moderate_dataset() -> None:
+    _assert_optimized_matches_reference(
+        _mixed_state_frame(320),
+        forward_return_sessions=7,
+        state_lookback_sessions=90,
+        min_state_observations=2,
+        signal_probability_threshold=0.35,
+        signal_average_forward_return_threshold_pct=-2.0,
+    )
+
+
 def _first_signal():
     return _signals()[0]
 
@@ -276,3 +323,158 @@ def _trend_frame(rows: int) -> pd.DataFrame:
             }
         )
     return pd.DataFrame(output)
+
+
+def _mixed_state_frame(rows: int) -> pd.DataFrame:
+    close = 100.0
+    output = []
+    for index in range(rows):
+        session_date = pd.Timestamp("2026-01-01") + pd.Timedelta(days=index)
+        if index % 37 < 8:
+            close *= 0.985
+        elif index % 37 < 18:
+            close *= 1.018
+        elif index % 37 < 28:
+            close *= 0.997
+        else:
+            close *= 1.006
+        output.append(
+            {
+                "date": session_date,
+                "open": close * 0.995,
+                "high": close * 1.015,
+                "low": close * 0.985,
+                "close": close,
+                "volume": 1000 + index,
+            }
+        )
+    return pd.DataFrame(output)
+
+
+def _assert_optimized_matches_reference(
+    data: pd.DataFrame,
+    forward_return_sessions: int,
+    state_lookback_sessions: int,
+    min_state_observations: int = 3,
+    positive_return_threshold_pct: float = 3.0,
+    signal_probability_threshold: float = 0.60,
+    signal_average_forward_return_threshold_pct: float = 1.0,
+) -> None:
+    strategy = S2MarkovStateTransitionStrategy(
+        state_lookback_sessions=state_lookback_sessions,
+        min_state_observations=min_state_observations,
+        forward_return_sessions=forward_return_sessions,
+        positive_return_threshold_pct=positive_return_threshold_pct,
+        signal_probability_threshold=signal_probability_threshold,
+        signal_average_forward_return_threshold_pct=(
+            signal_average_forward_return_threshold_pct
+        ),
+    )
+    optimized = _signal_summaries(strategy.generate_signals("TEST", data))
+    reference = _reference_signal_summaries(strategy, "TEST", data)
+
+    assert len(optimized) == len(reference)
+    for optimized_row, reference_row in zip(optimized, reference):
+        assert optimized_row.keys() == reference_row.keys()
+        for key in (
+            "generated_on",
+            "symbol",
+            "state_label",
+            "state_observation_count",
+        ):
+            assert optimized_row[key] == reference_row[key]
+        for key in (
+            "positive_transition_probability",
+            "average_forward_return_pct",
+            "median_forward_return_pct",
+        ):
+            assert optimized_row[key] == pytest.approx(reference_row[key])
+
+
+def _signal_summaries(signals) -> list[dict[str, object]]:
+    return [
+        {
+            "generated_on": signal.generated_on,
+            "symbol": signal.symbol,
+            "state_label": signal.metadata["state_label"],
+            "state_observation_count": signal.metadata[
+                "state_observation_count"
+            ],
+            "positive_transition_probability": signal.metadata[
+                "positive_transition_probability"
+            ],
+            "average_forward_return_pct": signal.metadata[
+                "average_forward_return_pct"
+            ],
+            "median_forward_return_pct": signal.metadata[
+                "median_forward_return_pct"
+            ],
+        }
+        for signal in signals
+    ]
+
+
+def _reference_signal_summaries(
+    strategy: S2MarkovStateTransitionStrategy,
+    symbol: str,
+    data: pd.DataFrame,
+) -> list[dict[str, object]]:
+    working = data.copy(deep=True).reset_index(drop=True)
+    state_frame = build_state_frame(working)
+    summaries = []
+    for current_index, row in working.iterrows():
+        state_label = state_frame.loc[current_index, "state_label"]
+        if state_label is None:
+            continue
+        prior_returns = []
+        start_index = max(0, current_index - strategy.state_lookback_sessions)
+        for prior_index in range(start_index, current_index):
+            forward_index = prior_index + strategy.forward_return_sessions
+            if forward_index >= current_index:
+                continue
+            if state_frame.loc[prior_index, "state_label"] != state_label:
+                continue
+            entry_close = working["close"].iloc[prior_index]
+            exit_close = working["close"].iloc[forward_index]
+            if pd.isna(entry_close) or pd.isna(exit_close) or entry_close <= 0:
+                continue
+            prior_returns.append(float(((exit_close / entry_close) - 1) * 100))
+        if len(prior_returns) < strategy.min_state_observations:
+            continue
+
+        probability = (
+            sum(
+                1
+                for forward_return in prior_returns
+                if forward_return >= strategy.positive_return_threshold_pct
+            )
+            / len(prior_returns)
+        )
+        average_return = sum(prior_returns) / len(prior_returns)
+        median_return = median(prior_returns)
+        if probability < strategy.signal_probability_threshold:
+            continue
+        if average_return < strategy.signal_average_forward_return_threshold_pct:
+            continue
+
+        summaries.append(
+            {
+                "generated_on": _row_date(row),
+                "symbol": symbol,
+                "state_label": state_label,
+                "state_observation_count": len(prior_returns),
+                "positive_transition_probability": probability,
+                "average_forward_return_pct": average_return,
+                "median_forward_return_pct": median_return,
+            }
+        )
+    return summaries
+
+
+def _row_date(row: pd.Series) -> date:
+    value = row["date"] if "date" in row.index else row["timestamp"]
+    if isinstance(value, pd.Timestamp):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    return pd.Timestamp(value).date()

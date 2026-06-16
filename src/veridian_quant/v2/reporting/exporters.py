@@ -137,6 +137,13 @@ SIGNAL_LOG_COLUMNS = [
     "candidate_score_liquidity",
     "candidate_score_atr",
     "candidate_pool_size_for_date",
+    "s2_candidate_ranking_mode",
+    "s2_candidate_rank",
+    "s2_candidate_score",
+    "s2_score_state_edge",
+    "s2_score_state_quality",
+    "s2_score_context",
+    "s2_score_penalty",
     "strategy_family",
     "state_label",
     "state_lookback_sessions",
@@ -663,6 +670,17 @@ def _signal_rows(result: Any) -> list[dict[str, object]]:
                 "candidate_pool_size_for_date": metadata.get(
                     "candidate_pool_size_for_date"
                 ),
+                "s2_candidate_ranking_mode": metadata.get(
+                    "s2_candidate_ranking_mode"
+                ),
+                "s2_candidate_rank": metadata.get("s2_candidate_rank"),
+                "s2_candidate_score": metadata.get("s2_candidate_score"),
+                "s2_score_state_edge": metadata.get("s2_score_state_edge"),
+                "s2_score_state_quality": metadata.get(
+                    "s2_score_state_quality"
+                ),
+                "s2_score_context": metadata.get("s2_score_context"),
+                "s2_score_penalty": metadata.get("s2_score_penalty"),
                 "strategy_family": metadata.get("strategy_family"),
                 "state_label": metadata.get("state_label"),
                 "state_lookback_sessions": metadata.get(

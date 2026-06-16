@@ -132,6 +132,45 @@ def test_s2_portfolio_runner_none_filter_matches_previous_behavior() -> None:
     assert explicit_none == baseline
 
 
+def test_s2_portfolio_runner_accepts_candidate_ranking_mode() -> None:
+    signals = (
+        _signal("RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW"),
+        _signal("RET_FLAT|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW"),
+    )
+    with patch(
+        "veridian_quant.v2.backtesting.markov_portfolio_runner.generate_s2_markov_signals",
+        return_value=list(signals),
+    ):
+        result = run_s2_markov_portfolio_backtest(
+            data_by_symbol={"AAA": _frame()},
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 1, 10),
+            starting_equity=Decimal("100000"),
+            min_state_observations=1,
+            forward_return_sessions=1,
+            round_trip_cost_pct=Decimal("0"),
+            s2_candidate_ranking_mode="state_edge_v1",
+        )
+
+    assert result.candidate_ranking_mode == "state_edge_v1"
+    assert {
+        signal.metadata.get("candidate_ranking_mode")
+        for signal in result.signals
+    } == {"s2:state_edge_v1"}
+
+
+def test_s2_portfolio_runner_ranking_none_matches_default_behavior() -> None:
+    kwargs = _runner_kwargs()
+
+    baseline = run_s2_markov_portfolio_backtest(**kwargs)
+    explicit_none = run_s2_markov_portfolio_backtest(
+        **kwargs,
+        s2_candidate_ranking_mode="none",
+    )
+
+    assert explicit_none == baseline
+
+
 def test_s2_portfolio_runner_records_filter_rejections() -> None:
     signals = (
         _signal("RET_DOWN|VOL_MID|DD_MID|LOW_MID_RANGE"),
@@ -198,6 +237,23 @@ def test_cli_parses_markov_signal_filter() -> None:
     )
 
     assert args.markov_signal_filter == "exclude_ret_down"
+
+
+def test_cli_parses_s2_candidate_ranking() -> None:
+    args = _parse_args(
+        [
+            "--start-date",
+            "2026-01-01",
+            "--end-date",
+            "2026-01-31",
+            "--symbols",
+            "AAA",
+            "--s2-candidate-ranking",
+            "hybrid_state_context_v1",
+        ]
+    )
+
+    assert args.s2_candidate_ranking == "hybrid_state_context_v1"
 
 
 def test_cli_parses_skip_all_signal_diagnostics() -> None:

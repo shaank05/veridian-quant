@@ -129,6 +129,36 @@ def test_signal_log_flattens_metadata() -> None:
     assert signal_log.loc[0, "close"] == 90.0
 
 
+def test_signal_log_includes_s2_ranking_metadata() -> None:
+    base = _result()
+    signal = replace(
+        base.signals[0],
+        metadata=MappingProxyType(
+            {
+                **dict(base.signals[0].metadata),
+                "candidate_ranking_mode": "s2:state_edge_v1",
+                "candidate_rank": 1,
+                "candidate_score": 2.3,
+                "candidate_pool_size_for_date": 4,
+                "s2_candidate_ranking_mode": "state_edge_v1",
+                "s2_candidate_rank": 1,
+                "s2_candidate_score": 2.3,
+                "s2_score_state_edge": 2.3,
+                "s2_score_state_quality": 0.0,
+                "s2_score_context": 0.0,
+                "s2_score_penalty": 0.0,
+            }
+        ),
+    )
+    paths = _export_to_temp_dir(replace(base, signals=(signal,)))
+
+    signal_log = pd.read_csv(paths["signal_log"])
+
+    assert signal_log.loc[0, "candidate_ranking_mode"] == "s2:state_edge_v1"
+    assert signal_log.loc[0, "s2_candidate_ranking_mode"] == "state_edge_v1"
+    assert signal_log.loc[0, "s2_score_state_edge"] == 2.3
+
+
 def test_summary_contains_simple_counts_and_total_net_pnl() -> None:
     paths = _export_to_temp_dir()
 

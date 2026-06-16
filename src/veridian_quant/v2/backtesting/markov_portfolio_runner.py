@@ -19,6 +19,11 @@ from veridian_quant.v2.backtesting.portfolio_runner import (
     PortfolioBacktestResult,
     PortfolioRejectedSignal,
 )
+from veridian_quant.v2.backtesting.s2_candidate_ranking import (
+    S2_CANDIDATE_RANKING_NONE,
+    rank_s2_entry_candidates,
+    validate_s2_candidate_ranking_mode,
+)
 from veridian_quant.v2.backtesting.setup import build_trade_setup
 from veridian_quant.v2.backtesting.sizing import build_position_plan
 from veridian_quant.v2.data.models import Signal
@@ -67,10 +72,14 @@ def run_s2_markov_portfolio_backtest(
     round_trip_cost_pct: Decimal | int | str | float = Decimal("0.004"),
     progress_reporter: object | None = None,
     markov_signal_filter: str = MARKOV_SIGNAL_FILTER_NONE,
+    s2_candidate_ranking_mode: str = S2_CANDIDATE_RANKING_NONE,
 ) -> PortfolioBacktestResult:
     """Run a deterministic multi-symbol S2 Markov research backtest."""
 
     markov_signal_filter = validate_markov_signal_filter(markov_signal_filter)
+    s2_candidate_ranking_mode = validate_s2_candidate_ranking_mode(
+        s2_candidate_ranking_mode
+    )
     progress = progress_reporter or NullProgressReporter()
     ledger = create_portfolio_ledger(starting_equity)
     symbols = tuple(sorted(data_by_symbol))
@@ -156,6 +165,25 @@ def run_s2_markov_portfolio_backtest(
         for signal in ordered_all_signals
         if signal.metadata.get("markov_filter_decision") != "filtered"
     )
+    ordered_execution_signals = rank_s2_entry_candidates(
+        ordered_execution_signals,
+        mode=s2_candidate_ranking_mode,
+    )
+    if s2_candidate_ranking_mode == S2_CANDIDATE_RANKING_NONE:
+        result_signals = ordered_all_signals
+    else:
+        ranked_by_identity = {
+            _signal_identity(signal): signal for signal in ordered_execution_signals
+        }
+        result_signals = tuple(
+            sorted(
+                (
+                    ranked_by_identity.get(_signal_identity(signal), signal)
+                    for signal in ordered_all_signals
+                ),
+                key=_result_signal_sort_key,
+            )
+        )
     progress.info(f"Total ordered S2 signals: {len(ordered_execution_signals)}")
     pending_trades: list[_PendingTrade] = []
     trades = []
@@ -244,12 +272,7 @@ def run_s2_markov_portfolio_backtest(
             )
             continue
 
-        closed_trade = replace(
-            closed_trade,
-            candidate_pool_size_for_date=signal.metadata.get(
-                "state_observation_count"
-            ),
-        )
+        closed_trade = _with_trade_ranking_metadata(closed_trade, signal)
         trade_pnl = calculate_trade_pnl(
             trade=closed_trade,
             round_trip_cost_pct=round_trip_cost_pct,
@@ -290,10 +313,11 @@ def run_s2_markov_portfolio_backtest(
         symbols=symbols,
         trade_pnls=tuple(trade_pnls),
         trades=tuple(trades),
-        signals=ordered_all_signals,
+        signals=result_signals,
         rejected_signals=tuple(rejected_signals),
         ledger=ledger,
         strategy_variant=markov_strategy_variant(STRATEGY_NAME, markov_signal_filter),
+        candidate_ranking_mode=s2_candidate_ranking_mode,
     )
 
 
@@ -343,6 +367,12 @@ def _reject(signal: Signal, reason: str) -> PortfolioRejectedSignal:
         signal_date=signal.generated_on,
         strategy_name=signal.strategy_name,
         reason=reason,
+        candidate_ranking_mode=signal.metadata.get("candidate_ranking_mode"),
+        candidate_rank=signal.metadata.get("candidate_rank"),
+        candidate_score=signal.metadata.get("candidate_score"),
+        candidate_pool_size_for_date=signal.metadata.get(
+            "candidate_pool_size_for_date"
+        ),
         markov_signal_filter=signal.metadata.get("markov_signal_filter"),
         markov_filter_decision=signal.metadata.get("markov_filter_decision"),
     )
@@ -355,6 +385,36 @@ def _append_rejection(
 ) -> None:
     rejected_signals.append(rejected_signal)
     progress_reporter.rejected(rejected_signal)
+
+
+def _with_trade_ranking_metadata(trade: object, signal: Signal) -> object:
+    return replace(
+        trade,
+        candidate_ranking_mode=signal.metadata.get("candidate_ranking_mode"),
+        candidate_rank=signal.metadata.get("candidate_rank"),
+        candidate_score=signal.metadata.get("candidate_score"),
+        candidate_pool_size_for_date=signal.metadata.get(
+            "candidate_pool_size_for_date"
+        ),
+    )
+
+
+def _signal_identity(signal: Signal) -> tuple[date, str, str, str]:
+    return (
+        signal.generated_on,
+        signal.symbol,
+        signal.reason,
+        str(signal.metadata.get("state_label", "")),
+    )
+
+
+def _result_signal_sort_key(signal: Signal) -> tuple[date, int, str]:
+    rank = signal.metadata.get("candidate_rank")
+    return (
+        signal.generated_on,
+        int(rank) if rank is not None else 1_000_000,
+        signal.symbol,
+    )
 
 
 def _validate_input(data: pd.DataFrame) -> None:

@@ -10,6 +10,9 @@ from typing import Iterable
 from veridian_quant.v2.backtesting.markov_portfolio_runner import (
     run_s2_markov_portfolio_backtest,
 )
+from veridian_quant.v2.backtesting.s2_candidate_ranking import (
+    S2_CANDIDATE_RANKING_MODES,
+)
 from veridian_quant.v2.data.loaders import SQLAlchemyDailyOHLCVLoader
 from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
 from veridian_quant.v2.reporting.progress import ProgressReporter
@@ -34,7 +37,8 @@ def main(argv: Iterable[str] | None = None) -> int:
         f"equity={args.starting_equity} "
         f"risk={args.risk_per_trade} "
         f"max_positions={args.max_concurrent_positions} "
-        f"markov_signal_filter={args.markov_signal_filter}"
+        f"markov_signal_filter={args.markov_signal_filter} "
+        f"s2_candidate_ranking={args.s2_candidate_ranking}"
     )
     setup_started = perf_counter()
     engine = _get_database_engine()
@@ -104,6 +108,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         round_trip_cost_pct=Decimal("0.004"),
         progress_reporter=reporter,
         markov_signal_filter=args.markov_signal_filter,
+        s2_candidate_ranking_mode=args.s2_candidate_ranking,
     )
     reporter.info(
         f"Finished S2 portfolio backtest in "
@@ -183,6 +188,11 @@ def _parse_args(argv: Iterable[str] | None) -> Namespace:
     parser.add_argument(
         "--markov-signal-filter",
         choices=MARKOV_SIGNAL_FILTERS,
+        default="none",
+    )
+    parser.add_argument(
+        "--s2-candidate-ranking",
+        choices=S2_CANDIDATE_RANKING_MODES,
         default="none",
     )
     parser.add_argument(

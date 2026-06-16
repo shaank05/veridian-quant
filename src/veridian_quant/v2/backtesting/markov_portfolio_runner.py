@@ -20,6 +20,8 @@ from veridian_quant.v2.backtesting.portfolio_runner import (
     PortfolioRejectedSignal,
 )
 from veridian_quant.v2.backtesting.s2_candidate_ranking import (
+    S2_AVOID_SHALLOW_UPTREND_PULLBACK_VARIANT,
+    S2_CANDIDATE_RANKING_AVOID_SHALLOW_UPTREND_PULLBACK_V1,
     S2_CANDIDATE_RANKING_NONE,
     rank_s2_entry_candidates,
     validate_s2_candidate_ranking_mode,
@@ -316,7 +318,10 @@ def run_s2_markov_portfolio_backtest(
         signals=result_signals,
         rejected_signals=tuple(rejected_signals),
         ledger=ledger,
-        strategy_variant=markov_strategy_variant(STRATEGY_NAME, markov_signal_filter),
+        strategy_variant=_s2_strategy_variant(
+            markov_signal_filter,
+            s2_candidate_ranking_mode,
+        ),
         candidate_ranking_mode=s2_candidate_ranking_mode,
     )
 
@@ -415,6 +420,20 @@ def _result_signal_sort_key(signal: Signal) -> tuple[date, int, str]:
         int(rank) if rank is not None else 1_000_000,
         signal.symbol,
     )
+
+
+def _s2_strategy_variant(
+    markov_signal_filter: str,
+    s2_candidate_ranking_mode: str,
+) -> str:
+    if (
+        s2_candidate_ranking_mode
+        == S2_CANDIDATE_RANKING_AVOID_SHALLOW_UPTREND_PULLBACK_V1
+    ):
+        if markov_signal_filter == MARKOV_SIGNAL_FILTER_NONE:
+            return S2_AVOID_SHALLOW_UPTREND_PULLBACK_VARIANT
+        return f"{S2_AVOID_SHALLOW_UPTREND_PULLBACK_VARIANT}__{markov_signal_filter}"
+    return markov_strategy_variant(STRATEGY_NAME, markov_signal_filter)
 
 
 def _validate_input(data: pd.DataFrame) -> None:

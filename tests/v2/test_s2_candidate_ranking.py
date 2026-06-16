@@ -148,6 +148,101 @@ def test_malformed_state_labels_do_not_crash() -> None:
     assert ranked[0].metadata["candidate_rank"] == 1
 
 
+def test_avoid_shallow_uptrend_pullback_penalizes_ret_up_shallow_far_from_low() -> None:
+    ranked = rank_s2_entry_candidates(
+        (
+            _signal(
+                "SHALLOW_UP",
+                date(2026, 1, 1),
+                probability=0.90,
+                average=6.0,
+                state_label="RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW",
+            ),
+            _signal(
+                "DEEPER_FLAT",
+                date(2026, 1, 1),
+                probability=0.70,
+                average=3.0,
+                state_label="RET_FLAT|VOL_MID|DD_MID|LOW_MID_RANGE",
+            ),
+        ),
+        "avoid_shallow_uptrend_pullback_v1",
+    )
+
+    assert ranked[0].symbol == "DEEPER_FLAT"
+    assert ranked[1].metadata["s2_score_penalty"] > 0
+
+
+def test_avoid_shallow_uptrend_pullback_penalizes_strong_up_shallow() -> None:
+    ranked = rank_s2_entry_candidates(
+        (
+            _signal(
+                "STRONG_UP",
+                date(2026, 1, 1),
+                probability=0.90,
+                average=6.0,
+                state_label="RET_STRONG_UP|VOL_MID|DD_SHALLOW|LOW_MID_RANGE",
+            ),
+            _signal(
+                "NEAR_LOW",
+                date(2026, 1, 1),
+                probability=0.70,
+                average=3.0,
+                state_label="RET_FLAT|VOL_MID|DD_MID|LOW_NEAR",
+            ),
+        ),
+        "avoid_shallow_uptrend_pullback_v1",
+    )
+
+    assert ranked[0].symbol == "NEAR_LOW"
+    assert ranked[1].metadata["s2_score_penalty"] > 0
+
+
+def test_avoid_shallow_uptrend_pullback_boosts_flat_mid_or_low_near_setups() -> None:
+    ranked = rank_s2_entry_candidates(
+        (
+            _signal(
+                "PLAIN_UP",
+                date(2026, 1, 1),
+                probability=0.75,
+                average=3.0,
+                state_label="RET_UP|VOL_MID|DD_MID|LOW_FAR_FROM_LOW",
+            ),
+            _signal(
+                "FLAT_NEAR",
+                date(2026, 1, 1),
+                probability=0.75,
+                average=3.0,
+                state_label="RET_FLAT|VOL_MID|DD_MID|LOW_NEAR",
+            ),
+        ),
+        "avoid_shallow_uptrend_pullback_v1",
+    )
+
+    assert ranked[0].symbol == "FLAT_NEAR"
+    assert ranked[0].metadata["s2_score_state_quality"] > 0
+
+
+def test_avoid_shallow_uptrend_pullback_is_deterministic() -> None:
+    signals = (
+        _signal(
+            "AAA",
+            date(2026, 1, 1),
+            state_label="RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW",
+        ),
+        _signal(
+            "BBB",
+            date(2026, 1, 1),
+            state_label="RET_FLAT|VOL_MID|DD_MID|LOW_NEAR",
+        ),
+    )
+
+    first = rank_s2_entry_candidates(signals, "avoid_shallow_uptrend_pullback_v1")
+    second = rank_s2_entry_candidates(signals, "avoid_shallow_uptrend_pullback_v1")
+
+    assert first == second
+
+
 def test_invalid_mode_raises() -> None:
     with pytest.raises(ValueError):
         rank_s2_entry_candidates((), "unknown")

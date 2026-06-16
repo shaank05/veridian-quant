@@ -171,6 +171,31 @@ def test_s2_portfolio_runner_ranking_none_matches_default_behavior() -> None:
     assert explicit_none == baseline
 
 
+def test_s2_portfolio_runner_names_avoid_shallow_uptrend_pullback_variant() -> None:
+    with patch(
+        "veridian_quant.v2.backtesting.markov_portfolio_runner.generate_s2_markov_signals",
+        return_value=[
+            _signal("RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW"),
+        ],
+    ):
+        result = run_s2_markov_portfolio_backtest(
+            data_by_symbol={"AAA": _frame()},
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 1, 10),
+            starting_equity=Decimal("100000"),
+            min_state_observations=1,
+            forward_return_sessions=1,
+            round_trip_cost_pct=Decimal("0"),
+            s2_candidate_ranking_mode="avoid_shallow_uptrend_pullback_v1",
+        )
+
+    assert (
+        result.strategy_variant
+        == "S2_MARKOV_STATE_TRANSITION_AVOID_SHALLOW_UPTREND_PULLBACK_V1"
+    )
+    assert result.candidate_ranking_mode == "avoid_shallow_uptrend_pullback_v1"
+
+
 def test_s2_portfolio_runner_records_filter_rejections() -> None:
     signals = (
         _signal("RET_DOWN|VOL_MID|DD_MID|LOW_MID_RANGE"),
@@ -249,11 +274,11 @@ def test_cli_parses_s2_candidate_ranking() -> None:
             "--symbols",
             "AAA",
             "--s2-candidate-ranking",
-            "hybrid_state_context_v1",
+            "avoid_shallow_uptrend_pullback_v1",
         ]
     )
 
-    assert args.s2_candidate_ranking == "hybrid_state_context_v1"
+    assert args.s2_candidate_ranking == "avoid_shallow_uptrend_pullback_v1"
 
 
 def test_cli_parses_skip_all_signal_diagnostics() -> None:

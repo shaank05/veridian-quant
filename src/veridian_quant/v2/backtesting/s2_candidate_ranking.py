@@ -18,12 +18,19 @@ S2_CANDIDATE_RANKING_STATE_EDGE_V1 = "state_edge_v1"
 S2_CANDIDATE_RANKING_CLEAN_STATE_V1 = "clean_state_v1"
 S2_CANDIDATE_RANKING_STATE_QUALITY_V1 = "state_quality_v1"
 S2_CANDIDATE_RANKING_HYBRID_STATE_CONTEXT_V1 = "hybrid_state_context_v1"
+S2_CANDIDATE_RANKING_AVOID_SHALLOW_UPTREND_PULLBACK_V1 = (
+    "avoid_shallow_uptrend_pullback_v1"
+)
+S2_AVOID_SHALLOW_UPTREND_PULLBACK_VARIANT = (
+    "S2_MARKOV_STATE_TRANSITION_AVOID_SHALLOW_UPTREND_PULLBACK_V1"
+)
 S2_CANDIDATE_RANKING_MODES = (
     S2_CANDIDATE_RANKING_NONE,
     S2_CANDIDATE_RANKING_STATE_EDGE_V1,
     S2_CANDIDATE_RANKING_CLEAN_STATE_V1,
     S2_CANDIDATE_RANKING_STATE_QUALITY_V1,
     S2_CANDIDATE_RANKING_HYBRID_STATE_CONTEXT_V1,
+    S2_CANDIDATE_RANKING_AVOID_SHALLOW_UPTREND_PULLBACK_V1,
 )
 
 
@@ -119,11 +126,19 @@ def _score_candidate(
         penalty = state_penalty
         state_quality_for_export = state_quality
         context_for_export = 0.0
-    else:
+    elif mode == S2_CANDIDATE_RANKING_HYBRID_STATE_CONTEXT_V1:
         penalty = state_penalty + context_penalty
         score = state_edge + state_quality + context - penalty
         state_quality_for_export = state_quality
         context_for_export = context
+    else:
+        uptrend_score, uptrend_penalty = _avoid_shallow_uptrend_pullback_score(
+            signal
+        )
+        penalty = uptrend_penalty
+        score = state_edge + uptrend_score - penalty
+        state_quality_for_export = uptrend_score
+        context_for_export = 0.0
 
     return _RankedS2Candidate(
         signal=signal,
@@ -223,6 +238,52 @@ def _context_score(signal: Signal) -> tuple[float, float]:
 
     if average_forward_return_pct > 15.0:
         penalty += 0.15
+
+    return score, penalty
+
+
+def _avoid_shallow_uptrend_pullback_score(signal: Signal) -> tuple[float, float]:
+    state = parse_markov_state_label(signal.metadata.get("state_label"))
+    if not state.valid:
+        return 0.0, 0.75
+
+    score = 0.0
+    penalty = 0.0
+    if (
+        state.ret_state == "RET_UP"
+        and state.dd_state == "DD_SHALLOW"
+        and state.low_state == "LOW_FAR_FROM_LOW"
+    ):
+        penalty += 2.00
+    if state.ret_state == "RET_STRONG_UP" and state.dd_state == "DD_SHALLOW":
+        penalty += 1.75
+    if state.ret_state == "RET_STRONG_UP" and state.vol_state == "VOL_HIGH":
+        penalty += 1.25
+    if (
+        state.dd_state == "DD_SHALLOW"
+        and state.low_state == "LOW_FAR_FROM_LOW"
+        and state.ret_state not in {"RET_FLAT", "RET_STRONG_DOWN"}
+    ):
+        penalty += 1.00
+
+    if state.ret_state == "RET_FLAT":
+        score += 0.75
+    if state.dd_state == "DD_MID":
+        score += 0.65
+    elif state.dd_state == "DD_DEEP":
+        score += 0.25
+    if state.low_state == "LOW_MID_RANGE":
+        score += 0.55
+    elif state.low_state == "LOW_NEAR":
+        score += 0.70
+
+    if state.ret_state == "RET_STRONG_DOWN":
+        if state.dd_state in {"DD_MID", "DD_DEEP"}:
+            score += 0.35
+        if state.low_state in {"LOW_NEAR", "LOW_MID_RANGE"}:
+            score += 0.35
+        if state.dd_state == "DD_SHALLOW" and state.low_state == "LOW_FAR_FROM_LOW":
+            penalty += 0.40
 
     return score, penalty
 

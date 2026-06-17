@@ -213,6 +213,11 @@ SIGNAL_LOG_COLUMNS = [
     "relative_strength_120d_vs_nifty",
     "markov_signal_filter",
     "markov_filter_decision",
+    "strategy_variant",
+    "s3_variant",
+    "s3_requires_strong_trend",
+    "s3_requires_above_sma50",
+    "s3_strong_trend_min_sma200_slope_20d_pct",
     "sma50",
     "sma200",
     "close_vs_sma50_pct",
@@ -961,6 +966,17 @@ def _signal_rows(result: Any) -> list[dict[str, object]]:
                 ),
                 "markov_signal_filter": metadata.get("markov_signal_filter"),
                 "markov_filter_decision": metadata.get("markov_filter_decision"),
+                "strategy_variant": metadata.get("strategy_variant"),
+                "s3_variant": metadata.get("s3_variant"),
+                "s3_requires_strong_trend": metadata.get(
+                    "s3_requires_strong_trend"
+                ),
+                "s3_requires_above_sma50": metadata.get(
+                    "s3_requires_above_sma50"
+                ),
+                "s3_strong_trend_min_sma200_slope_20d_pct": metadata.get(
+                    "s3_strong_trend_min_sma200_slope_20d_pct"
+                ),
                 "sma50": metadata.get("sma50"),
                 "sma200": metadata.get("sma200"),
                 "close_vs_sma50_pct": metadata.get("close_vs_sma50_pct"),

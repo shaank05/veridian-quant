@@ -15,7 +15,9 @@ from veridian_quant.v2.backtesting.s3_portfolio_runner import (
 from veridian_quant.v2.data.models import Signal, SignalType
 from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
 from veridian_quant.v2.run_s3_backtest import _parse_args
+from veridian_quant.v2.run_s3_backtest import _s3_variant_from_cli
 from veridian_quant.v2.strategies.s3_trend_pullback_continuation import (
+    S3_STRONG_TREND_V1,
     STRATEGY_NAME,
 )
 
@@ -215,6 +217,58 @@ def test_strategy_name_variant_and_ranking_mode_are_correct(monkeypatch) -> None
     assert result.candidate_ranking_mode == "none"
 
 
+def test_selected_s3_variant_is_recorded_and_ranking_remains_none(monkeypatch) -> None:
+    _patch_signals(
+        monkeypatch,
+        {
+            "AAA": [_signal("AAA", date(2026, 1, 15))],
+        },
+    )
+
+    result = run_s3_portfolio_backtest(
+        {"AAA": _trade_frame()},
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+        strategy_variant=S3_STRONG_TREND_V1,
+    )
+
+    assert result.strategy_variant == S3_STRONG_TREND_V1
+    assert result.candidate_ranking_mode == "none"
+
+
+def test_selected_s3_variant_is_passed_into_signal_generation(monkeypatch) -> None:
+    observed_variants = []
+
+    def fake_generate(symbol: str, data: pd.DataFrame, **kwargs):
+        observed_variants.append(kwargs["strategy_variant"])
+        return (_signal(symbol, date(2026, 1, 15)),)
+
+    monkeypatch.setattr(
+        "veridian_quant.v2.backtesting.s3_portfolio_runner."
+        "generate_s3_trend_pullback_signals",
+        fake_generate,
+    )
+
+    run_s3_portfolio_backtest(
+        {"AAA": _trade_frame()},
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+        strategy_variant=S3_STRONG_TREND_V1,
+    )
+
+    assert observed_variants == [S3_STRONG_TREND_V1]
+
+
+def test_unknown_s3_runner_variant_raises_value_error() -> None:
+    with pytest.raises(ValueError, match="unknown S3 strategy variant"):
+        run_s3_portfolio_backtest(
+            {"AAA": _trade_frame()},
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 1, 31),
+            strategy_variant="UNKNOWN",
+        )
+
+
 def test_result_signals_include_s3_metadata() -> None:
     data = _s3_qualifying_frame_with_future_exit()
     result = run_s3_portfolio_backtest(
@@ -226,6 +280,8 @@ def test_result_signals_include_s3_metadata() -> None:
     metadata = result.signals[0].metadata
 
     assert metadata["strategy_family"] == STRATEGY_NAME
+    assert metadata["strategy_variant"] == S3_BASELINE_VARIANT
+    assert metadata["s3_variant"] == S3_BASELINE_VARIANT
     assert metadata["sma_fast_window"] == 50
     assert metadata["pullback_lookback"] == 5
     assert "sma200_slope_20d_pct" in metadata
@@ -307,6 +363,8 @@ def test_standard_exporter_writes_s3_signal_metadata_columns(tmp_path) -> None:
 
     assert signal_log.loc[0, "sma_fast_window"] == 50
     assert signal_log.loc[0, "pullback_lookback"] == 5
+    assert signal_log.loc[0, "strategy_variant"] == S3_BASELINE_VARIANT
+    assert signal_log.loc[0, "s3_variant"] == S3_BASELINE_VARIANT
     assert "sma200_slope_20d_pct" in signal_log.columns
     assert "atr14_change_5d_pct" in signal_log.columns
 
@@ -347,6 +405,8 @@ def test_cli_parser_accepts_s3_arguments() -> None:
             "--allow-repeated-signals",
             "--disable-recovery-day",
             "--skip-all-signal-diagnostics",
+            "--s3-variant",
+            "strong_trend_v1",
             "--verbosity",
             "quiet",
         ]
@@ -369,7 +429,25 @@ def test_cli_parser_accepts_s3_arguments() -> None:
     assert args.allow_repeated_signals is True
     assert args.disable_recovery_day is True
     assert args.skip_all_signal_diagnostics is True
+    assert args.s3_variant == "strong_trend_v1"
+    assert _s3_variant_from_cli(args.s3_variant) == S3_STRONG_TREND_V1
     assert args.verbosity == "quiet"
+
+
+def test_cli_parser_rejects_invalid_s3_variant() -> None:
+    with pytest.raises(SystemExit):
+        _parse_args(
+            [
+                "--start-date",
+                "2020-01-01",
+                "--end-date",
+                "2026-04-30",
+                "--symbols",
+                "RELIANCE",
+                "--s3-variant",
+                "invalid",
+            ]
+        )
 
 
 def _patch_signals(monkeypatch, signals_by_symbol: dict[str, list[Signal]]) -> None:

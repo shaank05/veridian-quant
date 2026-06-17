@@ -13,10 +13,22 @@ from veridian_quant.v2.backtesting.s3_portfolio_runner import (
 from veridian_quant.v2.data.loaders import SQLAlchemyDailyOHLCVLoader
 from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
 from veridian_quant.v2.reporting.progress import ProgressReporter
+from veridian_quant.v2.strategies.s3_trend_pullback_continuation import (
+    S3_ABOVE_SMA50_V1,
+    S3_BASELINE,
+    S3_STRONG_TREND_ABOVE_SMA50_V1,
+    S3_STRONG_TREND_V1,
+)
 
 
 NIFTY_50_INSTRUMENT_KEY = "NSE_INDEX|Nifty 50"
 S3_LOOKBACK_BUFFER_DAYS = 365
+S3_CLI_VARIANTS = {
+    "baseline": S3_BASELINE,
+    "strong_trend_v1": S3_STRONG_TREND_V1,
+    "above_sma50_v1": S3_ABOVE_SMA50_V1,
+    "strong_trend_above_sma50_v1": S3_STRONG_TREND_ABOVE_SMA50_V1,
+}
 
 
 def main(argv: Iterable[str] | None = None) -> int:
@@ -30,7 +42,8 @@ def main(argv: Iterable[str] | None = None) -> int:
         f"{args.start_date} to {args.end_date} "
         f"equity={args.starting_equity} "
         f"risk={args.risk_per_trade} "
-        f"max_positions={args.max_concurrent_positions}"
+        f"max_positions={args.max_concurrent_positions} "
+        f"s3_variant={_s3_variant_from_cli(args.s3_variant)}"
     )
 
     setup_started = perf_counter()
@@ -105,6 +118,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         max_holding_sessions=20,
         round_trip_cost_pct=Decimal("0.004"),
         progress_reporter=reporter,
+        strategy_variant=_s3_variant_from_cli(args.s3_variant),
     )
     reporter.info(
         f"Finished S3 portfolio backtest in "
@@ -169,6 +183,11 @@ def _parse_args(argv: Iterable[str] | None) -> Namespace:
     parser.add_argument("--fresh-low-window", default=60, type=int)
     parser.add_argument("--allow-repeated-signals", action="store_true")
     parser.add_argument("--disable-recovery-day", action="store_true")
+    parser.add_argument(
+        "--s3-variant",
+        choices=tuple(S3_CLI_VARIANTS),
+        default="baseline",
+    )
     parser.add_argument("--skip-all-signal-diagnostics", action="store_true")
     parser.add_argument(
         "--verbosity",
@@ -207,6 +226,12 @@ def _parse_symbols(value: str) -> list[str]:
 
     symbols = [symbol.strip().upper() for symbol in value.split(",")]
     return [symbol for symbol in symbols if symbol]
+
+
+def _s3_variant_from_cli(value: str) -> str:
+    """Return the canonical S3 variant string for a CLI variant name."""
+
+    return S3_CLI_VARIANTS[value]
 
 
 def _get_database_engine() -> object:

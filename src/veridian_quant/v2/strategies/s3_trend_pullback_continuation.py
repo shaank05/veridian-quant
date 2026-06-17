@@ -17,6 +17,17 @@ from veridian_quant.v2.features.technical import atr
 
 
 STRATEGY_NAME = "S3_TREND_PULLBACK_CONTINUATION"
+S3_BASELINE = "S3_TREND_PULLBACK_CONTINUATION_BASELINE"
+S3_STRONG_TREND_V1 = "S3_STRONG_TREND_V1"
+S3_ABOVE_SMA50_V1 = "S3_ABOVE_SMA50_V1"
+S3_STRONG_TREND_ABOVE_SMA50_V1 = "S3_STRONG_TREND_ABOVE_SMA50_V1"
+S3_STRATEGY_VARIANTS = (
+    S3_BASELINE,
+    S3_STRONG_TREND_V1,
+    S3_ABOVE_SMA50_V1,
+    S3_STRONG_TREND_ABOVE_SMA50_V1,
+)
+S3_STRONG_TREND_MIN_SMA200_SLOPE_20D_PCT = 1.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -37,6 +48,7 @@ class S3TrendPullbackContinuationStrategy:
     fresh_low_window: int = 60
     allow_repeated_signals: bool = False
     require_recovery_day: bool = True
+    strategy_variant: str = S3_BASELINE
     strategy_name: str = STRATEGY_NAME
 
     @property
@@ -50,6 +62,7 @@ class S3TrendPullbackContinuationStrategy:
 
         _validate_input(data)
         self._validate_parameters()
+        validate_s3_strategy_variant(self.strategy_variant)
 
         working = _chronological_copy(data)
         feature_frame = build_s3_feature_frame(
@@ -87,7 +100,7 @@ class S3TrendPullbackContinuationStrategy:
         if not self.require_recovery_day:
             recovery_day = pd.Series(True, index=features.index)
 
-        return (
+        qualifies = (
             (features["close"] > features["sma200"])
             & (features["sma200_slope_20d_pct"] > 0)
             & (features["sma50_slope_20d_pct"] > 0)
@@ -110,10 +123,29 @@ class S3TrendPullbackContinuationStrategy:
             & (features["atr14_change_5d_pct"] <= self.max_atr_expansion_5d_pct)
             & recovery_day
         )
+        if _variant_requires_strong_trend(self.strategy_variant):
+            qualifies = qualifies & (
+                features["sma200_slope_20d_pct"]
+                > S3_STRONG_TREND_MIN_SMA200_SLOPE_20D_PCT
+            )
+        if _variant_requires_above_sma50(self.strategy_variant):
+            qualifies = qualifies & (features["close_vs_sma50_pct"] >= 0)
+        return qualifies
 
     def _metadata(self, features: pd.Series) -> dict[str, object]:
+        requires_strong_trend = _variant_requires_strong_trend(self.strategy_variant)
+        requires_above_sma50 = _variant_requires_above_sma50(self.strategy_variant)
         return {
             "strategy_family": STRATEGY_NAME,
+            "strategy_variant": self.strategy_variant,
+            "s3_variant": self.strategy_variant,
+            "s3_requires_strong_trend": requires_strong_trend,
+            "s3_requires_above_sma50": requires_above_sma50,
+            "s3_strong_trend_min_sma200_slope_20d_pct": (
+                S3_STRONG_TREND_MIN_SMA200_SLOPE_20D_PCT
+                if requires_strong_trend
+                else None
+            ),
             "close": _blank_nan(features["close"]),
             "sma50": _blank_nan(features["sma50"]),
             "sma200": _blank_nan(features["sma200"]),
@@ -176,6 +208,7 @@ def generate_s3_trend_pullback_signals(
     fresh_low_window: int = 60,
     allow_repeated_signals: bool = False,
     require_recovery_day: bool = True,
+    strategy_variant: str = S3_BASELINE,
 ) -> tuple[Signal, ...]:
     """Generate S3 signals using the default strategy class."""
 
@@ -194,8 +227,28 @@ def generate_s3_trend_pullback_signals(
         fresh_low_window=fresh_low_window,
         allow_repeated_signals=allow_repeated_signals,
         require_recovery_day=require_recovery_day,
+        strategy_variant=strategy_variant,
     )
     return strategy.generate_signals(symbol=symbol, data=data)
+
+
+def validate_s3_strategy_variant(variant: str) -> str:
+    """Return a valid S3 strategy variant or raise a clear ValueError."""
+
+    if variant not in S3_STRATEGY_VARIANTS:
+        allowed = ", ".join(S3_STRATEGY_VARIANTS)
+        raise ValueError(
+            f"unknown S3 strategy variant {variant!r}; expected one of: {allowed}"
+        )
+    return variant
+
+
+def _variant_requires_strong_trend(variant: str) -> bool:
+    return variant in {S3_STRONG_TREND_V1, S3_STRONG_TREND_ABOVE_SMA50_V1}
+
+
+def _variant_requires_above_sma50(variant: str) -> bool:
+    return variant in {S3_ABOVE_SMA50_V1, S3_STRONG_TREND_ABOVE_SMA50_V1}
 
 
 def build_s3_feature_frame(

@@ -24,12 +24,14 @@ from veridian_quant.v2.backtesting.sizing import build_position_plan
 from veridian_quant.v2.data.models import Signal
 from veridian_quant.v2.reporting.progress import NullProgressReporter
 from veridian_quant.v2.strategies.s3_trend_pullback_continuation import (
+    S3_BASELINE,
     STRATEGY_NAME,
     generate_s3_trend_pullback_signals,
+    validate_s3_strategy_variant,
 )
 
 
-S3_BASELINE_VARIANT = "S3_TREND_PULLBACK_CONTINUATION_BASELINE"
+S3_BASELINE_VARIANT = S3_BASELINE
 S3_CANDIDATE_RANKING_NONE = "none"
 
 
@@ -68,9 +70,11 @@ def run_s3_portfolio_backtest(
     max_holding_sessions: int = 20,
     round_trip_cost_pct: Decimal | int | str | float = Decimal("0.004"),
     progress_reporter: object | None = None,
+    strategy_variant: str = S3_BASELINE,
 ) -> PortfolioBacktestResult:
     """Run a deterministic multi-symbol S3 research portfolio backtest."""
 
+    strategy_variant = validate_s3_strategy_variant(strategy_variant)
     progress = progress_reporter or NullProgressReporter()
     ledger = create_portfolio_ledger(starting_equity)
     symbols = tuple(sorted(data_by_symbol))
@@ -105,6 +109,7 @@ def run_s3_portfolio_backtest(
                 fresh_low_window=fresh_low_window,
                 allow_repeated_signals=allow_repeated_signals,
                 require_recovery_day=require_recovery_day,
+                strategy_variant=strategy_variant,
             )
             total_generated_signals += len(generated_signals)
             signals.extend(
@@ -269,7 +274,7 @@ def run_s3_portfolio_backtest(
         signals=ordered_signals,
         rejected_signals=tuple(rejected_signals),
         ledger=ledger,
-        strategy_variant=S3_BASELINE_VARIANT,
+        strategy_variant=strategy_variant,
         candidate_ranking_mode=S3_CANDIDATE_RANKING_NONE,
     )
 

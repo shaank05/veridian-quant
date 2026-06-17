@@ -7,6 +7,10 @@ import pytest
 
 from veridian_quant.v2.data.models import SignalType
 from veridian_quant.v2.strategies.s3_trend_pullback_continuation import (
+    S3_ABOVE_SMA50_V1,
+    S3_BASELINE,
+    S3_STRONG_TREND_ABOVE_SMA50_V1,
+    S3_STRONG_TREND_V1,
     STRATEGY_NAME,
     S3TrendPullbackContinuationStrategy,
     generate_s3_trend_pullback_signals,
@@ -15,6 +19,11 @@ from veridian_quant.v2.strategies.s3_trend_pullback_continuation import (
 
 EXPECTED_METADATA_FIELDS = {
     "strategy_family",
+    "strategy_variant",
+    "s3_variant",
+    "s3_requires_strong_trend",
+    "s3_requires_above_sma50",
+    "s3_strong_trend_min_sma200_slope_20d_pct",
     "close",
     "sma50",
     "sma200",
@@ -85,6 +94,108 @@ def test_signal_generated_when_all_baseline_conditions_are_met() -> None:
     assert signals[0].signal_type == SignalType.LONG
     assert signals[0].strategy_name == STRATEGY_NAME
     assert signals[0].reason == "S3 trend pullback continuation setup"
+
+
+def test_baseline_variant_produces_same_signal_as_default() -> None:
+    data = _qualifying_frame()
+
+    default_signals = generate_s3_trend_pullback_signals("TEST", data)
+    baseline_signals = generate_s3_trend_pullback_signals(
+        "TEST",
+        data,
+        strategy_variant=S3_BASELINE,
+    )
+
+    assert baseline_signals == default_signals
+
+
+def test_strong_trend_variant_rejects_when_sma200_slope_not_strong() -> None:
+    data = _qualifying_frame()
+
+    baseline = generate_s3_trend_pullback_signals(
+        "TEST",
+        data,
+        sma_slope_lookback=1,
+    )
+    strong_trend = generate_s3_trend_pullback_signals(
+        "TEST",
+        data,
+        sma_slope_lookback=1,
+        strategy_variant=S3_STRONG_TREND_V1,
+    )
+
+    assert len(baseline) == 1
+    assert baseline[0].metadata["sma200_slope_20d_pct"] <= 1.0
+    assert strong_trend == ()
+
+
+def test_strong_trend_variant_accepts_when_sma200_slope_is_strong() -> None:
+    signals = generate_s3_trend_pullback_signals(
+        "TEST",
+        _qualifying_frame(),
+        strategy_variant=S3_STRONG_TREND_V1,
+    )
+
+    assert len(signals) == 1
+    assert signals[0].metadata["sma200_slope_20d_pct"] > 1.0
+
+
+def test_above_sma50_variant_rejects_when_close_is_below_sma50() -> None:
+    data = _below_sma50_baseline_qualifying_frame()
+
+    baseline = generate_s3_trend_pullback_signals("TEST", data)
+    above_sma50 = generate_s3_trend_pullback_signals(
+        "TEST",
+        data,
+        strategy_variant=S3_ABOVE_SMA50_V1,
+    )
+
+    assert len(baseline) == 1
+    assert baseline[0].metadata["close_vs_sma50_pct"] < 0
+    assert above_sma50 == ()
+
+
+def test_above_sma50_variant_accepts_when_close_is_above_sma50() -> None:
+    signals = generate_s3_trend_pullback_signals(
+        "TEST",
+        _qualifying_frame(),
+        strategy_variant=S3_ABOVE_SMA50_V1,
+    )
+
+    assert len(signals) == 1
+    assert signals[0].metadata["close_vs_sma50_pct"] >= 0
+
+
+def test_combined_variant_requires_both_extra_filters() -> None:
+    strong_but_below_sma50 = generate_s3_trend_pullback_signals(
+        "TEST",
+        _below_sma50_baseline_qualifying_frame(),
+        strategy_variant=S3_STRONG_TREND_ABOVE_SMA50_V1,
+    )
+    above_sma50_but_not_strong = generate_s3_trend_pullback_signals(
+        "TEST",
+        _qualifying_frame(),
+        sma_slope_lookback=1,
+        strategy_variant=S3_STRONG_TREND_ABOVE_SMA50_V1,
+    )
+    passes_both = generate_s3_trend_pullback_signals(
+        "TEST",
+        _qualifying_frame(),
+        strategy_variant=S3_STRONG_TREND_ABOVE_SMA50_V1,
+    )
+
+    assert strong_but_below_sma50 == ()
+    assert above_sma50_but_not_strong == ()
+    assert len(passes_both) == 1
+
+
+def test_unknown_s3_variant_raises_value_error() -> None:
+    with pytest.raises(ValueError, match="unknown S3 strategy variant"):
+        generate_s3_trend_pullback_signals(
+            "TEST",
+            _qualifying_frame(),
+            strategy_variant="UNKNOWN",
+        )
 
 
 def test_no_signal_when_close_is_below_sma200() -> None:
@@ -262,10 +373,29 @@ def test_metadata_contains_all_expected_fields() -> None:
 
     assert EXPECTED_METADATA_FIELDS.issubset(metadata)
     assert metadata["strategy_family"] == STRATEGY_NAME
+    assert metadata["strategy_variant"] == S3_BASELINE
+    assert metadata["s3_variant"] == S3_BASELINE
+    assert metadata["s3_requires_strong_trend"] is False
+    assert metadata["s3_requires_above_sma50"] is False
     assert metadata["pullback_lookback"] == 5
     assert metadata["sma_fast_window"] == 50
     assert metadata["sma_slow_window"] == 200
     assert metadata["require_recovery_day"] is True
+
+
+def test_variant_metadata_includes_selected_variant() -> None:
+    signal = generate_s3_trend_pullback_signals(
+        "TEST",
+        _qualifying_frame(),
+        strategy_variant=S3_STRONG_TREND_ABOVE_SMA50_V1,
+    )[0]
+    metadata = signal.metadata
+
+    assert metadata["strategy_variant"] == S3_STRONG_TREND_ABOVE_SMA50_V1
+    assert metadata["s3_variant"] == S3_STRONG_TREND_ABOVE_SMA50_V1
+    assert metadata["s3_requires_strong_trend"] is True
+    assert metadata["s3_requires_above_sma50"] is True
+    assert metadata["s3_strong_trend_min_sma200_slope_20d_pct"] == 1.0
 
 
 def test_signal_generated_on_equals_signal_row_date() -> None:
@@ -325,6 +455,23 @@ def _qualifying_frame(include_second_qualifying_day: bool = False) -> pd.DataFra
     if include_second_qualifying_day:
         closes.append(203.0)
     return _frame(closes)
+
+
+def _below_sma50_baseline_qualifying_frame() -> pd.DataFrame:
+    data = _qualifying_frame()
+    data.loc[data.index[-2], ["open", "high", "low", "close"]] = [
+        192.0,
+        193.0,
+        191.0,
+        192.0,
+    ]
+    data.loc[data.index[-1], ["open", "high", "low", "close"]] = [
+        195.0,
+        196.0,
+        194.0,
+        195.0,
+    ]
+    return data
 
 
 def _frame(closes: list[float]) -> pd.DataFrame:

@@ -323,7 +323,9 @@ S1 and S2 are independent signal-generation families.
 
 S2 is not an S1 filter.
 
-S1 remains the current benchmark strategy. S2 has been implemented but has not yet been benchmarked on the audited 200-symbol research universe.
+S1 remains the original v2 benchmark strategy.
+
+S2 has now been researched through Phase 27J. It has evidence of edge and is retained as a benchmark/research candidate, but it is frozen and not production-ready because of regime fragility, especially in 2025/2026.
 
 Shared components include:
 
@@ -341,8 +343,17 @@ Current runner architecture:
 * The S1 portfolio runner remains unchanged and continues to own S1-specific variants and S1 candidate ranking behavior.
 * S2 currently has a separate Markov portfolio runner.
 * Both runners use the same downstream trade mechanics after signals are generated.
+* S2 ranking now has signal-time stock/Nifty/relative-strength context enrichment available before portfolio capacity decisions.
+* S2 failure-audit diagnostics exist as research reporting infrastructure.
 
 Future strategy combination, voting, meta-ranking, and capital allocation layers are future work. They are not current behavior and must not be treated as accepted production rules.
+
+Current S2 decision:
+
+* Keep `exclude_ret_down + ranking none` as the safer S2 benchmark.
+* Keep `exclude_ret_down + clean_state_v1` as the higher-return S2 research candidate.
+* Do not continue immediate S2 tuning.
+* Move the next research effort to a new independent strategy family.
 
 ---
 

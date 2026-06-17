@@ -152,8 +152,60 @@ Strategy combination, voting, meta-ranking, and capital allocation layers are fu
 
 Context:
 
-S1 ranking v1 underperformed and S2 is not yet benchmarked.
+S1 ranking v1 underperformed and S2 is now frozen as a benchmark/research candidate rather than a production strategy.
 
 Consequence:
 
 No S1/S2 voting layer, meta-ranking layer, FFT strategy, wavelet strategy, or defensive regime layer is accepted at this stage.
+
+---
+
+## ADR-009 - Freeze S2 Markov Research After Phase 27J
+
+Date: 2026-06-17
+
+Status: Accepted
+
+Decision:
+
+Freeze `S2_MARKOV_STATE_TRANSITION` research for now.
+
+Retain:
+
+- Safer benchmark: `exclude_ret_down + ranking none`
+- Higher-return research candidate: `exclude_ret_down + clean_state_v1`
+
+Context:
+
+S2 has evidence of edge, but the Phase 27H-27J research cycle found material regime fragility. The high-return candidate suffered about -Rs 7.50L in 2025, with losses concentrated in shallow bullish-pullback states:
+
+- `RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW`
+- `RET_UP|VOL_MID|DD_SHALLOW|LOW_MID_RANGE`
+
+Guard variants improved targeted 2025 damage but weakened total edge too much.
+
+Consequence:
+
+S2 remains a benchmark/research candidate, not a production strategy. The next alpha research effort should move to a new independent strategy family.
+
+---
+
+## ADR-010 - S2 Context and Failure Audit Are Research Infrastructure
+
+Date: 2026-06-17
+
+Status: Accepted
+
+Decision:
+
+Keep S2 failure-audit diagnostics and signal-time context enrichment as research infrastructure.
+
+Context:
+
+Phase 27H added S2 failure audit CSVs to identify state, symbol, exit reason, month, and context buckets where 2025 differed from pre-2025 behavior.
+
+Phase 27J added signal-time stock/Nifty/relative-strength context metadata before S2 ranking and portfolio capacity decisions. This enrichment respects no-lookahead and is visible in signal logs.
+
+Consequence:
+
+These features improve auditability and future ranker research. They are not production trading logic and do not make S2 production-ready.

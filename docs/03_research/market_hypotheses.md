@@ -259,11 +259,23 @@ Research implementation exists as standalone S2 Markov State Transition.
 
 Status:
 
-Implemented, not yet benchmarked on the audited 200-symbol research universe, and not accepted as a production rule.
+Researched through Phase 27J, retained as benchmark/research candidate, frozen for now, and not accepted as a production rule.
 
 Reason:
 
-Markov logic must prove standalone contribution before it can be compared with or combined with S1.
+S2 has evidence of edge, but the research cycle found material regime fragility, especially in 2025/2026.
+
+Retained S2 benchmarks:
+
+* Safer benchmark: `exclude_ret_down + ranking none`
+* Higher-return research candidate: `exclude_ret_down + clean_state_v1`
+
+The 2025 failure audit found that S2 was vulnerable to shallow bullish pullbacks that looked healthy but failed to mean-revert:
+
+* `RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW`
+* `RET_UP|VOL_MID|DD_SHALLOW|LOW_MID_RANGE`
+
+S2 is useful for future comparison, but immediate S2 tuning is parked.
 
 ---
 
@@ -271,10 +283,12 @@ Markov logic must prove standalone contribution before it can be compared with o
 
 The current research priority is:
 
-## H1 + H3 + H6, plus standalone S2 evaluation
+## H1 + H3 + H6, plus new independent strategy research
 
 Meaning:
 
 S1 remains the current volatility-normalized mean-reversion benchmark, while opportunity selection under capital constraints is now a core research problem.
 
-S2 Markov State Transition should be tested independently before any S1/S2 voting, meta-ranking, or ensemble behavior is considered.
+S2 Markov State Transition has now been tested independently and is frozen as a benchmark/research candidate, not a production strategy.
+
+The next research priority is a new independent alpha source, likely S3 trend pullback continuation or another non-S2 strategy family.

@@ -154,3 +154,56 @@ The project should avoid adding too many advanced strategy families before valid
 Consequence:
 
 FFT and wavelet remain future research directions, not accepted production rules.
+
+---
+
+## 2026-06-17 - Freeze S2 Markov Research After Phase 27J
+
+Decision:
+
+Freeze `S2_MARKOV_STATE_TRANSITION` research for now.
+
+Keep two retained S2 benchmarks:
+
+- Safer benchmark: `markov_signal_filter = exclude_ret_down`, `s2_candidate_ranking = none`
+- Higher-return research candidate: `markov_signal_filter = exclude_ret_down`, `s2_candidate_ranking = clean_state_v1`
+
+Approximate retained benchmark results:
+
+- Safer benchmark: about Rs 9.72L net PnL, about 11.32% CAGR, about 24.04% max drawdown, about 1.189 PF.
+- Higher-return candidate: about Rs 12.32L net PnL, about 13.52% CAGR, about 33.94% max drawdown, about 1.223 PF, and about -Rs 7.50L in 2025.
+
+What was tried:
+
+- Raw S2 Markov baseline.
+- Markov state filters.
+- Candidate ranking modes.
+- Rejected/capacity counterfactual diagnostics.
+- 2025 failure audit.
+- `avoid_shallow_uptrend_pullback_v1`.
+- `2025_guard_v1`.
+- Signal-time stock/Nifty/relative-strength context enrichment.
+
+Rejected as benchmarks:
+
+- `avoid_shallow_uptrend_pullback_v1`
+- `exclude_ret_down + avoid_shallow_uptrend_pullback_v1`
+- `exclude_ret_down + 2025_guard_v1`
+- `exclude_ret_down + 2025_guard_v1 + signal-time context`
+
+Reason:
+
+S2 has evidence of edge, but remains regime fragile. The high-return candidate suffered a recurring 2025 regime failure concentrated in `RET_UP + VOL_MID + DD_SHALLOW + not truly near lows`, especially:
+
+- `RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW`
+- `RET_UP|VOL_MID|DD_SHALLOW|LOW_MID_RANGE`
+
+Guard variants reduced the targeted pocket, but weakened total PnL too much or shifted losses to replacement candidates.
+
+Consequence:
+
+S2 is retained as a benchmark/research candidate, not production-ready and not deployed live.
+
+Next:
+
+Move the next research effort to a new independent strategy, likely S3 trend pullback continuation or another non-S2 alpha source.

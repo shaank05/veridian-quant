@@ -9,6 +9,7 @@ from veridian_quant.v2.data.models import SignalType
 from veridian_quant.v2.strategies.s3_trend_pullback_continuation import (
     S3_ABOVE_SMA50_V1,
     S3_BASELINE,
+    S3_CONTROLLED_PULLBACK_V1,
     S3_STRONG_TREND_ABOVE_SMA50_V1,
     S3_STRONG_TREND_V1,
     STRATEGY_NAME,
@@ -23,7 +24,9 @@ EXPECTED_METADATA_FIELDS = {
     "s3_variant",
     "s3_requires_strong_trend",
     "s3_requires_above_sma50",
+    "s3_requires_controlled_pullback",
     "s3_strong_trend_min_sma200_slope_20d_pct",
+    "s3_controlled_pullback_min_return_5d_pct",
     "close",
     "sma50",
     "sma200",
@@ -187,6 +190,70 @@ def test_combined_variant_requires_both_extra_filters() -> None:
     assert strong_but_below_sma50 == ()
     assert above_sma50_but_not_strong == ()
     assert len(passes_both) == 1
+
+
+def test_controlled_pullback_variant_rejects_when_sma200_slope_not_strong() -> None:
+    data = _qualifying_frame()
+
+    baseline = generate_s3_trend_pullback_signals(
+        "TEST",
+        data,
+        sma_slope_lookback=1,
+    )
+    controlled = generate_s3_trend_pullback_signals(
+        "TEST",
+        data,
+        sma_slope_lookback=1,
+        strategy_variant=S3_CONTROLLED_PULLBACK_V1,
+    )
+
+    assert len(baseline) == 1
+    assert baseline[0].metadata["sma200_slope_20d_pct"] <= 1.0
+    assert controlled == ()
+
+
+def test_controlled_pullback_variant_rejects_when_close_is_below_sma50() -> None:
+    data = _below_sma50_baseline_qualifying_frame()
+
+    baseline = generate_s3_trend_pullback_signals("TEST", data)
+    controlled = generate_s3_trend_pullback_signals(
+        "TEST",
+        data,
+        strategy_variant=S3_CONTROLLED_PULLBACK_V1,
+    )
+
+    assert len(baseline) == 1
+    assert baseline[0].metadata["close_vs_sma50_pct"] < 0
+    assert controlled == ()
+
+
+def test_controlled_pullback_variant_rejects_deep_5d_pullback() -> None:
+    data = _deep_pullback_baseline_qualifying_frame()
+
+    baseline = generate_s3_trend_pullback_signals("TEST", data)
+    controlled = generate_s3_trend_pullback_signals(
+        "TEST",
+        data,
+        strategy_variant=S3_CONTROLLED_PULLBACK_V1,
+    )
+
+    assert len(baseline) == 1
+    assert baseline[0].metadata["return_5d_pct"] < -6
+    assert controlled == ()
+
+
+def test_controlled_pullback_variant_accepts_when_all_extra_filters_pass() -> None:
+    signals = generate_s3_trend_pullback_signals(
+        "TEST",
+        _qualifying_frame(),
+        strategy_variant=S3_CONTROLLED_PULLBACK_V1,
+    )
+
+    assert len(signals) == 1
+    metadata = signals[0].metadata
+    assert metadata["sma200_slope_20d_pct"] > 1.0
+    assert metadata["close_vs_sma50_pct"] >= 0
+    assert metadata["return_5d_pct"] >= -6
 
 
 def test_unknown_s3_variant_raises_value_error() -> None:
@@ -377,6 +444,8 @@ def test_metadata_contains_all_expected_fields() -> None:
     assert metadata["s3_variant"] == S3_BASELINE
     assert metadata["s3_requires_strong_trend"] is False
     assert metadata["s3_requires_above_sma50"] is False
+    assert metadata["s3_requires_controlled_pullback"] is False
+    assert metadata["s3_controlled_pullback_min_return_5d_pct"] is None
     assert metadata["pullback_lookback"] == 5
     assert metadata["sma_fast_window"] == 50
     assert metadata["sma_slow_window"] == 200
@@ -396,6 +465,22 @@ def test_variant_metadata_includes_selected_variant() -> None:
     assert metadata["s3_requires_strong_trend"] is True
     assert metadata["s3_requires_above_sma50"] is True
     assert metadata["s3_strong_trend_min_sma200_slope_20d_pct"] == 1.0
+
+
+def test_controlled_pullback_metadata_includes_selected_variant_and_threshold() -> None:
+    signal = generate_s3_trend_pullback_signals(
+        "TEST",
+        _qualifying_frame(),
+        strategy_variant=S3_CONTROLLED_PULLBACK_V1,
+    )[0]
+    metadata = signal.metadata
+
+    assert metadata["strategy_variant"] == S3_CONTROLLED_PULLBACK_V1
+    assert metadata["s3_variant"] == S3_CONTROLLED_PULLBACK_V1
+    assert metadata["s3_requires_strong_trend"] is True
+    assert metadata["s3_requires_above_sma50"] is True
+    assert metadata["s3_requires_controlled_pullback"] is True
+    assert metadata["s3_controlled_pullback_min_return_5d_pct"] == -6.0
 
 
 def test_signal_generated_on_equals_signal_row_date() -> None:
@@ -464,6 +549,23 @@ def _below_sma50_baseline_qualifying_frame() -> pd.DataFrame:
         193.0,
         191.0,
         192.0,
+    ]
+    data.loc[data.index[-1], ["open", "high", "low", "close"]] = [
+        195.0,
+        196.0,
+        194.0,
+        195.0,
+    ]
+    return data
+
+
+def _deep_pullback_baseline_qualifying_frame() -> pd.DataFrame:
+    data = _qualifying_frame()
+    data.loc[data.index[-2], ["open", "high", "low", "close"]] = [
+        194.0,
+        195.0,
+        193.0,
+        194.0,
     ]
     data.loc[data.index[-1], ["open", "high", "low", "close"]] = [
         195.0,

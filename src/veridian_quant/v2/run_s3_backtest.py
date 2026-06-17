@@ -16,6 +16,7 @@ from veridian_quant.v2.reporting.progress import ProgressReporter
 from veridian_quant.v2.strategies.s3_trend_pullback_continuation import (
     S3_ABOVE_SMA50_V1,
     S3_BASELINE,
+    S3_CONTROLLED_PULLBACK_V1,
     S3_STRONG_TREND_ABOVE_SMA50_V1,
     S3_STRONG_TREND_V1,
 )
@@ -28,6 +29,7 @@ S3_CLI_VARIANTS = {
     "strong_trend_v1": S3_STRONG_TREND_V1,
     "above_sma50_v1": S3_ABOVE_SMA50_V1,
     "strong_trend_above_sma50_v1": S3_STRONG_TREND_ABOVE_SMA50_V1,
+    "controlled_pullback_v1": S3_CONTROLLED_PULLBACK_V1,
 }
 
 

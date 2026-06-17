@@ -17,6 +17,7 @@ from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
 from veridian_quant.v2.run_s3_backtest import _parse_args
 from veridian_quant.v2.run_s3_backtest import _s3_variant_from_cli
 from veridian_quant.v2.strategies.s3_trend_pullback_continuation import (
+    S3_CONTROLLED_PULLBACK_V1,
     S3_STRONG_TREND_V1,
     STRATEGY_NAME,
 )
@@ -236,6 +237,25 @@ def test_selected_s3_variant_is_recorded_and_ranking_remains_none(monkeypatch) -
     assert result.candidate_ranking_mode == "none"
 
 
+def test_selected_controlled_pullback_variant_is_recorded(monkeypatch) -> None:
+    _patch_signals(
+        monkeypatch,
+        {
+            "AAA": [_signal("AAA", date(2026, 1, 15))],
+        },
+    )
+
+    result = run_s3_portfolio_backtest(
+        {"AAA": _trade_frame()},
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+        strategy_variant=S3_CONTROLLED_PULLBACK_V1,
+    )
+
+    assert result.strategy_variant == S3_CONTROLLED_PULLBACK_V1
+    assert result.candidate_ranking_mode == "none"
+
+
 def test_selected_s3_variant_is_passed_into_signal_generation(monkeypatch) -> None:
     observed_variants = []
 
@@ -257,6 +277,31 @@ def test_selected_s3_variant_is_passed_into_signal_generation(monkeypatch) -> No
     )
 
     assert observed_variants == [S3_STRONG_TREND_V1]
+
+
+def test_selected_controlled_pullback_variant_is_passed_into_signal_generation(
+    monkeypatch,
+) -> None:
+    observed_variants = []
+
+    def fake_generate(symbol: str, data: pd.DataFrame, **kwargs):
+        observed_variants.append(kwargs["strategy_variant"])
+        return (_signal(symbol, date(2026, 1, 15)),)
+
+    monkeypatch.setattr(
+        "veridian_quant.v2.backtesting.s3_portfolio_runner."
+        "generate_s3_trend_pullback_signals",
+        fake_generate,
+    )
+
+    run_s3_portfolio_backtest(
+        {"AAA": _trade_frame()},
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+        strategy_variant=S3_CONTROLLED_PULLBACK_V1,
+    )
+
+    assert observed_variants == [S3_CONTROLLED_PULLBACK_V1]
 
 
 def test_unknown_s3_runner_variant_raises_value_error() -> None:
@@ -365,6 +410,8 @@ def test_standard_exporter_writes_s3_signal_metadata_columns(tmp_path) -> None:
     assert signal_log.loc[0, "pullback_lookback"] == 5
     assert signal_log.loc[0, "strategy_variant"] == S3_BASELINE_VARIANT
     assert signal_log.loc[0, "s3_variant"] == S3_BASELINE_VARIANT
+    assert "s3_requires_controlled_pullback" in signal_log.columns
+    assert "s3_controlled_pullback_min_return_5d_pct" in signal_log.columns
     assert "sma200_slope_20d_pct" in signal_log.columns
     assert "atr14_change_5d_pct" in signal_log.columns
 
@@ -432,6 +479,24 @@ def test_cli_parser_accepts_s3_arguments() -> None:
     assert args.s3_variant == "strong_trend_v1"
     assert _s3_variant_from_cli(args.s3_variant) == S3_STRONG_TREND_V1
     assert args.verbosity == "quiet"
+
+
+def test_cli_parser_accepts_controlled_pullback_s3_variant() -> None:
+    args = _parse_args(
+        [
+            "--start-date",
+            "2020-01-01",
+            "--end-date",
+            "2026-04-30",
+            "--symbols",
+            "RELIANCE,TCS",
+            "--s3-variant",
+            "controlled_pullback_v1",
+        ]
+    )
+
+    assert args.s3_variant == "controlled_pullback_v1"
+    assert _s3_variant_from_cli(args.s3_variant) == S3_CONTROLLED_PULLBACK_V1
 
 
 def test_cli_parser_rejects_invalid_s3_variant() -> None:

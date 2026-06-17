@@ -21,13 +21,16 @@ S3_BASELINE = "S3_TREND_PULLBACK_CONTINUATION_BASELINE"
 S3_STRONG_TREND_V1 = "S3_STRONG_TREND_V1"
 S3_ABOVE_SMA50_V1 = "S3_ABOVE_SMA50_V1"
 S3_STRONG_TREND_ABOVE_SMA50_V1 = "S3_STRONG_TREND_ABOVE_SMA50_V1"
+S3_CONTROLLED_PULLBACK_V1 = "S3_CONTROLLED_PULLBACK_V1"
 S3_STRATEGY_VARIANTS = (
     S3_BASELINE,
     S3_STRONG_TREND_V1,
     S3_ABOVE_SMA50_V1,
     S3_STRONG_TREND_ABOVE_SMA50_V1,
+    S3_CONTROLLED_PULLBACK_V1,
 )
 S3_STRONG_TREND_MIN_SMA200_SLOPE_20D_PCT = 1.0
+S3_CONTROLLED_PULLBACK_MIN_RETURN_5D_PCT = -6.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -130,20 +133,34 @@ class S3TrendPullbackContinuationStrategy:
             )
         if _variant_requires_above_sma50(self.strategy_variant):
             qualifies = qualifies & (features["close_vs_sma50_pct"] >= 0)
+        if _variant_requires_controlled_pullback(self.strategy_variant):
+            qualifies = qualifies & (
+                features["return_5d_pct"]
+                >= S3_CONTROLLED_PULLBACK_MIN_RETURN_5D_PCT
+            )
         return qualifies
 
     def _metadata(self, features: pd.Series) -> dict[str, object]:
         requires_strong_trend = _variant_requires_strong_trend(self.strategy_variant)
         requires_above_sma50 = _variant_requires_above_sma50(self.strategy_variant)
+        requires_controlled_pullback = _variant_requires_controlled_pullback(
+            self.strategy_variant
+        )
         return {
             "strategy_family": STRATEGY_NAME,
             "strategy_variant": self.strategy_variant,
             "s3_variant": self.strategy_variant,
             "s3_requires_strong_trend": requires_strong_trend,
             "s3_requires_above_sma50": requires_above_sma50,
+            "s3_requires_controlled_pullback": requires_controlled_pullback,
             "s3_strong_trend_min_sma200_slope_20d_pct": (
                 S3_STRONG_TREND_MIN_SMA200_SLOPE_20D_PCT
                 if requires_strong_trend
+                else None
+            ),
+            "s3_controlled_pullback_min_return_5d_pct": (
+                S3_CONTROLLED_PULLBACK_MIN_RETURN_5D_PCT
+                if requires_controlled_pullback
                 else None
             ),
             "close": _blank_nan(features["close"]),
@@ -244,11 +261,23 @@ def validate_s3_strategy_variant(variant: str) -> str:
 
 
 def _variant_requires_strong_trend(variant: str) -> bool:
-    return variant in {S3_STRONG_TREND_V1, S3_STRONG_TREND_ABOVE_SMA50_V1}
+    return variant in {
+        S3_STRONG_TREND_V1,
+        S3_STRONG_TREND_ABOVE_SMA50_V1,
+        S3_CONTROLLED_PULLBACK_V1,
+    }
 
 
 def _variant_requires_above_sma50(variant: str) -> bool:
-    return variant in {S3_ABOVE_SMA50_V1, S3_STRONG_TREND_ABOVE_SMA50_V1}
+    return variant in {
+        S3_ABOVE_SMA50_V1,
+        S3_STRONG_TREND_ABOVE_SMA50_V1,
+        S3_CONTROLLED_PULLBACK_V1,
+    }
+
+
+def _variant_requires_controlled_pullback(variant: str) -> bool:
+    return variant == S3_CONTROLLED_PULLBACK_V1
 
 
 def build_s3_feature_frame(

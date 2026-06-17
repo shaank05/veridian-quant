@@ -217,7 +217,9 @@ SIGNAL_LOG_COLUMNS = [
     "s3_variant",
     "s3_requires_strong_trend",
     "s3_requires_above_sma50",
+    "s3_requires_controlled_pullback",
     "s3_strong_trend_min_sma200_slope_20d_pct",
+    "s3_controlled_pullback_min_return_5d_pct",
     "sma50",
     "sma200",
     "close_vs_sma50_pct",
@@ -974,8 +976,14 @@ def _signal_rows(result: Any) -> list[dict[str, object]]:
                 "s3_requires_above_sma50": metadata.get(
                     "s3_requires_above_sma50"
                 ),
+                "s3_requires_controlled_pullback": metadata.get(
+                    "s3_requires_controlled_pullback"
+                ),
                 "s3_strong_trend_min_sma200_slope_20d_pct": metadata.get(
                     "s3_strong_trend_min_sma200_slope_20d_pct"
+                ),
+                "s3_controlled_pullback_min_return_5d_pct": metadata.get(
+                    "s3_controlled_pullback_min_return_5d_pct"
                 ),
                 "sma50": metadata.get("sma50"),
                 "sma200": metadata.get("sma200"),

@@ -18,9 +18,11 @@ S2_CANDIDATE_RANKING_STATE_EDGE_V1 = "state_edge_v1"
 S2_CANDIDATE_RANKING_CLEAN_STATE_V1 = "clean_state_v1"
 S2_CANDIDATE_RANKING_STATE_QUALITY_V1 = "state_quality_v1"
 S2_CANDIDATE_RANKING_HYBRID_STATE_CONTEXT_V1 = "hybrid_state_context_v1"
+S2_CANDIDATE_RANKING_2025_GUARD_V1 = "2025_guard_v1"
 S2_CANDIDATE_RANKING_AVOID_SHALLOW_UPTREND_PULLBACK_V1 = (
     "avoid_shallow_uptrend_pullback_v1"
 )
+S2_2025_GUARD_VARIANT = "S2_MARKOV_STATE_TRANSITION_2025_GUARD_V1"
 S2_AVOID_SHALLOW_UPTREND_PULLBACK_VARIANT = (
     "S2_MARKOV_STATE_TRANSITION_AVOID_SHALLOW_UPTREND_PULLBACK_V1"
 )
@@ -30,6 +32,7 @@ S2_CANDIDATE_RANKING_MODES = (
     S2_CANDIDATE_RANKING_CLEAN_STATE_V1,
     S2_CANDIDATE_RANKING_STATE_QUALITY_V1,
     S2_CANDIDATE_RANKING_HYBRID_STATE_CONTEXT_V1,
+    S2_CANDIDATE_RANKING_2025_GUARD_V1,
     S2_CANDIDATE_RANKING_AVOID_SHALLOW_UPTREND_PULLBACK_V1,
 )
 
@@ -131,6 +134,12 @@ def _score_candidate(
         score = state_edge + state_quality + context - penalty
         state_quality_for_export = state_quality
         context_for_export = context
+    elif mode == S2_CANDIDATE_RANKING_2025_GUARD_V1:
+        guard_penalty = _guard_2025_penalty(signal)
+        score = state_quality - state_penalty - guard_penalty
+        penalty = guard_penalty
+        state_quality_for_export = state_quality
+        context_for_export = 0.0
     else:
         uptrend_score, uptrend_penalty = _avoid_shallow_uptrend_pullback_score(
             signal
@@ -288,6 +297,69 @@ def _avoid_shallow_uptrend_pullback_score(signal: Signal) -> tuple[float, float]
     return score, penalty
 
 
+def _guard_2025_penalty(signal: Signal) -> float:
+    state = parse_markov_state_label(signal.metadata.get("state_label"))
+    if not state.valid:
+        return 0.75
+
+    low_is_failure_pocket = state.low_state in {
+        "LOW_FAR_FROM_LOW",
+        "LOW_MID_RANGE",
+    }
+    core_failure_pocket = (
+        state.ret_state == "RET_UP"
+        and state.vol_state == "VOL_MID"
+        and state.dd_state == "DD_SHALLOW"
+        and low_is_failure_pocket
+    )
+    penalty = 0.0
+    if core_failure_pocket:
+        penalty += 2.00
+        penalty += _guard_2025_context_penalty(signal)
+    else:
+        if (
+            state.ret_state == "RET_UP"
+            and state.dd_state == "DD_SHALLOW"
+            and low_is_failure_pocket
+        ):
+            penalty += 0.85
+
+    return penalty
+
+
+def _guard_2025_context_penalty(signal: Signal) -> float:
+    metadata = signal.metadata
+    penalty = 0.0
+
+    drawdown_pct = _optional_number(metadata.get("current_drawdown_60d_pct"))
+    if drawdown_pct is not None and -5.0 <= drawdown_pct <= 0.0:
+        penalty += 0.35
+
+    low_distance_pct = _optional_number(
+        metadata.get("current_close_vs_60d_low_pct")
+    )
+    if low_distance_pct is not None and low_distance_pct >= 15.0:
+        penalty += 0.25
+
+    five_day_return = _optional_number(metadata.get("current_5d_return_pct"))
+    if five_day_return is not None and five_day_return >= -3.0:
+        penalty += 0.25
+
+    # Broader stock/Nifty trend guards require these fields to be injected into
+    # signal-time metadata. Use them when present; otherwise remain state-only.
+    for field in (
+        "stock_close_vs_sma50_pct",
+        "nifty_close_vs_sma50_pct",
+        "stock_sma50_slope_20d_pct",
+        "nifty_sma50_slope_20d_pct",
+    ):
+        value = _optional_number(metadata.get(field))
+        if value is not None and value > 0.0:
+            penalty += 0.15
+
+    return penalty
+
+
 def _with_ranking_metadata(
     candidate: _RankedS2Candidate,
     mode: str,
@@ -319,12 +391,17 @@ def _signal_sort_key(signal: Signal) -> tuple[date, str]:
 
 
 def _number(value: object) -> float:
+    number = _optional_number(value)
+    return 0.0 if number is None else number
+
+
+def _optional_number(value: object) -> float | None:
     if value is None or pd.isna(value):
-        return 0.0
+        return None
     try:
         number = float(value)
     except (TypeError, ValueError):
-        return 0.0
+        return None
     if not isfinite(number):
-        return 0.0
+        return None
     return number

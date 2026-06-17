@@ -7,6 +7,7 @@ import pytest
 
 from veridian_quant.v2.backtesting.s2_candidate_ranking import (
     rank_s2_entry_candidates,
+    validate_s2_candidate_ranking_mode,
 )
 from veridian_quant.v2.data.models import Signal, SignalType
 from veridian_quant.v2.strategies.s2_markov_state_transition import STRATEGY_NAME
@@ -106,6 +107,26 @@ def test_clean_state_v1_prefers_cleaner_state_components() -> None:
     assert ranked[0].symbol == "CLEAN"
 
 
+def test_clean_state_v1_behavior_remains_unchanged_for_2025_guard_pocket() -> None:
+    ranked = rank_s2_entry_candidates(
+        (
+            _signal(
+                "GUARD_POCKET",
+                date(2026, 1, 1),
+                state_label="RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW",
+            ),
+            _signal(
+                "FLAT",
+                date(2026, 1, 1),
+                state_label="RET_FLAT|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW",
+            ),
+        ),
+        "clean_state_v1",
+    )
+
+    assert ranked[0].symbol == "GUARD_POCKET"
+
+
 def test_state_quality_v1_combines_edge_and_state_quality() -> None:
     ranked = rank_s2_entry_candidates(
         (
@@ -146,6 +167,123 @@ def test_malformed_state_labels_do_not_crash() -> None:
     )
 
     assert ranked[0].metadata["candidate_rank"] == 1
+
+
+def test_2025_guard_v1_is_accepted_by_validation() -> None:
+    assert validate_s2_candidate_ranking_mode("2025_guard_v1") == "2025_guard_v1"
+
+
+def test_2025_guard_v1_penalizes_far_from_low_failure_pocket() -> None:
+    ranked = rank_s2_entry_candidates(
+        (
+            _signal(
+                "FAILURE_POCKET",
+                date(2026, 1, 1),
+                state_label="RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW",
+            ),
+            _signal(
+                "FLAT",
+                date(2026, 1, 1),
+                state_label="RET_FLAT|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW",
+            ),
+        ),
+        "2025_guard_v1",
+    )
+
+    assert ranked[0].symbol == "FLAT"
+    assert ranked[1].metadata["s2_score_penalty"] >= 2.0
+    assert ranked[1].metadata["candidate_ranking_mode"] == "s2:2025_guard_v1"
+
+
+def test_2025_guard_v1_penalizes_mid_range_failure_pocket() -> None:
+    ranked = rank_s2_entry_candidates(
+        (
+            _signal(
+                "FAILURE_POCKET",
+                date(2026, 1, 1),
+                state_label="RET_UP|VOL_MID|DD_SHALLOW|LOW_MID_RANGE",
+            ),
+            _signal(
+                "FLAT",
+                date(2026, 1, 1),
+                state_label="RET_FLAT|VOL_MID|DD_SHALLOW|LOW_MID_RANGE",
+            ),
+        ),
+        "2025_guard_v1",
+    )
+
+    assert ranked[0].symbol == "FLAT"
+    assert ranked[1].metadata["s2_score_penalty"] >= 2.0
+
+
+def test_2025_guard_v1_does_not_blindly_penalize_flat_shallow_far_from_low() -> None:
+    ranked = rank_s2_entry_candidates(
+        (
+            _signal(
+                "FLAT",
+                date(2026, 1, 1),
+                state_label="RET_FLAT|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW",
+            ),
+        ),
+        "2025_guard_v1",
+    )
+
+    assert ranked[0].metadata["s2_score_penalty"] == 0.0
+
+
+def test_2025_guard_v1_does_not_blindly_penalize_strong_down_near_low() -> None:
+    ranked = rank_s2_entry_candidates(
+        (
+            _signal(
+                "STRONG_DOWN",
+                date(2026, 1, 1),
+                state_label="RET_STRONG_DOWN|VOL_MID|DD_MID|LOW_NEAR",
+            ),
+        ),
+        "2025_guard_v1",
+    )
+
+    assert ranked[0].metadata["s2_score_penalty"] == 0.0
+
+
+def test_2025_guard_v1_context_penalty_uses_available_metadata_safely() -> None:
+    ranked = rank_s2_entry_candidates(
+        (
+            _signal(
+                "STATE_ONLY",
+                date(2026, 1, 1),
+                state_label="RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW",
+                metadata_overrides={
+                    "current_5d_return_pct": None,
+                    "current_drawdown_60d_pct": None,
+                    "current_close_vs_60d_low_pct": None,
+                },
+            ),
+        ),
+        "2025_guard_v1",
+    )
+
+    assert ranked[0].metadata["s2_score_penalty"] == 2.0
+
+
+def test_2025_guard_v1_is_deterministic() -> None:
+    signals = (
+        _signal(
+            "AAA",
+            date(2026, 1, 1),
+            state_label="RET_UP|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW",
+        ),
+        _signal(
+            "BBB",
+            date(2026, 1, 1),
+            state_label="RET_FLAT|VOL_MID|DD_SHALLOW|LOW_FAR_FROM_LOW",
+        ),
+    )
+
+    first = rank_s2_entry_candidates(signals, "2025_guard_v1")
+    second = rank_s2_entry_candidates(signals, "2025_guard_v1")
+
+    assert first == second
 
 
 def test_avoid_shallow_uptrend_pullback_penalizes_ret_up_shallow_far_from_low() -> None:

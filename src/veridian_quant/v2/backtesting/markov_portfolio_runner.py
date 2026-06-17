@@ -20,7 +20,9 @@ from veridian_quant.v2.backtesting.portfolio_runner import (
     PortfolioRejectedSignal,
 )
 from veridian_quant.v2.backtesting.s2_candidate_ranking import (
+    S2_2025_GUARD_VARIANT,
     S2_AVOID_SHALLOW_UPTREND_PULLBACK_VARIANT,
+    S2_CANDIDATE_RANKING_2025_GUARD_V1,
     S2_CANDIDATE_RANKING_AVOID_SHALLOW_UPTREND_PULLBACK_V1,
     S2_CANDIDATE_RANKING_NONE,
     rank_s2_entry_candidates,
@@ -426,6 +428,10 @@ def _s2_strategy_variant(
     markov_signal_filter: str,
     s2_candidate_ranking_mode: str,
 ) -> str:
+    if s2_candidate_ranking_mode == S2_CANDIDATE_RANKING_2025_GUARD_V1:
+        if markov_signal_filter == MARKOV_SIGNAL_FILTER_NONE:
+            return S2_2025_GUARD_VARIANT
+        return f"{S2_2025_GUARD_VARIANT}__{markov_signal_filter}"
     if (
         s2_candidate_ranking_mode
         == S2_CANDIDATE_RANKING_AVOID_SHALLOW_UPTREND_PULLBACK_V1

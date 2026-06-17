@@ -8,6 +8,13 @@ No strategy is production-approved.
 
 ---
 
+## Detailed Strategy Audits
+
+- S1: `docs/02_audits/s1_audit.md`
+- S2: `docs/02_audits/s2_audit.md`
+
+---
+
 ## Strategy Status Table
 
 | Strategy / Component | Status | Implemented | Research Tested | Current Decision |

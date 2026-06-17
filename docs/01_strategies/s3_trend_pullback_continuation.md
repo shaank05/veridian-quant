@@ -4,15 +4,31 @@
 
 Status:
 
-- Specification phase only.
-- Implementation: not started.
-- Backtest: not run.
+- Researched through Phase 28F.
+- Implementation: complete.
+- Backtest: complete on research200.
+- Research status: parked.
 - Production status: not production-ready.
 - Strategy family: standalone independent strategy.
 - Not an S1/S2 filter.
 - Not part of a voting ensemble yet.
 
-S3 is the next independent alpha-source candidate after the S1 baseline cycle and the frozen S2 Markov research cycle.
+S3 tested an independent trend-continuation alpha source after the S1 baseline cycle and the frozen S2 Markov research cycle.
+
+Final research decision:
+
+- Retain `S3_STRONG_TREND_ABOVE_SMA50_V1` as the S3 benchmark only.
+- Do not promote S3 to production.
+- Do not continue near-term S3 variants.
+- See `docs/02_audits/s3_audit.md` for the full audit.
+
+Reason:
+
+- Weak profit factor.
+- High drawdown relative to return.
+- Unstable yearly behavior.
+- Persistent stop-loss drag.
+- Controlled-pullback tuning did not improve realized portfolio performance.
 
 ---
 
@@ -246,6 +262,28 @@ Audit questions:
 
 ---
 
+## Final Research Status
+
+S3 is researched and parked.
+
+Best retained benchmark:
+
+`S3_STRONG_TREND_ABOVE_SMA50_V1`
+
+Approximate benchmark result on research200, 2020-01-01 to 2026-04-30:
+
+- Net PnL: about Rs 3.16L.
+- CAGR: about 4.43%.
+- Max drawdown: about 28.20%.
+- Profit factor: about 1.104.
+- Trades: about 500.
+
+This is not production-ready. S3 remains useful only as a trend-continuation benchmark for future comparison.
+
+No further near-term S3 variants should be added unless a materially new hypothesis appears, such as a regime model, ranking/capacity redesign, sector/relative-strength feature redesign, or ensemble diversification need.
+
+---
+
 ## Production Note
 
-S3 is not production-ready until implementation, backtest, robustness testing, failure audit, and production acceptance review are complete.
+S3 is not production-ready. Implementation and research were completed, but the standalone results did not meet production-quality expectations.

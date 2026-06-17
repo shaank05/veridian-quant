@@ -12,6 +12,7 @@ No strategy is production-approved.
 
 - S1: `docs/02_audits/s1_audit.md`
 - S2: `docs/02_audits/s2_audit.md`
+- S3: `docs/02_audits/s3_audit.md`
 
 ---
 
@@ -26,6 +27,7 @@ No strategy is production-approved.
 | `S2_MARKOV_STATE_TRANSITION` safer benchmark | Frozen research benchmark | Yes | Yes | Retain `exclude_ret_down + ranking none`; not production-ready |
 | `S2_MARKOV_STATE_TRANSITION` high-return candidate | Frozen research candidate | Yes | Yes | Retain `exclude_ret_down + clean_state_v1`; fragile due to 2025 |
 | S2 guard/ranking variants | Rejected as benchmarks | Yes | Yes | Do not promote; improved targeted weakness but lost too much total edge |
+| `S3_TREND_PULLBACK_CONTINUATION` | Parked / not production-ready | Yes | Yes | Retain `S3_STRONG_TREND_ABOVE_SMA50_V1` as benchmark only; do not continue variants now |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
@@ -89,6 +91,23 @@ Interpretation:
 - Retain as a higher-return S2 research candidate.
 - Useful benchmark for future comparison.
 - Not production-ready because of 2025 regime fragility and high drawdown.
+
+### S3 Retained Benchmark
+
+- Strategy: `S3_TREND_PULLBACK_CONTINUATION`
+- Variant: `S3_STRONG_TREND_ABOVE_SMA50_V1`
+- Net PnL: about Rs 3.16L
+- CAGR: about 4.43%
+- Max drawdown: about 28.20%
+- Profit factor: about 1.104
+- Trades: about 500
+
+Interpretation:
+
+- Best observed S3 variant.
+- Retain as an S3 family benchmark only.
+- Not production-ready.
+- Do not continue near-term S3 variants.
 
 ---
 

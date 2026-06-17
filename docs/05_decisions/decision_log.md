@@ -233,3 +233,41 @@ Consequence:
 Phase 28A is specification-only. No S3 implementation or backtest has started yet.
 
 Future Phase 28B should implement and benchmark the initial S3 baseline under the standard v2 portfolio methodology.
+
+---
+
+## 2026-06-17 - Freeze S3 Standalone Research
+
+Decision:
+
+Freeze `S3_TREND_PULLBACK_CONTINUATION` standalone research.
+
+Retain one S3 benchmark only:
+
+- `S3_STRONG_TREND_ABOVE_SMA50_V1`
+
+Do not invest more implementation time into near-term S3 variants.
+
+Approximate retained S3 benchmark result:
+
+- Net PnL: about Rs 3.16L.
+- CAGR: about 4.43%.
+- Max drawdown: about 28.20%.
+- Profit factor: about 1.104.
+- Trades: about 500.
+
+Rejected as production candidates:
+
+- `S3_TREND_PULLBACK_CONTINUATION_BASELINE`
+- `S3_STRONG_TREND_V1`
+- `S3_ABOVE_SMA50_V1`
+- `S3_STRONG_TREND_ABOVE_SMA50_V1`
+- `S3_CONTROLLED_PULLBACK_V1`
+
+Reason:
+
+S3 is technically valid, but the standalone edge is weak. The controlled-pullback variant did not improve realized performance, despite accepted-trade diagnostics suggesting that very deep 5-day pullbacks were damaging. Best S3 remains materially weaker than retained S1/S2 candidates, and more threshold tuning risks overfitting.
+
+Consequence:
+
+S3 is parked as a benchmark-only strategy family. Future work should move to broader strategy research, robustness, portfolio construction, or the next independent strategy family.

@@ -10,7 +10,14 @@ Feature ideas are not accepted trading rules. They must be tested through the no
 
 ## S3 Trend Pullback Continuation Candidate Features
 
-S3 should test controlled pullbacks inside confirmed uptrends. Candidate features should support that distinction without turning the first baseline into an overfit scoring model.
+S3 tested controlled pullbacks inside confirmed uptrends. Candidate features supported that distinction without turning the first baseline into an overfit scoring model.
+
+Current status:
+
+- S3 is researched and parked.
+- Retained benchmark: `S3_STRONG_TREND_ABOVE_SMA50_V1`.
+- Not production-ready.
+- No further near-term S3 feature variants should be added without a materially new hypothesis.
 
 Trend structure:
 
@@ -48,4 +55,4 @@ Market and relative-strength context:
 - Relative strength vs Nifty.
 - Relative strength trend vs Nifty.
 
-Initial S3 implementation should prefer a simple transparent subset. Additional features should be added only after baseline evidence shows where the strategy succeeds or fails.
+Initial S3 research used a simple transparent subset. Additional S3 features are parked for now because the standalone strategy did not produce production-quality results and further threshold tuning risks overfitting.

@@ -52,6 +52,29 @@ S2 has evidence of edge, but remains regime fragile and not production-ready.
 
 ---
 
+## S3 Rejected / Parked Items
+
+`S3_TREND_PULLBACK_CONTINUATION` is technically valid but parked as a standalone strategy family.
+
+Rejected as production candidates:
+
+- `S3_TREND_PULLBACK_CONTINUATION_BASELINE`: weak edge, about 1.045 PF, about 31.61% max drawdown.
+- `S3_STRONG_TREND_V1`: strong SMA200 slope alone worsened results versus baseline.
+- `S3_ABOVE_SMA50_V1`: improved over baseline, but remained too weak as a standalone production candidate.
+- `S3_CONTROLLED_PULLBACK_V1`: reduced signals but did not improve realized portfolio performance; drawdown worsened versus the retained S3 benchmark.
+
+Benchmark-only:
+
+- `S3_STRONG_TREND_ABOVE_SMA50_V1`: retained as the S3 benchmark, but rejected as a production candidate. Approximate result: about Rs 3.16L net PnL, about 1.104 PF, about 28.20% max drawdown.
+
+Current S3 decision:
+
+- Freeze S3 standalone research.
+- Do not continue near-term S3 variants.
+- Revisit only if regime modeling, ranking/capacity logic, sector/relative-strength features, or ensemble needs materially change.
+
+---
+
 ## Deferred Advanced Strategy Families
 
 The following remain future research directions:

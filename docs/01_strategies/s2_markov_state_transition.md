@@ -269,7 +269,7 @@ This supports future capacity-aware ranking research, but S2-specific ranking tu
 
 ## Parked / Future Work
 
-Future S2 work is parked until after independent S3/S4-style strategies are explored.
+Future S2 work is parked until additional independent strategy evidence or a materially new regime/ranking framework creates a reason to revisit it.
 
 Potential future work:
 
@@ -277,7 +277,7 @@ Potential future work:
 - Better market-regime detector.
 - More robust capacity-aware ranking.
 - Use Phase 27J signal-time context infrastructure in future rankers.
-- Potential S2 revisit after S3/S4 strategies are explored.
+- Potential S2 revisit after broader independent strategy comparison or materially new regime/ranking infrastructure.
 - Sector/industry conditioning if metadata becomes available.
 - Symbol-level robustness filters after broader strategy comparison.
 

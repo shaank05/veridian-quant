@@ -48,13 +48,14 @@ Capacity conclusion:
 
 ## Current Portfolio Research Decision
 
-Do not keep tuning S2 ranking immediately.
+Do not keep tuning S2 ranking or S3 threshold variants immediately.
 
 Reason:
 
 - Additional S2 ranking/guard variants produced diminishing returns.
 - The 2025/2026 fragility appears broader than one simple state or context exclusion.
-- A new independent alpha source is more valuable than further S2 micro-optimization.
+- S3 standalone trend-continuation research is also parked; the best S3 variant remains benchmark-only and not production-ready.
+- A new independent alpha source or broader portfolio construction work is more valuable than further S2/S3 micro-optimization.
 
 Future portfolio construction work:
 

@@ -227,6 +227,6 @@ Rationale:
 - Better market-regime detector.
 - More robust capacity-aware ranking.
 - Use Phase 27J signal-time context infrastructure in future rankers.
-- Potential S2 revisit after S3/S4 strategies are explored.
+- Potential S2 revisit after broader independent strategy comparison or materially new regime/ranking infrastructure.
 - Sector/industry conditioning if metadata becomes available.
 - Symbol-level robustness filters after broader strategy comparison.

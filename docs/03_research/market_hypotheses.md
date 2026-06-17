@@ -229,7 +229,11 @@ Standalone strategies should be tested independently before combining them as vo
 
 Strong stocks in confirmed uptrends often resume their trend after controlled pullbacks.
 
-S3 will test whether structurally healthy stocks can be bought after temporary weakness without drifting into falling-knife mean reversion.
+S3 tested whether structurally healthy stocks can be bought after temporary weakness without drifting into falling-knife mean reversion.
+
+Audit status:
+
+S3 is technically valid but parked as a standalone production candidate. The best retained benchmark is `S3_STRONG_TREND_ABOVE_SMA50_V1`, but it is benchmark-only.
 
 ## Expected Edge
 
@@ -329,7 +333,7 @@ S2 is useful for future comparison, but immediate S2 tuning is parked.
 
 The current research priority is:
 
-## H7, with H1 + H3 + H6 retained as benchmark context
+## Broader strategy research, robustness, and portfolio construction
 
 Meaning:
 
@@ -337,4 +341,6 @@ S1 remains the current volatility-normalized mean-reversion benchmark, while opp
 
 S2 Markov State Transition has now been tested independently and is frozen as a benchmark/research candidate, not a production strategy.
 
-The next research priority is `S3_TREND_PULLBACK_CONTINUATION`, which maps to H7 and tests controlled pullbacks inside confirmed uptrends.
+S3 Trend Pullback Continuation has now been tested independently and is parked as a benchmark-only strategy family, not a production strategy.
+
+The next research priority should not be more S3 threshold tuning. Future work should move to broader strategy research, robustness, portfolio construction, or the next independent strategy family.

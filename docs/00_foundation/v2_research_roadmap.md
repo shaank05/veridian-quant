@@ -2,19 +2,17 @@
 
 ## Current Research State
 
-Veridian Quant v2 has completed the S1 baseline cycle and the S2 Markov research cycle through Phase 27J.
-
-Phase 28A begins the S3 Trend Pullback Continuation research track as a specification-only phase. No S3 implementation or backtest has started yet.
+Veridian Quant v2 has completed the S1 baseline cycle, the S2 Markov research cycle through Phase 27J, and the S3 Trend Pullback Continuation research cycle through Phase 28G.
 
 Current retained research benchmarks:
 
 - `S1_BASELINE` remains the original v2 mean-reversion benchmark.
 - `S2_MARKOV_STATE_TRANSITION` is retained as a benchmark/research candidate, but is frozen and not production-ready.
-- `S3_TREND_PULLBACK_CONTINUATION` is the next independent strategy family to specify and research.
+- `S3_TREND_PULLBACK_CONTINUATION` is researched and parked. Retain `S3_STRONG_TREND_ABOVE_SMA50_V1` as an S3 benchmark only.
 
 S2 has evidence of edge, but the research cycle found material regime fragility, especially around the 2025/2026 period. S2 should not be deployed live. It should remain available for comparison against future independent strategies.
 
-S3 will test a different alpha source: buying structurally strong stocks after controlled pullbacks inside confirmed uptrends.
+S3 tested a different alpha source: buying structurally strong stocks after controlled pullbacks inside confirmed uptrends. The best S3 variant remained too weak for production.
 
 ---
 
@@ -107,8 +105,29 @@ S3 thesis:
 Outcome:
 
 - Specification added only.
-- Implementation is not started.
-- Baseline backtest is deferred to future Phase 28B.
+- Implementation and backtesting were deferred to later Phase 28 work.
+
+### Phase 28B-28F: S3 Implementation, Diagnostics, and Variants
+
+Implemented and researched `S3_TREND_PULLBACK_CONTINUATION` as a standalone trend-continuation strategy.
+
+Explored:
+
+- Baseline S3.
+- S3 diagnostics and accepted-trade filter simulations.
+- Strong-trend variant.
+- Above-SMA50 variant.
+- Strong-trend plus above-SMA50 variant.
+- Controlled-pullback variant.
+
+Outcome:
+
+- S3 is technically valid.
+- S3 is not production-ready.
+- Best S3 benchmark: `S3_STRONG_TREND_ABOVE_SMA50_V1`.
+- Best approximate result: about Rs 3.16L net PnL, about 4.43% CAGR, about 28.20% max drawdown, about 1.104 PF.
+- Controlled-pullback tuning did not improve realized portfolio performance.
+- S3 is parked after Phase 28G documentation.
 
 ---
 
@@ -185,15 +204,17 @@ The current evidence says:
 - S1 is useful as a benchmark, not as a final production strategy.
 - S2 has evidence of edge, but remains regime fragile.
 - S2 is retained as a benchmark/research candidate, not deployed live.
+- S3 is completed as a standalone trend-continuation experiment and parked.
+- The best S3 variant is retained as a benchmark only.
 - Portfolio capacity and accepted-trade selection remain major bottlenecks.
 - Additional S2 tuning has reached diminishing returns.
+- Additional S3 tuning risks overfitting.
 
 Next direction:
 
-- Move to the new independent `S3_TREND_PULLBACK_CONTINUATION` research family.
-- Phase 28A is specification-only.
-- Future Phase 28B should implement and benchmark the initial S3 baseline.
-- Do not continue immediate S2 tuning unless a later independent strategy comparison creates a specific reason to revisit S2.
+- Do not continue immediate S2 or S3 tuning.
+- Move to broader strategy research, robustness, portfolio construction, or the next independent strategy family.
+- Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 
 ---
 
@@ -205,8 +226,8 @@ The following are future research directions, not accepted production rules:
 - Better market-regime detector.
 - More robust capacity-aware ranking.
 - Use Phase 27J signal-time context infrastructure in future rankers.
-- Potential S2 revisit after S3/S4 strategies are explored.
-- S3 implementation and baseline research after Phase 28A specification.
+- Potential S2 revisit after more independent strategy evidence.
+- Potential S3 revisit only after material regime/ranking/sector/ensemble changes.
 - Sector/industry conditioning if metadata becomes available.
 - Symbol-level robustness filters after broader strategy comparison.
 - S1 candidate ranking v2.

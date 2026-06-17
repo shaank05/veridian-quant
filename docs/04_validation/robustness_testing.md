@@ -75,4 +75,4 @@ Parked future work:
 - Regime-aware exposure reduction rather than only candidate penalties.
 - Capacity-aware ranking validated across independent strategy families.
 - Sector/industry conditioning if reliable metadata becomes available.
-- S2 revisit after S3/S4 strategies create broader comparison context.
+- S2 or S3 revisit only after additional independent strategy evidence or a materially new regime/ranking framework.

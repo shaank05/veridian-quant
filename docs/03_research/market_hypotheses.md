@@ -223,6 +223,52 @@ Standalone strategies should be tested independently before combining them as vo
 
 ---
 
+# H7 - Trend Pullback Continuation
+
+## Hypothesis
+
+Strong stocks in confirmed uptrends often resume their trend after controlled pullbacks.
+
+S3 will test whether structurally healthy stocks can be bought after temporary weakness without drifting into falling-knife mean reversion.
+
+## Expected Edge
+
+Expected edge comes from:
+
+* Trend persistence.
+* Better entry price than chasing highs.
+* Strong stocks recovering faster after controlled weakness.
+* Avoiding deeply broken stocks that are down for structural reasons.
+
+## Why This May Work
+
+* Institutional accumulation can persist across multiple swing cycles.
+* Healthy uptrends often include short profit-taking pauses.
+* Pullbacks toward intermediate trend support can improve reward/risk.
+* Relative strength can remain durable even after short-term weakness.
+
+## When It May Fail
+
+* The pullback becomes a trend breakdown.
+* The broader market regime turns hostile.
+* A stock is above SMA200 but its sector is deteriorating.
+* Volatility expansion signals panic rather than controlled weakness.
+* Pullback-depth thresholds overfit one market period.
+
+## Candidate Features
+
+* SMA50/SMA200 trend.
+* SMA slope.
+* Controlled pullback return.
+* Drawdown from 20d/60d high.
+* Distance from SMA50.
+* Distance from 60d low.
+* ATR expansion.
+* Relative strength vs Nifty.
+* Nifty trend confirmation.
+
+---
+
 # Rejected or Deferred Hypotheses
 
 The following are not accepted production rules.
@@ -283,7 +329,7 @@ S2 is useful for future comparison, but immediate S2 tuning is parked.
 
 The current research priority is:
 
-## H1 + H3 + H6, plus new independent strategy research
+## H7, with H1 + H3 + H6 retained as benchmark context
 
 Meaning:
 
@@ -291,4 +337,4 @@ S1 remains the current volatility-normalized mean-reversion benchmark, while opp
 
 S2 Markov State Transition has now been tested independently and is frozen as a benchmark/research candidate, not a production strategy.
 
-The next research priority is a new independent alpha source, likely S3 trend pullback continuation or another non-S2 strategy family.
+The next research priority is `S3_TREND_PULLBACK_CONTINUATION`, which maps to H7 and tests controlled pullbacks inside confirmed uptrends.

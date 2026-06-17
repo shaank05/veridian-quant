@@ -207,3 +207,29 @@ S2 is retained as a benchmark/research candidate, not production-ready and not d
 Next:
 
 Move the next research effort to a new independent strategy, likely S3 trend pullback continuation or another non-S2 alpha source.
+
+---
+
+## 2026-06-17 - Begin S3 Trend Pullback Continuation Research
+
+Decision:
+
+Begin `S3_TREND_PULLBACK_CONTINUATION` as the next independent strategy-family research track.
+
+Context:
+
+S1 remains the original v2 mean-reversion benchmark, and S2 has been frozen after Phase 27J/27K/27L as a benchmark/research candidate rather than a production-ready strategy.
+
+The next alpha source should be independent from S1/S2 instead of continuing immediate S2 tuning.
+
+S3 will test structured pullbacks in confirmed uptrends:
+
+- Buy strength after a controlled dip, not weakness after panic.
+- Require trend health before considering a pullback.
+- Avoid deeply broken stocks that are down for structural reasons.
+
+Consequence:
+
+Phase 28A is specification-only. No S3 implementation or backtest has started yet.
+
+Future Phase 28B should implement and benchmark the initial S3 baseline under the standard v2 portfolio methodology.

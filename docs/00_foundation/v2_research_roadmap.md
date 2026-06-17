@@ -4,12 +4,17 @@
 
 Veridian Quant v2 has completed the S1 baseline cycle and the S2 Markov research cycle through Phase 27J.
 
+Phase 28A begins the S3 Trend Pullback Continuation research track as a specification-only phase. No S3 implementation or backtest has started yet.
+
 Current retained research benchmarks:
 
 - `S1_BASELINE` remains the original v2 mean-reversion benchmark.
 - `S2_MARKOV_STATE_TRANSITION` is retained as a benchmark/research candidate, but is frozen and not production-ready.
+- `S3_TREND_PULLBACK_CONTINUATION` is the next independent strategy family to specify and research.
 
 S2 has evidence of edge, but the research cycle found material regime fragility, especially around the 2025/2026 period. S2 should not be deployed live. It should remain available for comparison against future independent strategies.
+
+S3 will test a different alpha source: buying structurally strong stocks after controlled pullbacks inside confirmed uptrends.
 
 ---
 
@@ -88,6 +93,22 @@ Outcome:
 - S2 is not production-ready because of regime fragility, especially in 2025/2026.
 - S2 research is frozen for now.
 - The next research effort should move to a new independent strategy rather than continue tuning S2 immediately.
+
+### Phase 28A: S3 Trend Pullback Continuation Specification
+
+Documented `S3_TREND_PULLBACK_CONTINUATION` as the next standalone strategy-family candidate.
+
+S3 thesis:
+
+- Buy strength after a controlled dip, not weakness after panic.
+- Require trend health before considering pullback.
+- Test trend persistence and continuation rather than mean reversion or Markov state recurrence.
+
+Outcome:
+
+- Specification added only.
+- Implementation is not started.
+- Baseline backtest is deferred to future Phase 28B.
 
 ---
 
@@ -169,7 +190,9 @@ The current evidence says:
 
 Next direction:
 
-- Move to a new independent strategy, likely S3 trend pullback continuation or another non-S2 alpha source.
+- Move to the new independent `S3_TREND_PULLBACK_CONTINUATION` research family.
+- Phase 28A is specification-only.
+- Future Phase 28B should implement and benchmark the initial S3 baseline.
 - Do not continue immediate S2 tuning unless a later independent strategy comparison creates a specific reason to revisit S2.
 
 ---
@@ -183,6 +206,7 @@ The following are future research directions, not accepted production rules:
 - More robust capacity-aware ranking.
 - Use Phase 27J signal-time context infrastructure in future rankers.
 - Potential S2 revisit after S3/S4 strategies are explored.
+- S3 implementation and baseline research after Phase 28A specification.
 - Sector/industry conditioning if metadata becomes available.
 - Symbol-level robustness filters after broader strategy comparison.
 - S1 candidate ranking v2.

@@ -87,6 +87,22 @@ from veridian_quant.v2.reporting.s2_markov_filter_simulation import (
     build_s2_markov_state_component_summary_rows,
     build_s2_markov_state_label_summary_rows,
 )
+from veridian_quant.v2.reporting.s3_diagnostics import (
+    S3_CONTEXT_BUCKET_SUMMARY_COLUMNS,
+    S3_FAILURE_AUDIT_BY_EXIT_REASON_COLUMNS,
+    S3_FAILURE_AUDIT_BY_MONTH_COLUMNS,
+    S3_FAILURE_AUDIT_BY_SYMBOL_COLUMNS,
+    S3_FAILURE_AUDIT_BY_YEAR_COLUMNS,
+    S3_FILTER_SIMULATION_BY_YEAR_COLUMNS,
+    S3_FILTER_SIMULATION_COLUMNS,
+    build_s3_context_bucket_summary_rows,
+    build_s3_failure_audit_by_exit_reason_rows,
+    build_s3_failure_audit_by_month_rows,
+    build_s3_failure_audit_by_symbol_rows,
+    build_s3_failure_audit_by_year_rows,
+    build_s3_filter_simulation_by_year_rows,
+    build_s3_filter_simulation_rows,
+)
 
 
 TRADE_LOG_COLUMNS = [
@@ -353,6 +369,19 @@ def export_portfolio_backtest_csvs(
         / "s2_failure_audit_by_symbol.csv",
         "s2_failure_audit_context_comparison": output_path
         / "s2_failure_audit_context_comparison.csv",
+        "s3_filter_simulation": output_path / "s3_filter_simulation.csv",
+        "s3_filter_simulation_by_year": output_path
+        / "s3_filter_simulation_by_year.csv",
+        "s3_context_bucket_summary": output_path
+        / "s3_context_bucket_summary.csv",
+        "s3_failure_audit_by_year": output_path
+        / "s3_failure_audit_by_year.csv",
+        "s3_failure_audit_by_month": output_path
+        / "s3_failure_audit_by_month.csv",
+        "s3_failure_audit_by_exit_reason": output_path
+        / "s3_failure_audit_by_exit_reason.csv",
+        "s3_failure_audit_by_symbol": output_path
+        / "s3_failure_audit_by_symbol.csv",
         "all_signal_opportunity_log": output_path
         / "all_signal_opportunity_log.csv",
         "accepted_vs_rejected_signal_summary": output_path
@@ -623,6 +652,47 @@ def export_portfolio_backtest_csvs(
         progress_reporter,
         "Finished S2 failure audit diagnostics",
         s2_failure_audit_started,
+    )
+    s3_diagnostics_started = perf_counter()
+    _write_csv(
+        exports["s3_filter_simulation"],
+        build_s3_filter_simulation_rows(trade_context_rows),
+        S3_FILTER_SIMULATION_COLUMNS,
+    )
+    _write_csv(
+        exports["s3_filter_simulation_by_year"],
+        build_s3_filter_simulation_by_year_rows(trade_context_rows),
+        S3_FILTER_SIMULATION_BY_YEAR_COLUMNS,
+    )
+    _write_csv(
+        exports["s3_context_bucket_summary"],
+        build_s3_context_bucket_summary_rows(trade_context_rows),
+        S3_CONTEXT_BUCKET_SUMMARY_COLUMNS,
+    )
+    _write_csv(
+        exports["s3_failure_audit_by_year"],
+        build_s3_failure_audit_by_year_rows(trade_context_rows),
+        S3_FAILURE_AUDIT_BY_YEAR_COLUMNS,
+    )
+    _write_csv(
+        exports["s3_failure_audit_by_month"],
+        build_s3_failure_audit_by_month_rows(trade_context_rows),
+        S3_FAILURE_AUDIT_BY_MONTH_COLUMNS,
+    )
+    _write_csv(
+        exports["s3_failure_audit_by_exit_reason"],
+        build_s3_failure_audit_by_exit_reason_rows(trade_context_rows),
+        S3_FAILURE_AUDIT_BY_EXIT_REASON_COLUMNS,
+    )
+    _write_csv(
+        exports["s3_failure_audit_by_symbol"],
+        build_s3_failure_audit_by_symbol_rows(trade_context_rows),
+        S3_FAILURE_AUDIT_BY_SYMBOL_COLUMNS,
+    )
+    _log_elapsed(
+        progress_reporter,
+        "Finished S3 diagnostics",
+        s3_diagnostics_started,
     )
 
     if include_all_signal_diagnostics:

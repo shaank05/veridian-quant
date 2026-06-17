@@ -109,6 +109,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         progress_reporter=reporter,
         markov_signal_filter=args.markov_signal_filter,
         s2_candidate_ranking_mode=args.s2_candidate_ranking,
+        nifty_data=nifty_data,
     )
     reporter.info(
         f"Finished S2 portfolio backtest in "

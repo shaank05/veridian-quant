@@ -166,6 +166,20 @@ def test_signal_log_includes_s2_ranking_metadata() -> None:
     assert signal_log.loc[0, "s2_score_state_edge"] == 2.3
 
 
+def test_signal_log_includes_s2_signal_context_metadata_columns() -> None:
+    paths = _export_to_temp_dir()
+
+    signal_log = pd.read_csv(paths["signal_log"])
+
+    assert {
+        "stock_close_vs_sma50_pct",
+        "stock_sma50_slope_20d_pct",
+        "nifty_close_vs_sma50_pct",
+        "nifty_sma50_slope_20d_pct",
+        "relative_strength_20d_vs_nifty",
+    }.issubset(signal_log.columns)
+
+
 def test_summary_contains_simple_counts_and_total_net_pnl() -> None:
     paths = _export_to_temp_dir()
 

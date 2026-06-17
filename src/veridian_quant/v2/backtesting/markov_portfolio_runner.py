@@ -28,6 +28,9 @@ from veridian_quant.v2.backtesting.s2_candidate_ranking import (
     rank_s2_entry_candidates,
     validate_s2_candidate_ranking_mode,
 )
+from veridian_quant.v2.backtesting.s2_signal_context import (
+    enrich_s2_signals_with_context,
+)
 from veridian_quant.v2.backtesting.setup import build_trade_setup
 from veridian_quant.v2.backtesting.sizing import build_position_plan
 from veridian_quant.v2.data.models import Signal
@@ -77,6 +80,7 @@ def run_s2_markov_portfolio_backtest(
     progress_reporter: object | None = None,
     markov_signal_filter: str = MARKOV_SIGNAL_FILTER_NONE,
     s2_candidate_ranking_mode: str = S2_CANDIDATE_RANKING_NONE,
+    nifty_data: pd.DataFrame | None = None,
 ) -> PortfolioBacktestResult:
     """Run a deterministic multi-symbol S2 Markov research backtest."""
 
@@ -163,6 +167,11 @@ def run_s2_markov_portfolio_backtest(
     effective_market_end_date = _effective_market_end_date(data_by_valid_symbol)
     ordered_all_signals = tuple(
         sorted(signals, key=lambda signal: (signal.generated_on, signal.symbol))
+    )
+    ordered_all_signals = enrich_s2_signals_with_context(
+        ordered_all_signals,
+        data_by_symbol=data_by_valid_symbol,
+        nifty_data=nifty_data,
     )
     ordered_execution_signals = tuple(
         signal

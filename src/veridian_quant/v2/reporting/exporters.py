@@ -170,6 +170,31 @@ SIGNAL_LOG_COLUMNS = [
     "current_atr_pct",
     "current_drawdown_60d_pct",
     "current_close_vs_60d_low_pct",
+    "stock_close_vs_sma50_pct",
+    "stock_close_vs_sma200_pct",
+    "stock_sma50_slope_20d_pct",
+    "stock_sma200_slope_20d_pct",
+    "stock_return_5d_pct",
+    "stock_return_10d_pct",
+    "stock_return_20d_pct",
+    "stock_drawdown_60d_pct",
+    "stock_close_vs_60d_low_pct",
+    "stock_is_20d_low",
+    "stock_is_60d_low",
+    "stock_is_120d_low",
+    "stock_atr14_pct",
+    "stock_atr14_change_5d_pct",
+    "stock_consecutive_down_closes",
+    "stock_signal_day_return_pct",
+    "nifty_close_vs_sma50_pct",
+    "nifty_close_vs_sma200_pct",
+    "nifty_sma50_slope_20d_pct",
+    "nifty_sma200_slope_20d_pct",
+    "nifty_return_5d_pct",
+    "nifty_return_20d_pct",
+    "relative_strength_20d_vs_nifty",
+    "relative_strength_60d_vs_nifty",
+    "relative_strength_120d_vs_nifty",
     "markov_signal_filter",
     "markov_filter_decision",
 ]
@@ -779,6 +804,63 @@ def _signal_rows(result: Any) -> list[dict[str, object]]:
                 ),
                 "current_close_vs_60d_low_pct": metadata.get(
                     "current_close_vs_60d_low_pct"
+                ),
+                "stock_close_vs_sma50_pct": metadata.get(
+                    "stock_close_vs_sma50_pct"
+                ),
+                "stock_close_vs_sma200_pct": metadata.get(
+                    "stock_close_vs_sma200_pct"
+                ),
+                "stock_sma50_slope_20d_pct": metadata.get(
+                    "stock_sma50_slope_20d_pct"
+                ),
+                "stock_sma200_slope_20d_pct": metadata.get(
+                    "stock_sma200_slope_20d_pct"
+                ),
+                "stock_return_5d_pct": metadata.get("stock_return_5d_pct"),
+                "stock_return_10d_pct": metadata.get("stock_return_10d_pct"),
+                "stock_return_20d_pct": metadata.get("stock_return_20d_pct"),
+                "stock_drawdown_60d_pct": metadata.get(
+                    "stock_drawdown_60d_pct"
+                ),
+                "stock_close_vs_60d_low_pct": metadata.get(
+                    "stock_close_vs_60d_low_pct"
+                ),
+                "stock_is_20d_low": metadata.get("stock_is_20d_low"),
+                "stock_is_60d_low": metadata.get("stock_is_60d_low"),
+                "stock_is_120d_low": metadata.get("stock_is_120d_low"),
+                "stock_atr14_pct": metadata.get("stock_atr14_pct"),
+                "stock_atr14_change_5d_pct": metadata.get(
+                    "stock_atr14_change_5d_pct"
+                ),
+                "stock_consecutive_down_closes": metadata.get(
+                    "stock_consecutive_down_closes"
+                ),
+                "stock_signal_day_return_pct": metadata.get(
+                    "stock_signal_day_return_pct"
+                ),
+                "nifty_close_vs_sma50_pct": metadata.get(
+                    "nifty_close_vs_sma50_pct"
+                ),
+                "nifty_close_vs_sma200_pct": metadata.get(
+                    "nifty_close_vs_sma200_pct"
+                ),
+                "nifty_sma50_slope_20d_pct": metadata.get(
+                    "nifty_sma50_slope_20d_pct"
+                ),
+                "nifty_sma200_slope_20d_pct": metadata.get(
+                    "nifty_sma200_slope_20d_pct"
+                ),
+                "nifty_return_5d_pct": metadata.get("nifty_return_5d_pct"),
+                "nifty_return_20d_pct": metadata.get("nifty_return_20d_pct"),
+                "relative_strength_20d_vs_nifty": metadata.get(
+                    "relative_strength_20d_vs_nifty"
+                ),
+                "relative_strength_60d_vs_nifty": metadata.get(
+                    "relative_strength_60d_vs_nifty"
+                ),
+                "relative_strength_120d_vs_nifty": metadata.get(
+                    "relative_strength_120d_vs_nifty"
                 ),
                 "markov_signal_filter": metadata.get("markov_signal_filter"),
                 "markov_filter_decision": metadata.get("markov_filter_decision"),

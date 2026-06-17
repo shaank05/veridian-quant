@@ -60,6 +60,19 @@ from veridian_quant.v2.reporting.filter_simulation import (
     build_candidate_filter_simulation_rows,
 )
 from veridian_quant.v2.reporting.metrics import calculate_performance_summary
+from veridian_quant.v2.reporting.s2_failure_audit import (
+    S2_FAILURE_AUDIT_BY_MONTH_COLUMNS,
+    S2_FAILURE_AUDIT_BY_YEAR_COLUMNS,
+    S2_FAILURE_AUDIT_COMPARISON_COLUMNS,
+    S2_FAILURE_AUDIT_STATE_COMPONENT_COLUMNS,
+    build_s2_failure_audit_by_exit_reason_rows,
+    build_s2_failure_audit_by_month_rows,
+    build_s2_failure_audit_by_state_component_rows,
+    build_s2_failure_audit_by_state_label_rows,
+    build_s2_failure_audit_by_symbol_rows,
+    build_s2_failure_audit_by_year_rows,
+    build_s2_failure_audit_context_comparison_rows,
+)
 from veridian_quant.v2.reporting.s2_markov_filter_simulation import (
     S2_MARKOV_FILTER_SIMULATION_BY_SYMBOL_COLUMNS,
     S2_MARKOV_FILTER_SIMULATION_BY_YEAR_COLUMNS,
@@ -274,6 +287,20 @@ def export_portfolio_backtest_csvs(
         / "s2_markov_state_component_summary.csv",
         "s2_markov_state_label_summary": output_path
         / "s2_markov_state_label_summary.csv",
+        "s2_failure_audit_by_year": output_path
+        / "s2_failure_audit_by_year.csv",
+        "s2_failure_audit_by_month": output_path
+        / "s2_failure_audit_by_month.csv",
+        "s2_failure_audit_by_state_label": output_path
+        / "s2_failure_audit_by_state_label.csv",
+        "s2_failure_audit_by_state_component": output_path
+        / "s2_failure_audit_by_state_component.csv",
+        "s2_failure_audit_by_exit_reason": output_path
+        / "s2_failure_audit_by_exit_reason.csv",
+        "s2_failure_audit_by_symbol": output_path
+        / "s2_failure_audit_by_symbol.csv",
+        "s2_failure_audit_context_comparison": output_path
+        / "s2_failure_audit_context_comparison.csv",
         "all_signal_opportunity_log": output_path
         / "all_signal_opportunity_log.csv",
         "accepted_vs_rejected_signal_summary": output_path
@@ -503,6 +530,47 @@ def export_portfolio_backtest_csvs(
         progress_reporter,
         "Finished S2 Markov filter simulation",
         s2_filter_started,
+    )
+    s2_failure_audit_started = perf_counter()
+    _write_csv(
+        exports["s2_failure_audit_by_year"],
+        build_s2_failure_audit_by_year_rows(trade_context_rows),
+        S2_FAILURE_AUDIT_BY_YEAR_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_failure_audit_by_month"],
+        build_s2_failure_audit_by_month_rows(trade_context_rows),
+        S2_FAILURE_AUDIT_BY_MONTH_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_failure_audit_by_state_label"],
+        build_s2_failure_audit_by_state_label_rows(trade_context_rows),
+        S2_FAILURE_AUDIT_COMPARISON_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_failure_audit_by_state_component"],
+        build_s2_failure_audit_by_state_component_rows(trade_context_rows),
+        S2_FAILURE_AUDIT_STATE_COMPONENT_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_failure_audit_by_exit_reason"],
+        build_s2_failure_audit_by_exit_reason_rows(trade_context_rows),
+        S2_FAILURE_AUDIT_COMPARISON_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_failure_audit_by_symbol"],
+        build_s2_failure_audit_by_symbol_rows(trade_context_rows),
+        S2_FAILURE_AUDIT_COMPARISON_COLUMNS,
+    )
+    _write_csv(
+        exports["s2_failure_audit_context_comparison"],
+        build_s2_failure_audit_context_comparison_rows(trade_context_rows),
+        S2_FAILURE_AUDIT_COMPARISON_COLUMNS,
+    )
+    _log_elapsed(
+        progress_reporter,
+        "Finished S2 failure audit diagnostics",
+        s2_failure_audit_started,
     )
 
     if include_all_signal_diagnostics:

@@ -66,10 +66,69 @@ The infrastructure is useful for future rankers and strategies, but it did not p
 
 ---
 
+## I1 RAWRS Market Structure Intelligence
+
+`I1_RAWRS_MARKET_STRUCTURE_INTELLIGENCE` is a candidate market-structure and regime intelligence layer.
+
+RAWRS means:
+
+- Regime-Aware Adaptive Wavelet Response Surface.
+
+Status:
+
+- Phase 30A docs/spec only.
+- Non-strategy intelligence layer.
+- Not S5.
+- Not a direct signal generator.
+- Not a portfolio runner.
+- Not production-approved.
+
+Research purpose:
+
+- Study multi-scale price energy.
+- Study frequency/cycle behavior.
+- Study entropy/noise.
+- Study wavelet coherence.
+- Study regime/topology features.
+- Enrich future diagnostics for accepted trades and rejected/capacity signals.
+
+Candidate topology labels:
+
+- `clean_impulse`
+- `noisy_impulse`
+- `compression`
+- `expansion`
+- `cyclic_reversion`
+- `trend_drift`
+- `chaotic_chop`
+- `volatility_transition`
+- `regime_break`
+
+These labels are research concepts only. They are not accepted trading rules.
+
+Potential future use:
+
+- Winner/loser separation analysis.
+- Accepted versus rejected signal analysis.
+- Capacity/ranking context.
+- Regime-overlay research.
+- Risk/path-quality context.
+
+Audit requirements:
+
+- Use only information available up to the signal timestamp.
+- Use explicit trailing windows.
+- Avoid future leakage.
+- Avoid post-hoc filters tuned directly to final PnL.
+- Separate diagnostic-only counterfactuals from actual portfolio PnL.
+
+---
+
 ## Parked / Future Regime Work
 
 Future work:
 
+- I1 RAWRS market-structure intelligence diagnostics.
 - Better market-regime detector.
 - S2 regime-aware exposure reduction.
 - Context-aware ranking that is validated outside the S2-only tuning loop.

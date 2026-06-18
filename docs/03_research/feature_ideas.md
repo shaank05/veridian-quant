@@ -8,6 +8,81 @@ Feature ideas are not accepted trading rules. They must be tested through the no
 
 ---
 
+## I1 RAWRS Market Structure Intelligence Feature Ideas
+
+`I1_RAWRS_MARKET_STRUCTURE_INTELLIGENCE` is a reusable non-strategy intelligence layer.
+
+RAWRS means:
+
+- Regime-Aware Adaptive Wavelet Response Surface.
+
+Current status:
+
+- Phase 30A docs/spec only.
+- Not S5.
+- Not a strategy.
+- Not an entry model.
+- Not a signal generator.
+- Not a production rule.
+
+Intended research use:
+
+- Diagnostics on S1/S2/S3/S4 accepted trades.
+- Diagnostics on rejected/capacity signals.
+- Winner/loser separation analysis.
+- Regime/context enrichment.
+- Candidate-quality scoring research.
+- Future ranking/capacity redesign input.
+- Future market-regime overlay input.
+- Future risk/path-quality context.
+
+FFT / cycle feature candidates:
+
+- Dominant frequency.
+- Dominant cycle period.
+- Cycle strength.
+- Spectral concentration.
+- Spectral entropy.
+- Cycle stability over rolling windows.
+- Cycle phase diagnostics, but not direct phase-based entries yet.
+
+Wavelet feature candidates:
+
+- Micro energy.
+- Meso energy.
+- Macro energy.
+- Energy expansion.
+- Energy compression.
+- Multi-scale coherence.
+- Micro/meso/macro energy ratios.
+- Impulse vs drift topology.
+- Local regime shift detection.
+
+Entropy/noise feature candidates:
+
+- Return sign entropy.
+- Direction-change entropy.
+- Spectral entropy.
+- Wavelet entropy.
+- Choppiness / noise proxy.
+- Trend efficiency proxy.
+
+Candidate topology labels:
+
+- `clean_impulse`
+- `noisy_impulse`
+- `compression`
+- `expansion`
+- `cyclic_reversion`
+- `trend_drift`
+- `chaotic_chop`
+- `volatility_transition`
+- `regime_break`
+
+These features and labels are research/intelligence concepts only. They are not accepted strategy rules, filters, entries, exits, or ranking rules.
+
+---
+
 ## S4 Entropy / Volatility Compression Breakout Candidate Features
 
 S4 is an independent strategy family that tested volatility/range/noise compression followed by upside breakout confirmation.

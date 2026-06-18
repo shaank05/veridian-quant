@@ -364,3 +364,37 @@ Observed weaknesses:
 Consequence:
 
 No more S4 tuning for now. S4 is parked/frozen like S3. `S4_ATR_COMPRESSION_BREAKOUT_V1` remains useful only as a weak research benchmark/reference, not as a production candidate. Future S4 revisit should require a materially new hypothesis such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
+
+---
+
+## 2026-06-18 - Begin I1 RAWRS Market Structure Intelligence Specification
+
+Decision:
+
+Begin `I1_RAWRS_MARKET_STRUCTURE_INTELLIGENCE` as a non-strategy intelligence layer.
+
+RAWRS means:
+
+- Regime-Aware Adaptive Wavelet Response Surface.
+
+Context:
+
+S1 remains benchmark only. S2 remains frozen/parked. S3 remains frozen/parked. S4 remains frozen/parked after weak raw baseline evidence.
+
+Reason:
+
+The next useful work should study market structure, trade quality, regime context, and capacity selection without prematurely creating another direct strategy.
+
+I1 RAWRS will focus on:
+
+- FFT / cycle diagnostics.
+- Wavelet energy and coherence.
+- Entropy/noise features.
+- Regime/topology concepts.
+- Winner/loser separation analysis.
+- Accepted versus rejected signal diagnostics.
+- Future candidate-quality and regime-overlay research.
+
+Consequence:
+
+Create `docs/06_intelligence/` for reusable non-strategy intelligence modules. Do not call RAWRS S5. Do not create a strategy file, signal generator, backtest runner, CSV exporter, ranking rule, or production component in Phase 30A.

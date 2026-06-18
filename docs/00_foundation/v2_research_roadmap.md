@@ -17,6 +17,8 @@ S3 tested a different alpha source: buying structurally strong stocks after cont
 
 S4 tested a different alpha source: long-only breakouts after prior volatility, range, or entropy/noise compression. The best raw S4 variant was positive but too weak relative to drawdown for production. S4 should remain available as a research benchmark, but immediate S4 threshold tuning is parked.
 
+Phase 30A begins `I1_RAWRS_MARKET_STRUCTURE_INTELLIGENCE` as a docs-only non-strategy intelligence specification. RAWRS is not S5, not a signal generator, and not a backtest runner. Implementation is not started in Phase 30A.
+
 ---
 
 ## Completed Phases
@@ -171,6 +173,29 @@ Outcome:
 - Do not continue immediate S4 threshold tuning.
 - Future S4 revisit requires a materially new hypothesis such as market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 
+### Phase 30A: I1 RAWRS Market Structure Intelligence Specification
+
+Document `I1_RAWRS_MARKET_STRUCTURE_INTELLIGENCE` as a reusable non-strategy intelligence layer.
+
+RAWRS means:
+
+- Regime-Aware Adaptive Wavelet Response Surface.
+
+I1 RAWRS purpose:
+
+- Study multi-scale price energy, frequency/cycle behavior, entropy/noise, wavelet coherence, and regime/topology features.
+- Support diagnostics on S1/S2/S3/S4 accepted trades and rejected/capacity signals.
+- Support future candidate-quality, ranking/capacity, regime-overlay, and risk/path-quality research.
+
+Outcome:
+
+- Specification only.
+- No code implementation.
+- No S5 naming.
+- No direct buy/sell rules.
+- No backtest runner.
+- No production decision.
+
 ---
 
 ## Retained S2 Benchmarks
@@ -259,6 +284,7 @@ Next direction:
 
 - Do not continue immediate S2 or S3 tuning.
 - Do not continue immediate S4 tuning.
+- Begin I1 RAWRS intelligence specification work, not S5 strategy implementation.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 
@@ -275,6 +301,7 @@ The following are future research directions, not accepted production rules:
 - Potential S2 revisit after more independent strategy evidence.
 - Potential S3 revisit only after material regime/ranking/sector/ensemble changes.
 - Potential S4 revisit only after material regime/ranking/sector/portfolio-construction changes.
+- I1 RAWRS market-structure intelligence diagnostics.
 - Sector/industry conditioning if metadata becomes available.
 - Symbol-level robustness filters after broader strategy comparison.
 - S1 candidate ranking v2.

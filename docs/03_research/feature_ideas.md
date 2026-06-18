@@ -10,16 +10,17 @@ Feature ideas are not accepted trading rules. They must be tested through the no
 
 ## S4 Entropy / Volatility Compression Breakout Candidate Features
 
-S4 is a Phase 29A docs-only independent strategy family. It should test volatility/range/noise compression followed by upside breakout confirmation.
+S4 is an independent strategy family that tested volatility/range/noise compression followed by upside breakout confirmation.
 
 Current status:
 
-- Specification only.
-- No code implementation.
-- No backtest results.
+- Researched through Phase 29F raw Research200 baselines.
+- Frozen / parked after Phase 29G documentation.
 - Not production-ready.
-- No S2/S3 filter mixing yet.
-- No portfolio blending yet.
+- Retained weak benchmark: `S4_ATR_COMPRESSION_BREAKOUT_V1`.
+- Rejected raw baseline: `S4_RANGE_COMPRESSION_BREAKOUT_V1`.
+- Not promoted: `S4_ENTROPY_GATED_BREAKOUT_V1`.
+- No further near-term S4 feature or threshold tuning should be added without a materially new hypothesis.
 
 Compression candidates:
 
@@ -48,13 +49,21 @@ Optional context candidates:
 - Nifty trend context.
 - Relative strength versus Nifty.
 
-Initial future benchmark variants:
+Raw baseline variants:
 
 - `S4_ATR_COMPRESSION_BREAKOUT_V1`
 - `S4_RANGE_COMPRESSION_BREAKOUT_V1`
 - `S4_ENTROPY_GATED_BREAKOUT_V1`
 
-These features are research candidates only. Phase 29A does not promote any S4 rule to production and does not authorize parameter tuning.
+Raw S4 findings:
+
+- ATR compression was weakly positive but had poor return-to-drawdown.
+- Range compression was clearly negative.
+- Entropy gating was near breakeven but negative and unstable.
+- Capacity pressure and candidate selection remain major weaknesses.
+- Current standard signal export does not expose S4-specific compression/breakout metadata fields, creating an auditability gap for future work.
+
+These features are research candidates only. S4 is not promoted to production, and near-term S4 threshold tuning is parked.
 
 ---
 

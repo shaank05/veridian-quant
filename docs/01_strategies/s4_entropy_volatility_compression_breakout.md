@@ -4,15 +4,25 @@
 
 Status:
 
-- Phase 29A specification only.
-- No code implementation.
-- No backtest runner changes.
+- Researched through Phase 29F raw Research200 baselines.
+- Phase 29G documentation/parking complete.
+- Implementation exists for feature utilities, signal generation, portfolio runner, and CLI runner.
+- Raw baseline research complete.
+- Frozen / parked.
+- Not production-ready.
 - No production decision.
 - Strategy family: standalone independent strategy.
 - Not an S1/S2/S3 filter.
 - Not part of a portfolio blend or voting ensemble yet.
 
-S4 begins a new independent research family after S1, S2, and S3 have been retained only as benchmarks or parked research candidates.
+S4 tested a new independent research family after S1, S2, and S3 were retained only as benchmarks or parked research candidates.
+
+Current decision:
+
+- Retain `S4_ATR_COMPRESSION_BREAKOUT_V1` as a weak S4 benchmark/research reference only.
+- Reject `S4_RANGE_COMPRESSION_BREAKOUT_V1` as an S4 raw baseline.
+- Do not promote `S4_ENTROPY_GATED_BREAKOUT_V1`.
+- Do not continue near-term S4 threshold tuning.
 
 ---
 
@@ -200,9 +210,9 @@ Ambiguity handling:
 
 ---
 
-## Initial Benchmark Variants To Research Later
+## Raw Baseline Variants
 
-These variants are names for future research only. They are not implemented in Phase 29A.
+These variants were raw-tested on the audited Research200 universe using the standard v2 portfolio methodology.
 
 1. `S4_ATR_COMPRESSION_BREAKOUT_V1`
 2. `S4_RANGE_COMPRESSION_BREAKOUT_V1`
@@ -210,16 +220,112 @@ These variants are names for future research only. They are not implemented in P
 
 ---
 
+## Raw Research200 Baseline Results
+
+Backtest scope:
+
+- Universe: audited Research200.
+- Period: 2020-01-01 to 2026-04-30.
+- Starting equity: about Rs 10,00,000.
+- Default v2 portfolio methodology.
+- No ranking.
+- No tuning.
+- No production decision.
+
+### `S4_ATR_COMPRESSION_BREAKOUT_V1`
+
+Approximate result:
+
+- Net PnL: about +Rs 1.65L.
+- CAGR: about 2.45%.
+- Max drawdown: about 39.12%.
+- Profit factor: about 1.037.
+- Trades: 559.
+- Win rate: about 40.97%.
+- Average net PnL per trade: about +Rs 296.
+
+Interpretation:
+
+- Best of the three raw S4 variants.
+- Weak positive benchmark only.
+- Return-to-drawdown is poor.
+- Do not promote to production.
+- Do not tune further for now.
+
+### `S4_RANGE_COMPRESSION_BREAKOUT_V1`
+
+Approximate result:
+
+- Net PnL: about -Rs 4.13L.
+- CAGR: about -8.06%.
+- Max drawdown: about 57.79%.
+- Profit factor: about 0.883.
+- Trades: 590.
+- Win rate: about 37.46%.
+- Average net PnL per trade: about -Rs 699.
+
+Interpretation:
+
+- Rejected as an S4 raw baseline.
+- Not production-ready.
+- Do not continue near-term tuning.
+
+### `S4_ENTROPY_GATED_BREAKOUT_V1`
+
+Approximate result:
+
+- Net PnL: about -Rs 1.01L.
+- CAGR: about -1.67%.
+- Max drawdown: about 35.76%.
+- Profit factor: about 0.975.
+- Trades: 589.
+- Win rate: about 41.09%.
+- Average net PnL per trade: about -Rs 172.
+
+Interpretation:
+
+- Near breakeven but negative and unstable.
+- Not promoted.
+- Not production-ready.
+- Do not continue near-term tuning.
+
+---
+
+## Overall S4 Conclusion
+
+Raw S4 is technically valid but not production-ready.
+
+The best observed variant, `S4_ATR_COMPRESSION_BREAKOUT_V1`, produced weak positive results but with drawdown too high relative to return. `S4_RANGE_COMPRESSION_BREAKOUT_V1` was clearly negative, and `S4_ENTROPY_GATED_BREAKOUT_V1` was near breakeven but negative.
+
+Key observed weaknesses:
+
+- Poor return-to-drawdown.
+- Weak or negative profit factor.
+- Poor post-2021 stability.
+- Material 2022 and/or 2025/2026 weakness.
+- High capacity pressure across variants.
+- Heavy dependence on candidate selection.
+- Current standard signal export does not expose S4-specific compression/breakout metadata fields, creating an auditability gap for future S4 work.
+
+Current decision:
+
+- Freeze/park S4 after Phase 29F/29G.
+- Retain ATR compression breakout only as a weak benchmark/research reference.
+- Do not continue immediate S4 threshold tuning.
+- Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
+
+---
+
 ## Non-Goals
 
-Explicit non-goals for Phase 29A:
+Explicit non-goals after Phase 29G:
 
-- No S2/S3 filter mixing yet.
-- No parameter tuning yet.
-- No production decision yet.
-- No portfolio blending yet.
-- No code implementation in Phase 29A.
-- No changes to production strategy code, backtest runners, tests, configs, or data files.
+- No S2/S3 filter mixing.
+- No further S4 parameter tuning for now.
+- No production decision.
+- No portfolio blending.
+- No S4 ranking.
+- No immediate S4 feature variants.
 
 ---
 
@@ -240,7 +346,7 @@ Possible S4 failure cases:
 
 ## What Success Looks Like Later
 
-S4 should eventually be judged independently on the standard audited research universe and v2 portfolio methodology.
+S4 has now been judged on the standard audited research universe and v2 portfolio methodology for raw baselines. Any future S4 revisit should require a materially new hypothesis rather than incremental threshold tuning.
 
 Success criteria:
 

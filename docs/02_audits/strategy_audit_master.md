@@ -13,6 +13,7 @@ No strategy is production-approved.
 - S1: `docs/02_audits/s1_audit.md`
 - S2: `docs/02_audits/s2_audit.md`
 - S3: `docs/02_audits/s3_audit.md`
+- S4: summarized in this master audit for now; no separate S4 audit file has been created.
 
 ---
 
@@ -28,6 +29,9 @@ No strategy is production-approved.
 | `S2_MARKOV_STATE_TRANSITION` high-return candidate | Frozen research candidate | Yes | Yes | Retain `exclude_ret_down + clean_state_v1`; fragile due to 2025 |
 | S2 guard/ranking variants | Rejected as benchmarks | Yes | Yes | Do not promote; improved targeted weakness but lost too much total edge |
 | `S3_TREND_PULLBACK_CONTINUATION` | Parked / not production-ready | Yes | Yes | Retain `S3_STRONG_TREND_ABOVE_SMA50_V1` as benchmark only; do not continue variants now |
+| `S4_ATR_COMPRESSION_BREAKOUT_V1` | Weak benchmark / parked | Yes | Yes | Retain as weak S4 benchmark only; not production-ready; do not continue tuning now |
+| `S4_RANGE_COMPRESSION_BREAKOUT_V1` | Rejected raw baseline | Yes | Yes | Do not promote; negative PnL and high drawdown |
+| `S4_ENTROPY_GATED_BREAKOUT_V1` | Not promoted / parked | Yes | Yes | Near breakeven but negative and unstable; do not promote |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
@@ -109,6 +113,75 @@ Interpretation:
 - Not production-ready.
 - Do not continue near-term S3 variants.
 
+### S4 Raw Baselines
+
+Scope:
+
+- Strategy family: `S4_ENTROPY_VOLATILITY_COMPRESSION_BREAKOUT`
+- Universe: audited Research200
+- Period: 2020-01-01 to 2026-04-30
+- Starting equity: about Rs 10,00,000
+- Default v2 portfolio methodology
+- No ranking
+- No tuning
+
+#### S4 ATR Compression Breakout
+
+- Variant: `S4_ATR_COMPRESSION_BREAKOUT_V1`
+- Net PnL: about +Rs 1.65L
+- CAGR: about 2.45%
+- Max drawdown: about 39.12%
+- Profit factor: about 1.037
+- Trades: 559
+- Win rate: about 40.97%
+- Average net PnL per trade: about +Rs 296
+
+Interpretation:
+
+- Best raw S4 variant.
+- Retain only as a weak benchmark/research reference.
+- Not production-ready because return-to-drawdown and profit factor are too weak.
+
+#### S4 Range Compression Breakout
+
+- Variant: `S4_RANGE_COMPRESSION_BREAKOUT_V1`
+- Net PnL: about -Rs 4.13L
+- CAGR: about -8.06%
+- Max drawdown: about 57.79%
+- Profit factor: about 0.883
+- Trades: 590
+- Win rate: about 37.46%
+- Average net PnL per trade: about -Rs 699
+
+Interpretation:
+
+- Rejected as an S4 raw baseline.
+- Not production-ready.
+
+#### S4 Entropy-Gated Breakout
+
+- Variant: `S4_ENTROPY_GATED_BREAKOUT_V1`
+- Net PnL: about -Rs 1.01L
+- CAGR: about -1.67%
+- Max drawdown: about 35.76%
+- Profit factor: about 0.975
+- Trades: 589
+- Win rate: about 41.09%
+- Average net PnL per trade: about -Rs 172
+
+Interpretation:
+
+- Near breakeven but negative and unstable.
+- Not promoted.
+- Not production-ready.
+
+Overall S4 decision:
+
+- Freeze/park S4 after raw baseline research.
+- Do not continue immediate S4 threshold tuning.
+- Future S4 revisit requires a materially new hypothesis such as regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
+- Current standard signal export does not expose S4-specific compression/breakout metadata fields, creating an auditability gap for future work.
+
 ---
 
 ## S2 Audit Findings
@@ -163,4 +236,6 @@ Current decision:
 
 - Freeze S2 research for now.
 - Keep both retained S2 benchmarks for comparison.
-- Move the next research effort to a new independent strategy.
+- Freeze S3 and S4 research for now.
+- Keep retained S3 and weak S4 benchmarks for comparison.
+- Move the next research effort to broader robustness, portfolio construction, or a materially new independent hypothesis.

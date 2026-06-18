@@ -75,6 +75,40 @@ Current S3 decision:
 
 ---
 
+## S4 Rejected / Parked Items
+
+`S4_ENTROPY_VOLATILITY_COMPRESSION_BREAKOUT` is technically valid but parked as a standalone strategy family after raw Research200 baselines.
+
+Raw baseline scope:
+
+- Universe: audited Research200.
+- Period: 2020-01-01 to 2026-04-30.
+- Default v2 portfolio methodology.
+- No ranking.
+- No tuning.
+- No production decision.
+
+Rejected as S4 raw baseline:
+
+- `S4_RANGE_COMPRESSION_BREAKOUT_V1`: about -Rs 4.13L net PnL, about -8.06% CAGR, about 57.79% max drawdown, about 0.883 PF, 590 trades, and about -Rs 699 average net PnL per trade.
+
+Not promoted:
+
+- `S4_ENTROPY_GATED_BREAKOUT_V1`: about -Rs 1.01L net PnL, about -1.67% CAGR, about 35.76% max drawdown, about 0.975 PF, 589 trades, and about -Rs 172 average net PnL per trade. It was near breakeven but negative and unstable.
+
+Benchmark-only:
+
+- `S4_ATR_COMPRESSION_BREAKOUT_V1`: retained only as a weak S4 benchmark/research reference. Approximate result: about +Rs 1.65L net PnL, about 2.45% CAGR, about 39.12% max drawdown, about 1.037 PF, 559 trades, and about +Rs 296 average net PnL per trade.
+
+Current S4 decision:
+
+- Freeze/park S4 after Phase 29F/29G.
+- Do not continue immediate S4 threshold tuning.
+- Do not promote raw S4 to production.
+- Revisit only if regime modeling, sector context, capacity/ranking redesign, or portfolio-construction needs materially change.
+
+---
+
 ## Deferred Advanced Strategy Families
 
 The following remain future research directions:

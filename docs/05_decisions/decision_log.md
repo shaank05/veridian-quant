@@ -310,3 +310,57 @@ Further near-term S2 or S3 threshold tuning risks overfitting. The next useful s
 Consequence:
 
 Phase 29A is docs/spec only. No production strategy code, backtest runners, tests, configs, or data files should be changed. No S2/S3 filter mixing, parameter tuning, production decision, or portfolio blending is authorized in this phase.
+
+---
+
+## 2026-06-18 - Freeze S4 Raw Baseline Research After Phase 29F/29G
+
+Decision:
+
+Freeze/park `S4_ENTROPY_VOLATILITY_COMPRESSION_BREAKOUT` raw baseline research.
+
+Retain one weak S4 benchmark only:
+
+- `S4_ATR_COMPRESSION_BREAKOUT_V1`
+
+Reject as S4 raw baseline:
+
+- `S4_RANGE_COMPRESSION_BREAKOUT_V1`
+
+Do not promote:
+
+- `S4_ENTROPY_GATED_BREAKOUT_V1`
+
+Raw Research200 baseline scope:
+
+- Period: 2020-01-01 to 2026-04-30.
+- Universe: audited Research200.
+- Starting equity: about Rs 10,00,000.
+- Default v2 portfolio methodology.
+- No ranking.
+- No tuning.
+- No production decision.
+
+Approximate raw baseline results:
+
+- `S4_ATR_COMPRESSION_BREAKOUT_V1`: about +Rs 1.65L net PnL, about 2.45% CAGR, about 39.12% max drawdown, about 1.037 PF, 559 trades, about 40.97% win rate, and about +Rs 296 average net PnL per trade.
+- `S4_RANGE_COMPRESSION_BREAKOUT_V1`: about -Rs 4.13L net PnL, about -8.06% CAGR, about 57.79% max drawdown, about 0.883 PF, 590 trades, about 37.46% win rate, and about -Rs 699 average net PnL per trade.
+- `S4_ENTROPY_GATED_BREAKOUT_V1`: about -Rs 1.01L net PnL, about -1.67% CAGR, about 35.76% max drawdown, about 0.975 PF, 589 trades, about 41.09% win rate, and about -Rs 172 average net PnL per trade.
+
+Reason:
+
+Raw S4 is technically valid but not production-ready. The ATR compression variant was the best of the three, but its edge is too weak relative to drawdown. Range compression was clearly negative. Entropy gating was near breakeven but negative and unstable.
+
+Observed weaknesses:
+
+- Poor return-to-drawdown.
+- Weak or negative profit factor.
+- Poor post-2021 stability.
+- Material 2022 and/or 2025/2026 weakness.
+- High capacity pressure across variants.
+- Heavy dependence on candidate selection.
+- Current standard signal export does not expose S4-specific compression/breakout metadata fields, creating an auditability gap for future work.
+
+Consequence:
+
+No more S4 tuning for now. S4 is parked/frozen like S3. `S4_ATR_COMPRESSION_BREAKOUT_V1` remains useful only as a weak research benchmark/reference, not as a production candidate. Future S4 revisit should require a materially new hypothesis such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.

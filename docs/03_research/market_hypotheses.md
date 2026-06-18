@@ -281,9 +281,13 @@ Stocks that spend time in unusually compressed volatility, tight ranges, or redu
 
 S4 will test this as `S4_ENTROPY_VOLATILITY_COMPRESSION_BREAKOUT`.
 
-Phase 29A status:
+Audit status:
 
-S4 is docs/spec only. It is a new independent strategy family, not an S1/S2/S3 filter, and not a production rule.
+S4 has been implemented and raw-tested through Phase 29F/29G as an independent strategy family, not an S1/S2/S3 filter.
+
+Current conclusion:
+
+S4 is technically valid but parked after weak raw baseline evidence. `S4_ATR_COMPRESSION_BREAKOUT_V1` is retained only as a weak benchmark/research reference. `S4_RANGE_COMPRESSION_BREAKOUT_V1` is rejected as an S4 raw baseline, and `S4_ENTROPY_GATED_BREAKOUT_V1` is not promoted. S4 is not production-ready.
 
 ## Expected Edge
 
@@ -393,4 +397,6 @@ S3 Trend Pullback Continuation has now been tested independently and is parked a
 
 S4 Entropy / Volatility Compression Breakout is now the next independent docs-only strategy family for Phase 29A.
 
-The next research priority should not be more S2 or S3 threshold tuning. Future work should first complete and review the S4 specification before any implementation decision.
+S4 Entropy / Volatility Compression Breakout has now been raw-tested independently and is parked as a weak benchmark-only strategy family, not a production strategy.
+
+The next research priority should not be more S2, S3, or S4 threshold tuning. Future work should move to broader robustness, portfolio construction, or a materially new independent hypothesis.

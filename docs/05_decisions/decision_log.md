@@ -398,3 +398,19 @@ I1 RAWRS will focus on:
 Consequence:
 
 Create `docs/06_intelligence/` for reusable non-strategy intelligence modules. Do not call RAWRS S5. Do not create a strategy file, signal generator, backtest runner, CSV exporter, ranking rule, or production component in Phase 30A.
+
+---
+
+## 2026-06-18 - Design I1 RAWRS Signal-Time Diagnostics Before Ranking
+
+Decision:
+
+Design I1 RAWRS signal-time diagnostics before implementing any ranking, overlay, or strategy logic.
+
+Reason:
+
+RAWRS must first prove whether features separate winners/losers and accepted/rejected signal quality without leakage or post-hoc overfitting.
+
+Consequence:
+
+Phase 30C is docs-only. Future work may create diagnostic outputs, but no trading behavior changes, ranking rules, overlays, strategy logic, diagnostics runner, or production component are authorized by this decision.

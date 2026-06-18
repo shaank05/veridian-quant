@@ -196,6 +196,29 @@ Outcome:
 - No backtest runner.
 - No production decision.
 
+### Phase 30B: I1 RAWRS Feature Utility Foundation
+
+Implement the initial RAWRS feature utility foundation for research use only.
+
+Outcome:
+
+- Initial feature utilities exist for signal-time market-structure analysis.
+- Utilities remain non-strategy intelligence infrastructure.
+- No strategy behavior, runner behavior, ranking, overlay, or production decision is authorized by Phase 30B.
+
+### Phase 30C: I1 RAWRS Signal-Time Diagnostic Design
+
+Document `I1_RAWRS_SIGNAL_TIME_DIAGNOSTICS` as the signal-time diagnostic blueprint for future RAWRS research.
+
+Outcome:
+
+- Docs-only design in `docs/06_intelligence/i1_rawrs_signal_time_diagnostics.md`.
+- Defines accepted-trade, rejected-signal, capacity-rejection, winner/loser, year/regime, and strategy-family diagnostic plans.
+- Defines leakage and post-hoc overfitting guardrails.
+- Does not implement a diagnostics runner.
+- Does not implement ranking or overlays.
+- Does not change strategy or backtest behavior.
+
 ---
 
 ## Retained S2 Benchmarks
@@ -284,7 +307,7 @@ Next direction:
 
 - Do not continue immediate S2 or S3 tuning.
 - Do not continue immediate S4 tuning.
-- Begin I1 RAWRS intelligence specification work, not S5 strategy implementation.
+- Continue I1 RAWRS intelligence work through signal-time diagnostics, not S5 strategy implementation.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 
@@ -301,7 +324,7 @@ The following are future research directions, not accepted production rules:
 - Potential S2 revisit after more independent strategy evidence.
 - Potential S3 revisit only after material regime/ranking/sector/ensemble changes.
 - Potential S4 revisit only after material regime/ranking/sector/portfolio-construction changes.
-- I1 RAWRS market-structure intelligence diagnostics.
+- I1 RAWRS market-structure intelligence diagnostics, beginning with Phase 30C signal-time diagnostic design.
 - Sector/industry conditioning if metadata becomes available.
 - Symbol-level robustness filters after broader strategy comparison.
 - S1 candidate ranking v2.

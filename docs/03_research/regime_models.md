@@ -77,6 +77,8 @@ RAWRS means:
 Status:
 
 - Phase 30A docs/spec only.
+- Phase 30B implemented initial research feature utilities.
+- Phase 30C defines signal-time diagnostics before any ranking or overlay work.
 - Non-strategy intelligence layer.
 - Not S5.
 - Not a direct signal generator.
@@ -122,13 +124,21 @@ Audit requirements:
 - Avoid post-hoc filters tuned directly to final PnL.
 - Separate diagnostic-only counterfactuals from actual portfolio PnL.
 
+Phase 30C diagnostic evidence design:
+
+- Attach RAWRS features to accepted trades, rejected signals, and capacity-rejected signals at the signal timestamp.
+- Compare winners versus losers, high-R versus low-R, target exits versus stops, and accepted versus rejected candidate quality.
+- Test feature buckets across years, weak regimes, and strategy families before considering ranking or overlay research.
+- Keep rejected-signal outcomes diagnostic-only and separate from actual portfolio PnL.
+- Treat 2022, 2025, and 2026 as important weak-regime diagnostic periods where data is available.
+
 ---
 
 ## Parked / Future Regime Work
 
 Future work:
 
-- I1 RAWRS market-structure intelligence diagnostics.
+- I1 RAWRS market-structure intelligence diagnostics using the Phase 30C signal-time design.
 - Better market-regime detector.
 - S2 regime-aware exposure reduction.
 - Context-aware ranking that is validated outside the S2-only tuning loop.

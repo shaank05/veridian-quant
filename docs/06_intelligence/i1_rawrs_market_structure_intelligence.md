@@ -12,6 +12,8 @@ The purpose of I1 RAWRS is to compute and study multi-scale price energy, freque
 
 These features are intended for diagnostics, ranking research, and future regime overlays.
 
+Phase 30C adds the signal-time diagnostic design in `docs/06_intelligence/i1_rawrs_signal_time_diagnostics.md`. That document defines how RAWRS features should be attached to accepted trades, rejected signals, and capacity-rejection cases before any ranking, overlay, or strategy implementation is considered.
+
 I1 RAWRS should help answer questions such as:
 
 - Why did accepted trades win or lose?
@@ -156,6 +158,13 @@ Phase 30A does not authorize:
 - Portfolio blending.
 - Production promotion.
 
+Phase 30C also does not authorize:
+
+- Diagnostics runner implementation.
+- Ranking implementation.
+- Overlay implementation.
+- Trading behavior changes.
+
 ---
 
 ## Candidate Feature Families
@@ -278,6 +287,8 @@ Initial diagnostic plan:
 
 Diagnostics should start with descriptive separation tests, not optimized strategy rules.
 
+The detailed Phase 30C design is maintained in `docs/06_intelligence/i1_rawrs_signal_time_diagnostics.md`.
+
 ---
 
 ## Winner / Loser Separation Tests
@@ -370,6 +381,8 @@ Possible future phases:
 
 These are possible future phases, not approved implementation work in Phase 30A.
 
+Phase 30C defines signal-time diagnostics before any ranking or overlay implementation.
+
 ---
 
 ## Promotion Rules
@@ -395,6 +408,7 @@ Related docs:
 
 - `docs/00_foundation/v2_design_document.md`
 - `docs/00_foundation/v2_research_roadmap.md`
+- `docs/06_intelligence/i1_rawrs_signal_time_diagnostics.md`
 - `docs/03_research/feature_ideas.md`
 - `docs/03_research/regime_models.md`
 - `docs/03_research/portfolio_construction.md`

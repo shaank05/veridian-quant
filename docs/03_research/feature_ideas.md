@@ -19,6 +19,8 @@ RAWRS means:
 Current status:
 
 - Phase 30A docs/spec only.
+- Phase 30B implemented initial research feature utilities.
+- Phase 30C defines signal-time diagnostic usage before ranking or overlays.
 - Not S5.
 - Not a strategy.
 - Not an entry model.
@@ -80,6 +82,26 @@ Candidate topology labels:
 - `regime_break`
 
 These features and labels are research/intelligence concepts only. They are not accepted strategy rules, filters, entries, exits, or ranking rules.
+
+Phase 30C diagnostic feature usage:
+
+- Attach RAWRS features at the signal timestamp for accepted trades and rejected signals.
+- Start with transparent feature buckets, quantile tables, mean/median comparisons, win rate by bucket, R-multiple by bucket, and profit factor by bucket.
+- Compare feature behavior by year, weak regime, and strategy family before any threshold or composite score is considered.
+- Keep usage research-only until independent validation supports ranking, overlay, or capacity research.
+
+Initial signal-time diagnostic feature candidates:
+
+- `rawrs_log_return`
+- `rawrs_fft_spectral_concentration`
+- `rawrs_fft_spectral_entropy`
+- `rawrs_fft_dominant_period`
+- `rawrs_micro_energy`
+- `rawrs_meso_energy`
+- `rawrs_macro_energy`
+- `rawrs_micro_meso_energy_ratio`
+- `rawrs_meso_macro_energy_ratio`
+- `rawrs_direction_change_rate`
 
 ---
 

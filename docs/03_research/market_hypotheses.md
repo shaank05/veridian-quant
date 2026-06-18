@@ -395,8 +395,6 @@ S2 Markov State Transition has now been tested independently and is frozen as a 
 
 S3 Trend Pullback Continuation has now been tested independently and is parked as a benchmark-only strategy family, not a production strategy.
 
-S4 Entropy / Volatility Compression Breakout is now the next independent docs-only strategy family for Phase 29A.
-
 S4 Entropy / Volatility Compression Breakout has now been raw-tested independently and is parked as a weak benchmark-only strategy family, not a production strategy.
 
 The next research priority should not be more S2, S3, or S4 threshold tuning. Future work should move to broader robustness, portfolio construction, or a materially new independent hypothesis.

@@ -13,7 +13,7 @@ No strategy is production-approved.
 - S1: `docs/02_audits/s1_audit.md`
 - S2: `docs/02_audits/s2_audit.md`
 - S3: `docs/02_audits/s3_audit.md`
-- S4: summarized in this master audit for now; no separate S4 audit file has been created.
+- S4: `docs/02_audits/s4_audit.md`
 
 ---
 
@@ -114,6 +114,10 @@ Interpretation:
 - Do not continue near-term S3 variants.
 
 ### S4 Raw Baselines
+
+Detailed audit:
+
+- `docs/02_audits/s4_audit.md`
 
 Scope:
 

@@ -273,6 +273,54 @@ Expected edge comes from:
 
 ---
 
+# H8 - Volatility Compression Breakout
+
+## Hypothesis
+
+Stocks that spend time in unusually compressed volatility, tight ranges, or reduced directional noise may produce favorable long-only breakout opportunities once price confirms expansion.
+
+S4 will test this as `S4_ENTROPY_VOLATILITY_COMPRESSION_BREAKOUT`.
+
+Phase 29A status:
+
+S4 is docs/spec only. It is a new independent strategy family, not an S1/S2/S3 filter, and not a production rule.
+
+## Expected Edge
+
+Expected edge comes from:
+
+* Volatility expansion after unusually quiet periods.
+* Breakout confirmation after compression rather than prediction during compression.
+* Capturing early continuation after a range resolves upward.
+* Avoiding direct dependence on oversold mean reversion, Markov recurrence, or pullback-continuation logic.
+
+## Why This May Work
+
+* Market participants often accumulate or distribute before visible range expansion.
+* Tight ranges can create clustered stops and momentum follow-through after a breakout.
+* Low recent volatility can allow tighter initial risk definition.
+* Breakout confirmation can reduce premature entries inside unresolved ranges.
+
+## When It May Fail
+
+* Breakout fails quickly and returns inside the range.
+* Compression reflects illiquidity rather than useful setup quality.
+* Entry at next open suffers from unfavorable breakout gaps.
+* Low volatility persists rather than expanding.
+* Broader market weakness overwhelms individual breakouts.
+* Added volume or trend filters overfit and blur S4's independent thesis.
+
+## Candidate Features
+
+* ATR percentile compression.
+* Rolling high-low range compression.
+* Optional entropy/noise compression.
+* Close above N-day high.
+* Optional volume confirmation.
+* Optional trend context.
+
+---
+
 # Rejected or Deferred Hypotheses
 
 The following are not accepted production rules.
@@ -343,4 +391,6 @@ S2 Markov State Transition has now been tested independently and is frozen as a 
 
 S3 Trend Pullback Continuation has now been tested independently and is parked as a benchmark-only strategy family, not a production strategy.
 
-The next research priority should not be more S3 threshold tuning. Future work should move to broader strategy research, robustness, portfolio construction, or the next independent strategy family.
+S4 Entropy / Volatility Compression Breakout is now the next independent docs-only strategy family for Phase 29A.
+
+The next research priority should not be more S2 or S3 threshold tuning. Future work should first complete and review the S4 specification before any implementation decision.

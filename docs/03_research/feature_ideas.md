@@ -8,6 +8,56 @@ Feature ideas are not accepted trading rules. They must be tested through the no
 
 ---
 
+## S4 Entropy / Volatility Compression Breakout Candidate Features
+
+S4 is a Phase 29A docs-only independent strategy family. It should test volatility/range/noise compression followed by upside breakout confirmation.
+
+Current status:
+
+- Specification only.
+- No code implementation.
+- No backtest results.
+- Not production-ready.
+- No S2/S3 filter mixing yet.
+- No portfolio blending yet.
+
+Compression candidates:
+
+- ATR percentile compression.
+- Rolling high-low range compression.
+- Optional entropy/noise compression.
+- Return sign entropy.
+- Direction-change count.
+- Efficiency-ratio-style noise proxy.
+
+Breakout confirmation candidates:
+
+- Close above N-day high.
+- Breakout close versus prior range high.
+- Optional breakout-day range expansion.
+
+Volume confirmation candidates:
+
+- Breakout-day volume versus average volume.
+- Breakout-day volume percentile.
+- Volume expansion relative to compression-window volume.
+
+Optional context candidates:
+
+- Stock above SMA50 or SMA200.
+- Nifty trend context.
+- Relative strength versus Nifty.
+
+Initial future benchmark variants:
+
+- `S4_ATR_COMPRESSION_BREAKOUT_V1`
+- `S4_RANGE_COMPRESSION_BREAKOUT_V1`
+- `S4_ENTROPY_GATED_BREAKOUT_V1`
+
+These features are research candidates only. Phase 29A does not promote any S4 rule to production and does not authorize parameter tuning.
+
+---
+
 ## S3 Trend Pullback Continuation Candidate Features
 
 S3 tested controlled pullbacks inside confirmed uptrends. Candidate features supported that distinction without turning the first baseline into an overfit scoring model.

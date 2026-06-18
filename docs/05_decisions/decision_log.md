@@ -271,3 +271,42 @@ S3 is technically valid, but the standalone edge is weak. The controlled-pullbac
 Consequence:
 
 S3 is parked as a benchmark-only strategy family. Future work should move to broader strategy research, robustness, portfolio construction, or the next independent strategy family.
+
+---
+
+## 2026-06-18 - Start S4 Docs-Only Independent Strategy Family
+
+Decision:
+
+Start Phase 29A for `S4_ENTROPY_VOLATILITY_COMPRESSION_BREAKOUT` as a new independent strategy-family specification.
+
+Context:
+
+S1 remains the benchmark Z-score mean-reversion strategy, not production-ready.
+
+S2 Markov State Transition remains frozen/parked with retained safer and higher-return benchmarks, not production-ready.
+
+S3 Trend Pullback Continuation remains parked with `S3_STRONG_TREND_ABOVE_SMA50_V1` retained as benchmark only, not production-ready.
+
+S4 will test long-only breakouts after volatility, range, or optional entropy/noise compression:
+
+- ATR percentile compression.
+- Rolling high-low range compression.
+- Optional entropy/noise compression.
+- Close above N-day high.
+- Optional volume confirmation.
+- Optional trend context.
+
+Initial future benchmark variants:
+
+- `S4_ATR_COMPRESSION_BREAKOUT_V1`
+- `S4_RANGE_COMPRESSION_BREAKOUT_V1`
+- `S4_ENTROPY_GATED_BREAKOUT_V1`
+
+Reason:
+
+Further near-term S2 or S3 threshold tuning risks overfitting. The next useful step is to define a separate alpha source before any implementation work.
+
+Consequence:
+
+Phase 29A is docs/spec only. No production strategy code, backtest runners, tests, configs, or data files should be changed. No S2/S3 filter mixing, parameter tuning, production decision, or portfolio blending is authorized in this phase.

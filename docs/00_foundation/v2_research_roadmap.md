@@ -2,7 +2,7 @@
 
 ## Current Research State
 
-Veridian Quant v2 has completed the S1 baseline cycle, the S2 Markov research cycle through Phase 27J, and the S3 Trend Pullback Continuation research cycle through Phase 28G.
+Veridian Quant v2 has completed the S1 baseline cycle, the S2 Markov research cycle through Phase 27J/27K, and the S3 Trend Pullback Continuation research cycle through Phase 28G.
 
 Current retained research benchmarks:
 
@@ -13,6 +13,8 @@ Current retained research benchmarks:
 S2 has evidence of edge, but the research cycle found material regime fragility, especially around the 2025/2026 period. S2 should not be deployed live. It should remain available for comparison against future independent strategies.
 
 S3 tested a different alpha source: buying structurally strong stocks after controlled pullbacks inside confirmed uptrends. The best S3 variant remained too weak for production.
+
+Phase 29A starts `S4_ENTROPY_VOLATILITY_COMPRESSION_BREAKOUT` as a new independent strategy family in docs/spec form only. No S4 code, backtest, configuration, or data changes are part of Phase 29A.
 
 ---
 
@@ -129,6 +131,28 @@ Outcome:
 - Controlled-pullback tuning did not improve realized portfolio performance.
 - S3 is parked after Phase 28G documentation.
 
+### Phase 29A: S4 Entropy / Volatility Compression Breakout Specification
+
+Document `S4_ENTROPY_VOLATILITY_COMPRESSION_BREAKOUT` as the next standalone strategy-family candidate.
+
+S4 thesis:
+
+- Research long-only breakouts after volatility, range, or optional entropy/noise compression.
+- Signal on breakout close and enter next session open.
+- Use conservative v2 ATR stop, R-multiple target, max-holding-period, and same-candle ambiguity handling when implementation begins later.
+
+Initial future benchmark variants:
+
+- `S4_ATR_COMPRESSION_BREAKOUT_V1`
+- `S4_RANGE_COMPRESSION_BREAKOUT_V1`
+- `S4_ENTROPY_GATED_BREAKOUT_V1`
+
+Outcome:
+
+- Specification added only.
+- S1, S2, and S3 remain frozen or parked.
+- No S4 implementation, parameter tuning, backtest, production decision, or portfolio blending has started.
+
 ---
 
 ## Retained S2 Benchmarks
@@ -206,6 +230,7 @@ The current evidence says:
 - S2 is retained as a benchmark/research candidate, not deployed live.
 - S3 is completed as a standalone trend-continuation experiment and parked.
 - The best S3 variant is retained as a benchmark only.
+- S4 is starting as a new independent docs-only strategy family.
 - Portfolio capacity and accepted-trade selection remain major bottlenecks.
 - Additional S2 tuning has reached diminishing returns.
 - Additional S3 tuning risks overfitting.
@@ -213,7 +238,7 @@ The current evidence says:
 Next direction:
 
 - Do not continue immediate S2 or S3 tuning.
-- Move to broader strategy research, robustness, portfolio construction, or the next independent strategy family.
+- Continue Phase 29A docs/spec work for S4 before any implementation decision.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 
 ---
@@ -228,6 +253,7 @@ The following are future research directions, not accepted production rules:
 - Use Phase 27J signal-time context infrastructure in future rankers.
 - Potential S2 revisit after more independent strategy evidence.
 - Potential S3 revisit only after material regime/ranking/sector/ensemble changes.
+- S4 implementation and backtest after Phase 29A is reviewed.
 - Sector/industry conditioning if metadata becomes available.
 - Symbol-level robustness filters after broader strategy comparison.
 - S1 candidate ranking v2.

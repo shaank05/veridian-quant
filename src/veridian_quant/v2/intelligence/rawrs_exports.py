@@ -25,6 +25,7 @@ RAWRS_DIAGNOSTIC_FILENAMES = {
     "feature_by_strategy_summary": "rawrs_feature_by_strategy_summary.csv",
     "same_day_candidate_pool_summary": "rawrs_same_day_candidate_pool_summary.csv",
 }
+RAWRS_REALIZED_R_COL = "rawrs_realized_r"
 
 
 def export_rawrs_diagnostic_csvs(
@@ -73,12 +74,13 @@ def build_rawrs_trade_diagnostics(
 ) -> pd.DataFrame:
     """Attach signal-time RAWRS features to trade-level records."""
 
-    return attach_rawrs_features_by_symbol(
+    attached = attach_rawrs_features_by_symbol(
         trades,
         rawrs_features_by_symbol,
         symbol_col=symbol_col,
         signal_timestamp_col=signal_timestamp_col,
     )
+    return ensure_rawrs_realized_r(attached)
 
 
 def build_rawrs_signal_diagnostics(
@@ -126,15 +128,17 @@ def build_rawrs_feature_bucket_summary(
 ) -> pd.DataFrame:
     """Build combined bucket summaries for selected RAWRS feature columns."""
 
-    selected_features = _usable_rawrs_feature_columns(records, feature_cols)
+    diagnostic_records = ensure_rawrs_realized_r(records)
+    selected_features = _usable_rawrs_feature_columns(diagnostic_records, feature_cols)
+    selected_r_col = _select_realized_r_column(diagnostic_records, r_col)
     summaries: list[pd.DataFrame] = []
     for feature in selected_features:
         summary = summarize_outcome_by_rawrs_bucket(
-            records,
+            diagnostic_records,
             feature_col=feature,
             outcome_col=outcome_col,
             pnl_col=pnl_col,
-            r_col=r_col,
+            r_col=selected_r_col,
             buckets=buckets,
         )
         summary.insert(0, "feature", feature)
@@ -145,6 +149,22 @@ def build_rawrs_feature_bucket_summary(
     return pd.concat(summaries, ignore_index=True)
 
 
+def ensure_rawrs_realized_r(records: pd.DataFrame) -> pd.DataFrame:
+    """Return records with RAWRS-local realized R when it can be derived."""
+
+    output = records.copy(deep=True)
+    if "r_multiple" in output.columns or "realized_r" in output.columns:
+        return output
+    if "net_pnl" not in output.columns or "initial_risk_amount" not in output.columns:
+        return output
+
+    net_pnl = pd.to_numeric(output["net_pnl"], errors="coerce")
+    initial_risk = pd.to_numeric(output["initial_risk_amount"], errors="coerce")
+    safe_risk = initial_risk.where(initial_risk != 0)
+    output[RAWRS_REALIZED_R_COL] = net_pnl / safe_risk
+    return output
+
+
 def _usable_rawrs_feature_columns(
     records: pd.DataFrame,
     feature_cols: list[str] | None,
@@ -153,7 +173,8 @@ def _usable_rawrs_feature_columns(
         feature_cols = [
             column
             for column in records.columns
-            if column.startswith("rawrs_") and column != RAWRS_FEATURE_TIMESTAMP_COL
+            if column.startswith("rawrs_")
+            and column not in (RAWRS_FEATURE_TIMESTAMP_COL, RAWRS_REALIZED_R_COL)
         ]
 
     missing = [column for column in feature_cols if column not in records.columns]
@@ -169,3 +190,16 @@ def _usable_rawrs_feature_columns(
     if not usable:
         raise ValueError("no usable RAWRS feature columns found")
     return usable
+
+
+def _select_realized_r_column(
+    records: pd.DataFrame,
+    requested_r_col: str | None,
+) -> str | None:
+    if requested_r_col in ("r_multiple", "realized_r", RAWRS_REALIZED_R_COL):
+        if requested_r_col in records.columns:
+            return requested_r_col
+    for column in ("r_multiple", "realized_r", RAWRS_REALIZED_R_COL):
+        if column in records.columns:
+            return column
+    return None

@@ -583,7 +583,7 @@ def _build_feature_bucket_summary_if_possible(
     pnl_col = _first_existing_column(trade_diagnostics, ("net_pnl", "gross_pnl"))
     r_col = _first_existing_column(
         trade_diagnostics,
-        ("r_multiple", "realized_r", "reward_risk_ratio"),
+        ("r_multiple", "realized_r", "rawrs_realized_r"),
     )
     try:
         return build_rawrs_feature_bucket_summary(

@@ -306,6 +306,46 @@ def test_light_mode_end_to_end_writes_actual_rawrs_outputs(tmp_path) -> None:
     }
 
 
+def test_cli_path_computes_rawrs_realized_r_and_bucket_summary_uses_it(tmp_path) -> None:
+    strategy_dir = tmp_path / "strategy"
+    rawrs_dir = tmp_path / "rawrs"
+    strategy_dir.mkdir()
+    _write_required_files(strategy_dir, "light")
+    pd.DataFrame(
+        {
+            "trade_id": [1, 2],
+            "symbol": ["AAA", "AAA"],
+            "entry_date": ["2026-01-02", "2026-01-03"],
+            "exit_reason": ["target_hit", "stop_loss"],
+            "reward_risk_ratio": [2.0, 2.0],
+        }
+    ).to_csv(strategy_dir / "trade_log.csv", index=False)
+    pd.DataFrame(
+        {
+            "trade_id": [1, 2],
+            "symbol": ["AAA", "AAA"],
+            "entry_date": ["2026-01-02", "2026-01-03"],
+            "net_pnl": [100.0, -50.0],
+            "initial_risk_amount": [50.0, 100.0],
+            "reward_risk_ratio": [2.0, 2.0],
+        }
+    ).to_csv(strategy_dir / "trade_pnl_log.csv", index=False)
+
+    run_rawrs_diagnostics(
+        strategy_output_dir=strategy_dir,
+        output_dir=rawrs_dir,
+        mode="light",
+        loader=FakeLoader({"AAA": _ohlcv_frame(90)}),
+    )
+
+    trade_diagnostics = pd.read_csv(rawrs_dir / "rawrs_trade_diagnostics.csv")
+    bucket_summary = pd.read_csv(rawrs_dir / "rawrs_feature_bucket_summary.csv")
+
+    assert trade_diagnostics["rawrs_realized_r"].tolist() == [2.0, -0.5]
+    assert bucket_summary["mean_r"].tolist() != [2.0] * len(bucket_summary)
+    assert set(bucket_summary["mean_r"]) == {2.0, -0.5}
+
+
 def test_full_mode_end_to_end_writes_rejection_diagnostics(tmp_path) -> None:
     strategy_dir = tmp_path / "strategy"
     rawrs_dir = tmp_path / "rawrs"

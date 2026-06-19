@@ -7,6 +7,7 @@ import pandas as pd
 import pytest
 
 from veridian_quant.v2.intelligence.rawrs_exports import (
+    ensure_rawrs_realized_r,
     build_rawrs_feature_bucket_summary,
     build_rawrs_rejection_diagnostics,
     build_rawrs_signal_diagnostics,
@@ -186,6 +187,83 @@ def test_feature_bucket_summary_combines_per_feature_summaries() -> None:
     assert {"total_pnl", "mean_r", "outcome_win_rate"}.issubset(result.columns)
 
 
+def test_feature_bucket_summary_uses_r_multiple_when_available() -> None:
+    records = _bucket_records()
+    records["r_multiple"] = [10.0, 20.0, 30.0, 40.0]
+    records["realized_r"] = [1.0, 1.0, 1.0, 1.0]
+
+    result = build_rawrs_feature_bucket_summary(
+        records,
+        outcome_col="outcome",
+        feature_cols=["rawrs_micro_energy"],
+        buckets=2,
+    )
+
+    assert result["mean_r"].tolist() == [15.0, 35.0]
+
+
+def test_feature_bucket_summary_uses_realized_r_when_r_multiple_missing() -> None:
+    records = _bucket_records()
+    records["realized_r"] = [1.0, -0.5, 2.0, -1.5]
+
+    result = build_rawrs_feature_bucket_summary(
+        records,
+        outcome_col="outcome",
+        feature_cols=["rawrs_micro_energy"],
+        buckets=2,
+    )
+
+    assert result["mean_r"].tolist() == [0.25, 0.25]
+
+
+def test_ensure_rawrs_realized_r_computes_from_net_pnl_and_initial_risk() -> None:
+    records = pd.DataFrame(
+        {
+            "net_pnl": [100.0, -50.0, 25.0],
+            "initial_risk_amount": [50.0, 100.0, 0.0],
+        }
+    )
+    original = records.copy(deep=True)
+
+    result = ensure_rawrs_realized_r(records)
+
+    assert result["rawrs_realized_r"].iloc[0] == 2.0
+    assert result["rawrs_realized_r"].iloc[1] == -0.5
+    assert pd.isna(result["rawrs_realized_r"].iloc[2])
+    pd.testing.assert_frame_equal(records, original)
+
+
+def test_reward_risk_ratio_alone_is_not_used_as_realized_r() -> None:
+    records = _bucket_records()
+    records["reward_risk_ratio"] = [2.0, 2.0, 2.0, 2.0]
+
+    result = build_rawrs_feature_bucket_summary(
+        records,
+        outcome_col="outcome",
+        feature_cols=["rawrs_micro_energy"],
+        buckets=2,
+    )
+
+    assert "mean_r" not in result.columns
+    assert "median_r" not in result.columns
+
+
+def test_feature_bucket_summary_uses_computed_rawrs_realized_r() -> None:
+    records = _bucket_records()
+    records["net_pnl"] = [100.0, -50.0, 200.0, -150.0]
+    records["initial_risk_amount"] = [50.0, 100.0, 100.0, 300.0]
+    records["reward_risk_ratio"] = [2.0, 2.0, 2.0, 2.0]
+
+    result = build_rawrs_feature_bucket_summary(
+        records,
+        outcome_col="outcome",
+        feature_cols=["rawrs_micro_energy"],
+        buckets=2,
+    )
+
+    assert result["mean_r"].tolist() == [0.75, 0.75]
+
+
 def test_feature_bucket_summary_raises_when_no_usable_rawrs_features() -> None:
     records = pd.DataFrame(
         {
@@ -238,4 +316,13 @@ def _rawrs_frame(dates: list[str], micro_energy: list[float]) -> pd.DataFrame:
             "rawrs_fft_spectral_entropy": [value / 10.0 for value in micro_energy],
         },
         index=pd.to_datetime(dates),
+    )
+
+
+def _bucket_records() -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "outcome": ["win", "loss", "win", "loss"],
+            "rawrs_micro_energy": [1.0, 2.0, 3.0, 4.0],
+        }
     )

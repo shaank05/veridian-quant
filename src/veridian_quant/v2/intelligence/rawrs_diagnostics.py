@@ -24,9 +24,28 @@ def normalize_signal_timestamp_column(records: pd.DataFrame) -> pd.Series:
 
     for column in _SIGNAL_TIMESTAMP_COLUMNS:
         if column in records.columns:
-            return pd.to_datetime(records[column])
+            return normalize_rawrs_join_timestamp(records[column])
     candidates = ", ".join(_SIGNAL_TIMESTAMP_COLUMNS)
     raise ValueError(f"missing signal timestamp column; expected one of: {candidates}")
+
+
+def normalize_rawrs_join_timestamp(
+    values: pd.Series | pd.DatetimeIndex,
+) -> pd.Series | pd.DatetimeIndex:
+    """Return timezone-naive UTC timestamps for RAWRS as-of joins.
+
+    Timezone-aware inputs are converted to UTC and then made timezone-naive.
+    Timezone-naive inputs stay timezone-naive. Series preserve their index,
+    order, and name.
+    """
+
+    if isinstance(values, pd.DatetimeIndex):
+        normalized_index = pd.to_datetime(values, utc=True).tz_localize(None)
+        return pd.DatetimeIndex(normalized_index, name=values.name)
+
+    converted = pd.to_datetime(values, utc=True)
+    normalized = converted.dt.tz_localize(None)
+    return pd.Series(normalized, index=values.index, name=values.name)
 
 
 def attach_rawrs_features_at_signal_time(
@@ -47,7 +66,9 @@ def attach_rawrs_features_at_signal_time(
         return output
 
     features = rawrs_features.loc[:, feature_cols].copy(deep=True)
-    features.index = pd.to_datetime(features.index)
+    features.index = normalize_rawrs_join_timestamp(
+        pd.DatetimeIndex(features.index)
+    )
     features = features.loc[features.index.notna()]
     if features.empty:
         return output
@@ -246,7 +267,7 @@ def _signal_timestamps(
         return normalize_signal_timestamp_column(records)
     if signal_timestamp_col not in records.columns:
         raise ValueError(f"missing signal timestamp column: {signal_timestamp_col}")
-    return pd.to_datetime(records[signal_timestamp_col])
+    return normalize_rawrs_join_timestamp(records[signal_timestamp_col])
 
 
 def _rawrs_feature_columns(

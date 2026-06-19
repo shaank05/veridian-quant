@@ -148,6 +148,44 @@ def test_build_diagnostics_from_frames_attaches_rawrs_to_trade_records() -> None
     assert trade_diagnostics["rawrs_micro_energy"].tolist() == [1.0, 2.0]
 
 
+def test_build_diagnostics_from_frames_handles_utc_timestamps_without_merge_error() -> None:
+    frames = {
+        "signal_log.csv": pd.DataFrame(
+            {
+                "symbol": ["AAA"],
+                "generated_on": ["2026-01-02T00:00:00Z"],
+            }
+        ),
+        "trade_log.csv": pd.DataFrame(
+            {
+                "trade_id": [1],
+                "symbol": ["AAA"],
+                "entry_date": ["2026-01-02T00:00:00Z"],
+                "exit_reason": ["target_hit"],
+            }
+        ),
+        "trade_pnl_log.csv": pd.DataFrame(
+            {
+                "trade_id": [1],
+                "symbol": ["AAA"],
+                "entry_date": ["2026-01-02T00:00:00Z"],
+                "net_pnl": [100.0],
+                "r_multiple": [2.0],
+            }
+        ),
+    }
+    features = {"AAA": _rawrs_frame(["2026-01-02T00:00:00Z"], [1.0])}
+
+    result = build_rawrs_diagnostics_from_csv_frames(
+        frames,
+        features,
+        mode="light",
+    )
+
+    assert result["signal_diagnostics"].loc[0, "rawrs_micro_energy"] == 1.0
+    assert result["trade_diagnostics"].loc[0, "rawrs_micro_energy"] == 1.0
+
+
 def test_full_mode_attaches_rawrs_to_rejected_signals_when_present() -> None:
     frames = _csv_frames()
     frames["rejected_signals.csv"] = pd.DataFrame(

@@ -10,6 +10,7 @@ from veridian_quant.v2.intelligence.rawrs_diagnostics import (
     attach_rawrs_features_at_signal_time,
     attach_rawrs_features_by_symbol,
     bucket_rawrs_feature,
+    normalize_rawrs_join_timestamp,
     normalize_signal_timestamp_column,
     summarize_outcome_by_rawrs_bucket,
     summarize_rawrs_feature_by_outcome,
@@ -72,6 +73,58 @@ def test_no_future_leakage_for_records_before_first_feature() -> None:
     assert pd.isna(result.loc[0, "rawrs_feature_timestamp"])
     assert result.loc[1, "rawrs_micro_energy"] == 0.30
     assert result.loc[1, "rawrs_feature_timestamp"] == pd.Timestamp("2026-01-03")
+
+
+def test_timezone_aware_signal_timestamps_attach_to_naive_feature_index() -> None:
+    records = pd.DataFrame(
+        {"generated_on": pd.to_datetime(["2026-01-02 00:00:00+00:00"])}
+    )
+    rawrs = _rawrs_frame(["2026-01-02"], [0.25])
+
+    result = attach_rawrs_features_at_signal_time(records, rawrs)
+
+    assert result.loc[0, "rawrs_micro_energy"] == 0.25
+    assert result.loc[0, "rawrs_feature_timestamp"] == pd.Timestamp("2026-01-02")
+
+
+def test_timezone_naive_signal_timestamps_attach_to_aware_feature_index() -> None:
+    records = pd.DataFrame({"generated_on": ["2026-01-02"]})
+    rawrs = _rawrs_frame(["2026-01-02 00:00:00+00:00"], [0.25])
+
+    result = attach_rawrs_features_at_signal_time(records, rawrs)
+
+    assert result.loc[0, "rawrs_micro_energy"] == 0.25
+    assert result.loc[0, "rawrs_feature_timestamp"] == pd.Timestamp("2026-01-02")
+
+
+def test_both_timezone_aware_timestamps_attach_without_merge_dtype_error() -> None:
+    records = pd.DataFrame(
+        {"generated_on": pd.to_datetime(["2026-01-02 05:30:00+05:30"])}
+    )
+    rawrs = _rawrs_frame(["2026-01-02 00:00:00+00:00"], [0.25])
+
+    result = attach_rawrs_features_at_signal_time(records, rawrs)
+
+    assert result.loc[0, "rawrs_micro_energy"] == 0.25
+    assert result.loc[0, "rawrs_feature_timestamp"] == pd.Timestamp("2026-01-02")
+
+
+def test_timezone_normalization_preserves_series_index_and_returns_naive_utc() -> None:
+    values = pd.Series(
+        pd.to_datetime(["2026-01-02 05:30:00+05:30"]),
+        index=pd.Index(["row-a"], name="row"),
+        name="generated_on",
+    )
+
+    result = normalize_rawrs_join_timestamp(values)
+
+    expected = pd.Series(
+        pd.to_datetime(["2026-01-02 00:00:00"]),
+        index=values.index,
+        name="generated_on",
+    )
+    pd.testing.assert_series_equal(result, expected)
+    assert result.dt.tz is None
 
 
 def test_attachment_inputs_are_not_mutated() -> None:

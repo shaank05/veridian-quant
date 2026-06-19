@@ -37,6 +37,19 @@ Not allowed in Phase 30C:
 
 ---
 
+## Strategy Output Compatibility
+
+Phase 30F adds `docs/06_intelligence/i1_rawrs_strategy_output_compatibility.md` as the strategy output compatibility audit for future standalone RAWRS diagnostics.
+
+Future implementation should support:
+
+- Light RAWRS diagnostics from standard accepted-trade and signal/trade output files.
+- Full RAWRS diagnostics when rejected-signal, all-signal, capacity, and same-day candidate-pool diagnostic outputs are available and populated.
+
+Future RAWRS tooling should validate the selected mode against available strategy output files. Missing or empty rejected-signal/all-signal files must not be interpreted as no rejected opportunities.
+
+---
+
 ## Why This Is Diagnostics, Not Strategy Logic
 
 RAWRS diagnostics are descriptive research tools.
@@ -349,6 +362,7 @@ Phase 30C does not authorize:
 Related docs:
 
 - `docs/06_intelligence/i1_rawrs_market_structure_intelligence.md`
+- `docs/06_intelligence/i1_rawrs_strategy_output_compatibility.md`
 - `docs/00_foundation/v2_research_roadmap.md`
 - `docs/03_research/regime_models.md`
 - `docs/03_research/feature_ideas.md`

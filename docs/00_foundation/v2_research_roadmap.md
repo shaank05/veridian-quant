@@ -219,6 +219,19 @@ Outcome:
 - Does not implement ranking or overlays.
 - Does not change strategy or backtest behavior.
 
+### Phase 30F: I1 RAWRS Strategy Output Compatibility Audit
+
+Document how future standalone RAWRS diagnostics should consume existing S1/S2/S3/S4 strategy output folders.
+
+Outcome:
+
+- Docs-only audit in `docs/06_intelligence/i1_rawrs_strategy_output_compatibility.md`.
+- Defines light RAWRS diagnostics for standard accepted-trade and signal/trade outputs.
+- Defines full RAWRS diagnostics for runs with rejected-signal, all-signal, capacity, and same-day candidate-pool outputs available.
+- Establishes this compatibility audit as a prerequisite before standalone RAWRS CLI implementation.
+- Does not implement CLI behavior.
+- Does not change code, tests, strategy runners, standard exporters, backtesting logic, reports, or strategy behavior.
+
 ---
 
 ## Retained S2 Benchmarks

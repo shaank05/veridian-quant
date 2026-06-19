@@ -414,3 +414,19 @@ RAWRS must first prove whether features separate winners/losers and accepted/rej
 Consequence:
 
 Phase 30C is docs-only. Future work may create diagnostic outputs, but no trading behavior changes, ranking rules, overlays, strategy logic, diagnostics runner, or production component are authorized by this decision.
+
+---
+
+## 2026-06-18 - Audit Strategy Output Compatibility Before RAWRS CLI
+
+Decision:
+
+Audit S1/S2/S3/S4 output compatibility before implementing a standalone RAWRS CLI.
+
+Reason:
+
+Different runners and flags may produce different CSV availability, especially when all-signal diagnostics are skipped for speed.
+
+Consequence:
+
+Future RAWRS CLI design should support light and full diagnostic modes. It should validate required input files for the selected mode instead of assuming one universal output shape. Missing rejected-signal files must not be interpreted as no rejections, and empty all-signal files must not be interpreted as no opportunities without checking whether diagnostics were skipped.

@@ -14,6 +14,8 @@ These features are intended for diagnostics, ranking research, and future regime
 
 Phase 30C adds the signal-time diagnostic design in `docs/06_intelligence/i1_rawrs_signal_time_diagnostics.md`. That document defines how RAWRS features should be attached to accepted trades, rejected signals, and capacity-rejection cases before any ranking, overlay, or strategy implementation is considered.
 
+Phase 30F adds `docs/06_intelligence/i1_rawrs_strategy_output_compatibility.md` as a docs-only prerequisite for any future standalone RAWRS CLI design. It audits S1/S2/S3/S4 output compatibility and defines light versus full diagnostic modes based on available strategy output files.
+
 I1 RAWRS should help answer questions such as:
 
 - Why did accepted trades win or lose?
@@ -409,6 +411,7 @@ Related docs:
 - `docs/00_foundation/v2_design_document.md`
 - `docs/00_foundation/v2_research_roadmap.md`
 - `docs/06_intelligence/i1_rawrs_signal_time_diagnostics.md`
+- `docs/06_intelligence/i1_rawrs_strategy_output_compatibility.md`
 - `docs/03_research/feature_ideas.md`
 - `docs/03_research/regime_models.md`
 - `docs/03_research/portfolio_construction.md`

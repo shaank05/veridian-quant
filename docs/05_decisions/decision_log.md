@@ -430,3 +430,19 @@ Different runners and flags may produce different CSV availability, especially w
 Consequence:
 
 Future RAWRS CLI design should support light and full diagnostic modes. It should validate required input files for the selected mode instead of assuming one universal output shape. Missing rejected-signal files must not be interpreted as no rejections, and empty all-signal files must not be interpreted as no opportunities without checking whether diagnostics were skipped.
+
+---
+
+## 2026-06-18 - Implement RAWRS Diagnostics As Standalone CLI
+
+Decision:
+
+Implement RAWRS diagnostics as a standalone CLI with light/full mode validation before any S1/S2/S3/S4 runner integration.
+
+Reason:
+
+Strategy outputs differ by runner and diagnostic-skip flags. A standalone validation layer reduces coupling, keeps RAWRS optional, and protects existing strategy behavior.
+
+Consequence:
+
+RAWRS diagnostics can be run separately from strategy backtests. Runner integration remains deferred. The CLI should consume existing output folders, validate required files, warn on optional or incomplete inputs, write RAWRS outputs separately, and avoid changing PnL, trades, exits, sizing, rejected signals, capacity, or strategy behavior.

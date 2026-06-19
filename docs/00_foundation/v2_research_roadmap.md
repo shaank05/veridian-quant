@@ -232,6 +232,20 @@ Outcome:
 - Does not implement CLI behavior.
 - Does not change code, tests, strategy runners, standard exporters, backtesting logic, reports, or strategy behavior.
 
+### Phase 30G: I1 RAWRS Standalone Diagnostic CLI
+
+Implement a standalone RAWRS diagnostic CLI that consumes existing strategy output folders without rerunning backtests.
+
+Outcome:
+
+- Adds `src/veridian_quant/v2/run_rawrs_diagnostics.py`.
+- Adds light/full mode validation for existing strategy output CSVs.
+- Reads strategy output CSVs without modifying them.
+- Writes RAWRS diagnostic outputs only through standalone RAWRS export helpers when precomputed RAWRS feature frames are provided.
+- Defers external OHLCV loading until a clean project-approved file/data source is defined.
+- Does not integrate into S1/S2/S3/S4 runners.
+- Does not change strategy behavior, backtest behavior, standard exporters, portfolio logic, PnL, trades, exits, sizing, rejected signals, or capacity.
+
 ---
 
 ## Retained S2 Benchmarks

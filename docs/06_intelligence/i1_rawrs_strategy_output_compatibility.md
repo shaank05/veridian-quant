@@ -27,6 +27,10 @@ Not allowed:
 - No report generation.
 - No changes to PnL, trades, exits, sizing, rejected signals, capacity, or strategy behavior.
 
+Phase 30G adds `src/veridian_quant/v2/run_rawrs_diagnostics.py` as a standalone RAWRS diagnostic CLI. The Phase 30G CLI supports light/full input validation, CSV reading, and reusable precomputed-feature diagnostic/export helpers. It does not integrate with S1/S2/S3/S4 runners and does not rerun backtests.
+
+The standalone OHLCV loading hook is deferred. Until a clean file-based or project-approved OHLCV source is defined for this CLI, RAWRS feature attachment should use the internal precomputed `rawrs_features_by_symbol` helper path.
+
 ## Why Compatibility Audit Is Needed Before RAWRS CLI
 
 The existing S1/S2/S3/S4 runners share the standard portfolio CSV exporter, but they do not expose identical CLI flags. S2, S3, and S4 support `--skip-all-signal-diagnostics`; S1 does not currently expose that flag.
@@ -308,7 +312,7 @@ Future RAWRS diagnostics should:
 
 ## Recommended Future CLI Behavior
 
-A future standalone RAWRS CLI should:
+The Phase 30G standalone RAWRS CLI establishes the validation layer. Future extensions should:
 
 - Accept a strategy output directory.
 - Accept an OHLCV source or precomputed RAWRS feature source.
@@ -321,6 +325,15 @@ A future standalone RAWRS CLI should:
 - Never modify existing strategy outputs.
 - Write RAWRS outputs to a separate output directory.
 - Avoid integration into S1/S2/S3/S4 runners until standalone evidence justifies it.
+
+Current Phase 30G status:
+
+- Light/full required-file validation is implemented.
+- Missing optional-file warnings are implemented.
+- Empty full-mode row-level file detection is implemented.
+- CSV reading from the strategy output directory is implemented.
+- Precomputed-feature diagnostic build/export helpers are implemented.
+- External OHLCV loading remains deferred.
 
 ## Guardrails
 

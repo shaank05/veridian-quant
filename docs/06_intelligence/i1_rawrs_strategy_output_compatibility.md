@@ -27,9 +27,9 @@ Not allowed:
 - No report generation.
 - No changes to PnL, trades, exits, sizing, rejected signals, capacity, or strategy behavior.
 
-Phase 30G adds `src/veridian_quant/v2/run_rawrs_diagnostics.py` as a standalone RAWRS diagnostic CLI. The Phase 30G CLI supports light/full input validation, CSV reading, and reusable precomputed-feature diagnostic/export helpers. It does not integrate with S1/S2/S3/S4 runners and does not rerun backtests.
+Phase 30G adds `src/veridian_quant/v2/run_rawrs_diagnostics.py` as a standalone RAWRS diagnostic CLI. The Phase 30G CLI supports light/full input validation, CSV reading, symbol/date inference, DB-backed OHLCV loading through the existing v2 data loader convention, RAWRS feature computation, diagnostic attachment, and standalone RAWRS CSV export. It does not integrate with S1/S2/S3/S4 runners and does not rerun backtests.
 
-The standalone OHLCV loading hook is deferred. Until a clean file-based or project-approved OHLCV source is defined for this CLI, RAWRS feature attachment should use the internal precomputed `rawrs_features_by_symbol` helper path.
+The CLI reuses the existing `SQLAlchemyDailyOHLCVLoader` plus `DatabaseClient().get_engine()` convention used by strategy CLIs. The internal precomputed `rawrs_features_by_symbol` helper path remains available for tests and future programmatic use.
 
 ## Why Compatibility Audit Is Needed Before RAWRS CLI
 
@@ -332,8 +332,10 @@ Current Phase 30G status:
 - Missing optional-file warnings are implemented.
 - Empty full-mode row-level file detection is implemented.
 - CSV reading from the strategy output directory is implemented.
-- Precomputed-feature diagnostic build/export helpers are implemented.
-- External OHLCV loading remains deferred.
+- Symbol and date-range inference from strategy outputs is implemented.
+- DB-backed OHLCV loading is implemented using the existing v2 data loader convention.
+- RAWRS feature computation and diagnostic CSV export are implemented.
+- Precomputed-feature diagnostic build/export helpers remain available.
 
 ## Guardrails
 

@@ -11,10 +11,15 @@ from veridian_quant.v2.run_rawrs_diagnostics import (
     FULL_REQUIRED_FILES,
     LIGHT_REQUIRED_FILES,
     build_rawrs_diagnostics_from_csv_frames,
+    compute_rawrs_features_by_symbol,
+    infer_rawrs_date_range,
+    infer_rawrs_symbols,
+    load_rawrs_ohlcv_by_symbol,
     main,
     optional_rawrs_input_files,
     read_rawrs_input_csvs,
     required_files_for_mode,
+    run_rawrs_diagnostics,
     run_rawrs_diagnostics_from_frames,
     validate_rawrs_input_directory,
 )
@@ -93,6 +98,28 @@ def test_csv_reader_loads_expected_files_and_ignores_absent_optional_files(tmp_p
     assert frames["signal_log.csv"].loc[0, "symbol"] == "AAA"
 
 
+def test_infer_symbols_from_signal_trade_and_rejection_frames() -> None:
+    frames = _csv_frames()
+    frames["rejected_signals.csv"] = pd.DataFrame(
+        {"symbol": ["CCC"], "signal_date": ["2026-01-04"], "reason": ["CAPACITY"]}
+    )
+
+    assert infer_rawrs_symbols(frames, mode="light") == ["AAA", "BBB"]
+    assert infer_rawrs_symbols(frames, mode="full") == ["AAA", "BBB", "CCC"]
+
+
+def test_infer_date_range_from_available_timestamp_columns() -> None:
+    frames = _csv_frames()
+    frames["rejected_signals.csv"] = pd.DataFrame(
+        {"symbol": ["CCC"], "signal_date": ["2026-01-05"], "reason": ["CAPACITY"]}
+    )
+
+    assert infer_rawrs_date_range(frames, mode="full") == (
+        pd.Timestamp("2026-01-02").date(),
+        pd.Timestamp("2026-01-05").date(),
+    )
+
+
 def test_build_diagnostics_from_frames_attaches_rawrs_to_signal_log() -> None:
     frames = _csv_frames()
 
@@ -162,6 +189,36 @@ def test_unknown_symbols_produce_nan_rawrs_features_not_crashes() -> None:
     assert np.isnan(signal_diagnostics.loc[1, "rawrs_micro_energy"])
 
 
+def test_ohlcv_loading_with_fake_loader_warns_missing_symbol() -> None:
+    loaded, missing = load_rawrs_ohlcv_by_symbol(
+        ["AAA", "ZZZ"],
+        pd.Timestamp("2026-01-01").date(),
+        pd.Timestamp("2026-01-10").date(),
+        loader=FakeLoader({"AAA": _ohlcv_frame(80)}),
+    )
+
+    assert set(loaded) == {"AAA"}
+    assert missing == ["ZZZ"]
+
+
+def test_ohlcv_loading_raises_when_no_symbols_loadable() -> None:
+    with pytest.raises(ValueError, match="no OHLCV data could be loaded"):
+        load_rawrs_ohlcv_by_symbol(
+            ["ZZZ"],
+            pd.Timestamp("2026-01-01").date(),
+            pd.Timestamp("2026-01-10").date(),
+            loader=FakeLoader({}),
+        )
+
+
+def test_rawrs_feature_computation_by_symbol_uses_synthetic_ohlcv() -> None:
+    result = compute_rawrs_features_by_symbol({"AAA": _ohlcv_frame(80)})
+
+    assert "AAA" in result
+    assert "rawrs_micro_energy" in result["AAA"].columns
+    assert result["AAA"].index.equals(pd.date_range("2025-11-01", periods=80))
+
+
 def test_diagnostic_outputs_are_written_to_separate_output_dir(tmp_path) -> None:
     strategy_dir = tmp_path / "strategy"
     rawrs_dir = tmp_path / "rawrs"
@@ -183,6 +240,74 @@ def test_diagnostic_outputs_are_written_to_separate_output_dir(tmp_path) -> None
     assert (strategy_dir / "signal_log.csv").read_text() == original_signal_log
 
 
+def test_light_mode_end_to_end_writes_actual_rawrs_outputs(tmp_path) -> None:
+    strategy_dir = tmp_path / "strategy"
+    rawrs_dir = tmp_path / "rawrs"
+    strategy_dir.mkdir()
+    _write_required_files(strategy_dir, "light")
+    _frame_for_filename("trade_log.csv").to_csv(strategy_dir / "trade_log.csv", index=False)
+    _frame_for_filename("trade_pnl_log.csv").to_csv(
+        strategy_dir / "trade_pnl_log.csv",
+        index=False,
+    )
+
+    result = run_rawrs_diagnostics(
+        strategy_output_dir=strategy_dir,
+        output_dir=rawrs_dir,
+        mode="light",
+        loader=FakeLoader({"AAA": _ohlcv_frame(90)}),
+    )
+
+    assert (rawrs_dir / "rawrs_signal_diagnostics.csv").exists()
+    assert (rawrs_dir / "rawrs_trade_diagnostics.csv").exists()
+    assert (rawrs_dir / "rawrs_feature_bucket_summary.csv").exists()
+    assert set(result.generated_paths) >= {
+        "signal_diagnostics",
+        "trade_diagnostics",
+        "feature_bucket_summary",
+    }
+
+
+def test_full_mode_end_to_end_writes_rejection_diagnostics(tmp_path) -> None:
+    strategy_dir = tmp_path / "strategy"
+    rawrs_dir = tmp_path / "rawrs"
+    strategy_dir.mkdir()
+    _write_required_files(strategy_dir, "full")
+
+    result = run_rawrs_diagnostics(
+        strategy_output_dir=strategy_dir,
+        output_dir=rawrs_dir,
+        mode="full",
+        loader=FakeLoader({"AAA": _ohlcv_frame(90)}),
+    )
+
+    assert (rawrs_dir / "rawrs_rejection_diagnostics.csv").exists()
+    assert "rejection_diagnostics" in result.generated_paths
+
+
+def test_missing_ohlcv_for_one_symbol_warns_and_outputs_nan(tmp_path) -> None:
+    strategy_dir = tmp_path / "strategy"
+    rawrs_dir = tmp_path / "rawrs"
+    strategy_dir.mkdir()
+    _write_required_files(strategy_dir, "light")
+    signal_log = pd.DataFrame(
+        {"symbol": ["AAA", "ZZZ"], "generated_on": ["2026-01-02", "2026-01-02"]}
+    )
+    signal_log.to_csv(strategy_dir / "signal_log.csv", index=False)
+
+    result = run_rawrs_diagnostics(
+        strategy_output_dir=strategy_dir,
+        output_dir=rawrs_dir,
+        mode="light",
+        loader=FakeLoader({"AAA": _ohlcv_frame(90)}),
+    )
+    diagnostics = pd.read_csv(rawrs_dir / "rawrs_signal_diagnostics.csv")
+
+    assert result.symbols_missing == ["ZZZ"]
+    assert any("missing OHLCV data" in warning for warning in result.warnings)
+    assert pd.isna(diagnostics.loc[diagnostics["symbol"] == "ZZZ", "rawrs_micro_energy"]).all()
+
+
 def test_main_returns_nonzero_for_missing_required_files(tmp_path) -> None:
     output_dir = tmp_path / "rawrs"
 
@@ -200,11 +325,15 @@ def test_main_returns_nonzero_for_missing_required_files(tmp_path) -> None:
     assert exit_code == 1
 
 
-def test_main_does_not_modify_strategy_output_files(tmp_path) -> None:
+def test_main_does_not_modify_strategy_output_files(monkeypatch, tmp_path) -> None:
     strategy_dir = tmp_path / "strategy"
     output_dir = tmp_path / "rawrs"
     strategy_dir.mkdir()
     _write_required_files(strategy_dir, "light")
+    monkeypatch.setattr(
+        "veridian_quant.v2.run_rawrs_diagnostics._create_default_ohlcv_loader",
+        lambda lookback_buffer_days: FakeLoader({"AAA": _ohlcv_frame(90)}),
+    )
     before = {
         path.name: path.read_text()
         for path in strategy_dir.iterdir()
@@ -229,6 +358,7 @@ def test_main_does_not_modify_strategy_output_files(tmp_path) -> None:
     }
     assert exit_code == 0
     assert after == before
+    assert (output_dir / "rawrs_signal_diagnostics.csv").exists()
 
 
 def test_no_import_dependency_on_strategy_runner_modules() -> None:
@@ -333,11 +463,22 @@ def _frame_for_filename(filename: str) -> pd.DataFrame:
         return pd.DataFrame({"symbol": ["AAA"], "generated_on": ["2026-01-02"]})
     if filename == "trade_log.csv":
         return pd.DataFrame(
-            {"trade_id": [1], "symbol": ["AAA"], "entry_date": ["2026-01-02"]}
+            {
+                "trade_id": [1, 2],
+                "symbol": ["AAA", "AAA"],
+                "entry_date": ["2026-01-02", "2026-01-03"],
+                "exit_reason": ["target_hit", "stop_loss"],
+            }
         )
     if filename == "trade_pnl_log.csv":
         return pd.DataFrame(
-            {"trade_id": [1], "symbol": ["AAA"], "entry_date": ["2026-01-02"]}
+            {
+                "trade_id": [1, 2],
+                "symbol": ["AAA", "AAA"],
+                "entry_date": ["2026-01-02", "2026-01-03"],
+                "net_pnl": [100.0, -50.0],
+                "r_multiple": [2.0, -1.0],
+            }
         )
     if filename == "rejected_signals.csv":
         return pd.DataFrame(
@@ -350,3 +491,28 @@ def _frame_for_filename(filename: str) -> pd.DataFrame:
     if filename == "same_day_candidate_pool_summary.csv":
         return pd.DataFrame({"signal_date": ["2026-01-02"], "candidates": [1]})
     return pd.DataFrame({"value": [1]})
+
+
+def _ohlcv_frame(periods: int) -> pd.DataFrame:
+    dates = pd.date_range("2025-11-01", periods=periods)
+    closes = [100.0 + index for index in range(periods)]
+    return pd.DataFrame(
+        {
+            "date": dates,
+            "open": closes,
+            "high": [value + 1.0 for value in closes],
+            "low": [value - 1.0 for value in closes],
+            "close": closes,
+            "volume": [1000] * periods,
+        }
+    )
+
+
+class FakeLoader:
+    def __init__(self, data_by_symbol: dict[str, pd.DataFrame]) -> None:
+        self.data_by_symbol = data_by_symbol
+
+    def load_symbol(self, symbol, start_date, end_date):
+        if symbol not in self.data_by_symbol:
+            return pd.DataFrame()
+        return self.data_by_symbol[symbol]

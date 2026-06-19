@@ -6,11 +6,14 @@ strategy backtests, import S1/S2/S3/S4 runners, or modify source outputs.
 
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Mapping
 
 import pandas as pd
 
+from veridian_quant.v2.data.loaders import SQLAlchemyDailyOHLCVLoader
+from veridian_quant.v2.intelligence.rawrs import rawrs_feature_frame
 from veridian_quant.v2.intelligence.rawrs_exports import (
     build_rawrs_feature_bucket_summary,
     build_rawrs_rejection_diagnostics,
@@ -56,6 +59,7 @@ FULL_ROW_LEVEL_FILES = [
     "same_day_candidate_pool_summary.csv",
 ]
 VALID_MODES = ("light", "full")
+DEFAULT_LOOKBACK_BUFFER_DAYS = 365
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,6 +75,20 @@ class RawrsInputValidationResult:
     empty_required_files: list[str]
     warnings: list[str]
     is_valid: bool
+
+
+@dataclass(frozen=True, slots=True)
+class RawrsRunResult:
+    """Result summary for a standalone RAWRS diagnostic run."""
+
+    mode: str
+    strategy_output_dir: Path
+    output_dir: Path
+    generated_paths: dict[str, Path]
+    warnings: list[str]
+    symbols_requested: list[str]
+    symbols_loaded: list[str]
+    symbols_missing: list[str]
 
 
 def required_files_for_mode(mode: str) -> list[str]:
@@ -192,11 +210,12 @@ def build_rawrs_diagnostics_from_csv_frames(
         )
 
     trade_log = csv_frames.get("trade_log.csv")
-    if trade_log is not None and _has_trade_timestamp_compatibility(trade_log):
+    trade_records = _trade_records_for_diagnostics(csv_frames)
+    if trade_records is not None and _has_trade_timestamp_compatibility(trade_records):
         diagnostics["trade_diagnostics"] = build_rawrs_trade_diagnostics(
-            trade_log,
+            trade_records,
             rawrs_features_by_symbol,
-            signal_timestamp_col=_trade_timestamp_col(trade_log),
+            signal_timestamp_col=_trade_timestamp_col(trade_records),
         )
 
     rejected_signals = csv_frames.get("rejected_signals.csv")
@@ -212,6 +231,154 @@ def build_rawrs_diagnostics_from_csv_frames(
         diagnostics["feature_bucket_summary"] = feature_bucket_summary
 
     return diagnostics
+
+
+def infer_rawrs_symbols(
+    csv_frames: dict[str, pd.DataFrame],
+    *,
+    mode: str,
+) -> list[str]:
+    """Infer symbols needing RAWRS features from strategy output CSV frames."""
+
+    required_files_for_mode(mode)
+    symbols: set[str] = set()
+    for filename in _symbol_source_files(mode):
+        frame = csv_frames.get(filename)
+        if frame is None or "symbol" not in frame.columns:
+            continue
+        symbols.update(str(symbol).strip().upper() for symbol in frame["symbol"].dropna())
+    return sorted(symbol for symbol in symbols if symbol)
+
+
+def infer_rawrs_date_range(
+    csv_frames: dict[str, pd.DataFrame],
+    *,
+    mode: str,
+) -> tuple[date, date]:
+    """Infer the RAWRS OHLCV date range needed for loaded strategy outputs."""
+
+    required_files_for_mode(mode)
+    timestamps: list[pd.Timestamp] = []
+    for filename, columns in _timestamp_source_columns(mode).items():
+        frame = csv_frames.get(filename)
+        if frame is None:
+            continue
+        for column in columns:
+            if column not in frame.columns:
+                continue
+            values = pd.to_datetime(frame[column], errors="coerce").dropna()
+            timestamps.extend(values.tolist())
+    if not timestamps:
+        raise ValueError("could not infer RAWRS date range from strategy output CSVs")
+    return min(timestamps).date(), max(timestamps).date()
+
+
+def load_rawrs_ohlcv_by_symbol(
+    symbols: Iterable[str],
+    start_date: date,
+    end_date: date,
+    *,
+    loader: object | None = None,
+    lookback_buffer_days: int = DEFAULT_LOOKBACK_BUFFER_DAYS,
+) -> tuple[dict[str, pd.DataFrame], list[str]]:
+    """Load OHLCV data for symbols using the existing v2 DB loader convention."""
+
+    symbol_list = [str(symbol).strip().upper() for symbol in symbols if str(symbol).strip()]
+    data_loader = loader or _create_default_ohlcv_loader(
+        lookback_buffer_days=lookback_buffer_days
+    )
+    loaded: dict[str, pd.DataFrame] = {}
+    missing: list[str] = []
+    for symbol in symbol_list:
+        try:
+            data = data_loader.load_symbol(symbol, start_date, end_date)
+        except Exception:
+            missing.append(symbol)
+            continue
+        if data is None or data.empty:
+            missing.append(symbol)
+            continue
+        loaded[symbol] = data
+    if not loaded:
+        raise ValueError("no OHLCV data could be loaded for requested RAWRS symbols")
+    return loaded, missing
+
+
+def compute_rawrs_features_by_symbol(
+    ohlcv_by_symbol: Mapping[str, pd.DataFrame],
+) -> dict[str, pd.DataFrame]:
+    """Compute RAWRS feature frames for loaded OHLCV data by symbol."""
+
+    features: dict[str, pd.DataFrame] = {}
+    for symbol, data in ohlcv_by_symbol.items():
+        feature_input = data.copy(deep=True)
+        if "date" in feature_input.columns:
+            feature_input["date"] = pd.to_datetime(feature_input["date"])
+            feature_input = feature_input.set_index("date")
+        feature_input = feature_input.sort_index()
+        features[symbol] = rawrs_feature_frame(feature_input)
+    return features
+
+
+def run_rawrs_diagnostics(
+    *,
+    strategy_output_dir: str | Path,
+    output_dir: str | Path,
+    mode: str,
+    loader: object | None = None,
+    lookback_buffer_days: int = DEFAULT_LOOKBACK_BUFFER_DAYS,
+) -> RawrsRunResult:
+    """Run standalone RAWRS diagnostics from an existing strategy output folder."""
+
+    strategy_dir = Path(strategy_output_dir)
+    rawrs_output_dir = Path(output_dir)
+    validation = validate_rawrs_input_directory(strategy_dir, mode)
+    warnings = list(validation.warnings)
+    if not validation.is_valid:
+        _raise_validation_error(validation)
+
+    csv_frames = read_rawrs_input_csvs(strategy_dir, validation)
+    symbols = infer_rawrs_symbols(csv_frames, mode=mode)
+    if not symbols:
+        raise ValueError("no symbols found in strategy output CSVs")
+    start_date, end_date = infer_rawrs_date_range(csv_frames, mode=mode)
+
+    trade_records = _trade_records_for_diagnostics(csv_frames)
+    trade_timestamp = _trade_timestamp_col(trade_records) if trade_records is not None else None
+    if trade_timestamp == "entry_date":
+        warnings.append(
+            "trade diagnostics are entry-time aligned because original signal "
+            "timestamps were unavailable in trade records"
+        )
+
+    ohlcv_by_symbol, missing_symbols = load_rawrs_ohlcv_by_symbol(
+        symbols,
+        start_date,
+        end_date,
+        loader=loader,
+        lookback_buffer_days=lookback_buffer_days,
+    )
+    if missing_symbols:
+        warnings.append(
+            "missing OHLCV data for symbols: " + ", ".join(sorted(missing_symbols))
+        )
+    rawrs_features = compute_rawrs_features_by_symbol(ohlcv_by_symbol)
+    generated_paths = run_rawrs_diagnostics_from_frames(
+        csv_frames=csv_frames,
+        rawrs_features_by_symbol=rawrs_features,
+        output_dir=rawrs_output_dir,
+        mode=mode,
+    )
+    return RawrsRunResult(
+        mode=mode,
+        strategy_output_dir=strategy_dir,
+        output_dir=rawrs_output_dir,
+        generated_paths=generated_paths,
+        warnings=warnings,
+        symbols_requested=symbols,
+        symbols_loaded=sorted(rawrs_features),
+        symbols_missing=sorted(missing_symbols),
+    )
 
 
 def run_rawrs_diagnostics_from_frames(
@@ -241,43 +408,29 @@ def parse_args(argv: Iterable[str] | None = None) -> Namespace:
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--mode", required=True, choices=VALID_MODES)
     parser.add_argument("--feature-prefix", default="rawrs_")
+    parser.add_argument(
+        "--lookback-buffer-days",
+        default=DEFAULT_LOOKBACK_BUFFER_DAYS,
+        type=int,
+    )
     return parser.parse_args(list(argv) if argv is not None else None)
 
 
 def main(argv: Iterable[str] | None = None) -> int:
-    """Validate strategy outputs for standalone RAWRS diagnostics."""
+    """Run standalone RAWRS diagnostics from existing strategy outputs."""
 
     args = parse_args(argv)
-    validation = validate_rawrs_input_directory(
-        Path(args.strategy_output_dir),
-        args.mode,
-    )
-    for warning in validation.warnings:
-        print(f"WARNING: {warning}")
-    if not validation.is_valid:
-        if validation.missing_required_files:
-            print(
-                "ERROR: missing required RAWRS input files: "
-                + ", ".join(validation.missing_required_files)
-            )
-        empty_full_files = [
-            filename
-            for filename in validation.empty_required_files
-            if filename in FULL_ROW_LEVEL_FILES
-        ]
-        if empty_full_files:
-            print(
-                "ERROR: full-mode row-level files are empty: "
-                + ", ".join(empty_full_files)
-            )
+    try:
+        result = run_rawrs_diagnostics(
+            strategy_output_dir=args.strategy_output_dir,
+            output_dir=args.output_dir,
+            mode=args.mode,
+            lookback_buffer_days=args.lookback_buffer_days,
+        )
+    except Exception as error:
+        print(f"ERROR: {error}")
         return 1
-
-    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
-    read_rawrs_input_csvs(Path(args.strategy_output_dir), validation)
-    print(
-        "RAWRS input validation passed. External OHLCV/feature loading is deferred; "
-        "use run_rawrs_diagnostics_from_frames with precomputed RAWRS features."
-    )
+    _print_run_summary(result)
     return 0
 
 
@@ -305,6 +458,112 @@ def _trade_timestamp_col(trade_log: pd.DataFrame) -> str | None:
         if column in trade_log.columns:
             return column
     return None
+
+
+def _symbol_source_files(mode: str) -> tuple[str, ...]:
+    if mode == "full":
+        return ("signal_log.csv", "trade_log.csv", "trade_pnl_log.csv", "rejected_signals.csv")
+    return ("signal_log.csv", "trade_log.csv", "trade_pnl_log.csv")
+
+
+def _timestamp_source_columns(mode: str) -> dict[str, tuple[str, ...]]:
+    columns = {
+        "signal_log.csv": ("generated_on", "signal_date", "date", "timestamp"),
+        "trade_log.csv": (
+            "signal_date",
+            "generated_on",
+            "entry_signal_date",
+            "entry_date",
+        ),
+        "trade_pnl_log.csv": (
+            "signal_date",
+            "generated_on",
+            "entry_signal_date",
+            "entry_date",
+        ),
+    }
+    if mode == "full":
+        columns["rejected_signals.csv"] = ("signal_date", "generated_on", "date")
+    return columns
+
+
+def _trade_records_for_diagnostics(
+    csv_frames: dict[str, pd.DataFrame],
+) -> pd.DataFrame | None:
+    trade_log = csv_frames.get("trade_log.csv")
+    if trade_log is None:
+        return None
+    trade_records = trade_log.copy(deep=True)
+    trade_pnls = csv_frames.get("trade_pnl_log.csv")
+    if (
+        trade_pnls is not None
+        and "trade_id" in trade_records.columns
+        and "trade_id" in trade_pnls.columns
+    ):
+        pnl_columns = [
+            column
+            for column in trade_pnls.columns
+            if column == "trade_id" or column not in trade_records.columns
+        ]
+        trade_records = trade_records.merge(
+            trade_pnls.loc[:, pnl_columns],
+            on="trade_id",
+            how="left",
+        )
+    return trade_records
+
+
+def _create_default_ohlcv_loader(
+    *,
+    lookback_buffer_days: int,
+) -> SQLAlchemyDailyOHLCVLoader:
+    try:
+        from src.veridian_quant.data.db_client import DatabaseClient
+    except ImportError as error:
+        raise RuntimeError(
+            "Could not import src.veridian_quant.data.db_client.DatabaseClient"
+        ) from error
+
+    engine = DatabaseClient().get_engine()
+    if engine is None:
+        raise RuntimeError("DatabaseClient().get_engine() returned None")
+    return SQLAlchemyDailyOHLCVLoader(
+        engine=engine,
+        lookback_buffer_days=lookback_buffer_days,
+    )
+
+
+def _raise_validation_error(validation: RawrsInputValidationResult) -> None:
+    messages: list[str] = []
+    if validation.missing_required_files:
+        messages.append(
+            "missing required RAWRS input files: "
+            + ", ".join(validation.missing_required_files)
+        )
+    empty_full_files = [
+        filename
+        for filename in validation.empty_required_files
+        if filename in FULL_ROW_LEVEL_FILES
+    ]
+    if empty_full_files:
+        messages.append(
+            "full-mode row-level files are empty: " + ", ".join(empty_full_files)
+        )
+    raise ValueError("; ".join(messages) or "RAWRS input validation failed")
+
+
+def _print_run_summary(result: RawrsRunResult) -> None:
+    for warning in result.warnings:
+        print(f"WARNING: {warning}")
+    print(f"mode: {result.mode}")
+    print(f"strategy_output_dir: {result.strategy_output_dir}")
+    print(f"rawrs_output_dir: {result.output_dir}")
+    print("symbols_requested: " + ", ".join(result.symbols_requested))
+    print("symbols_loaded: " + ", ".join(result.symbols_loaded))
+    print("symbols_missing: " + ", ".join(result.symbols_missing))
+    print("files_generated:")
+    for name, path in sorted(result.generated_paths.items()):
+        print(f"  {name}: {path}")
 
 
 def _build_feature_bucket_summary_if_possible(

@@ -41,7 +41,7 @@ Not allowed in Phase 30C:
 
 Phase 30F adds `docs/06_intelligence/i1_rawrs_strategy_output_compatibility.md` as the strategy output compatibility audit for future standalone RAWRS diagnostics.
 
-Phase 30G adds the standalone RAWRS diagnostic CLI in `src/veridian_quant/v2/run_rawrs_diagnostics.py`. The CLI validates existing strategy output folders in `light` or `full` mode and provides reusable helpers for building RAWRS diagnostics from already-loaded CSV frames plus precomputed RAWRS feature frames.
+Phase 30G adds the standalone RAWRS diagnostic CLI in `src/veridian_quant/v2/run_rawrs_diagnostics.py`. The CLI validates existing strategy output folders in `light` or `full` mode, infers required symbols and dates, loads DB-backed OHLCV data through the existing v2 data loader convention, computes RAWRS feature frames, and writes standalone RAWRS diagnostic CSVs.
 
 Future implementation should support:
 
@@ -50,7 +50,7 @@ Future implementation should support:
 
 Future RAWRS tooling should validate the selected mode against available strategy output files. Missing or empty rejected-signal/all-signal files must not be interpreted as no rejected opportunities.
 
-Standalone OHLCV loading for the CLI is deferred until a clean project-approved data source is defined. The Phase 30G path therefore separates compatibility validation from feature-frame attachment.
+The precomputed-feature helper path remains available for programmatic tests and future integrations, but the CLI itself now runs end to end when the existing database-backed OHLCV source is available.
 
 ---
 

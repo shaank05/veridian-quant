@@ -352,6 +352,72 @@ def test_input_dataframes_are_not_mutated(monkeypatch) -> None:
         pd.testing.assert_frame_equal(data_by_symbol[symbol], original)
 
 
+def test_rawrs_overlay_is_not_computed_when_disabled(monkeypatch) -> None:
+    _patch_signals(monkeypatch, {"AAA": [_signal("AAA", date(2026, 1, 15))]})
+    monkeypatch.setattr(
+        "veridian_quant.v2.backtesting.s3_portfolio_runner."
+        "build_rawrs_overlay_feature_frame",
+        lambda data: (_ for _ in ()).throw(AssertionError("must stay disabled")),
+    )
+    result = run_s3_portfolio_backtest(
+        {"AAA": _trade_frame()},
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+    )
+    assert len(result.trades) == 1
+    assert "rawrs_overlay_enabled" not in result.signals[0].metadata
+
+
+def test_rawrs_overlay_rejects_low_percentile_before_portfolio_flow(monkeypatch) -> None:
+    _patch_signals(monkeypatch, {"AAA": [_signal("AAA", date(2026, 1, 15))]})
+    _patch_rawrs_overlay_features(monkeypatch, list(range(31, 0, -1)))
+    result = run_s3_portfolio_backtest(
+        {"AAA": _trade_frame()},
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+        max_concurrent_positions=0,
+        enable_rawrs_overlay=True,
+        rawrs_percentile_lookback=10,
+        rawrs_min_observations=10,
+    )
+    assert result.trades == ()
+    assert _rejection_reasons(result) == ["RAWRS_OVERLAY_REJECTED"]
+    assert result.signals[0].metadata["rawrs_overlay_decision"] == "REJECT"
+
+
+def test_rawrs_overlay_allows_value_above_threshold(monkeypatch) -> None:
+    _patch_signals(monkeypatch, {"AAA": [_signal("AAA", date(2026, 1, 15))]})
+    _patch_rawrs_overlay_features(monkeypatch, list(range(1, 32)))
+    result = run_s3_portfolio_backtest(
+        {"AAA": _trade_frame()},
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+        enable_rawrs_overlay=True,
+        rawrs_percentile_lookback=10,
+        rawrs_min_observations=10,
+    )
+    assert len(result.trades) == 1
+    assert result.signals[0].metadata["rawrs_overlay_decision"] == "ALLOW"
+
+
+def test_rawrs_overlay_allows_missing_feature_value(monkeypatch) -> None:
+    _patch_signals(monkeypatch, {"AAA": [_signal("AAA", date(2026, 1, 15))]})
+    _patch_rawrs_overlay_features(monkeypatch, [float("nan")] * 31)
+    result = run_s3_portfolio_backtest(
+        {"AAA": _trade_frame()},
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 31),
+        enable_rawrs_overlay=True,
+        rawrs_percentile_lookback=10,
+        rawrs_min_observations=10,
+    )
+    assert len(result.trades) == 1
+    assert (
+        result.signals[0].metadata["rawrs_overlay_decision"]
+        == "ALLOW_MISSING_FEATURE_VALUE"
+    )
+
+
 def test_missing_columns_create_data_unavailable_rejection_not_crash() -> None:
     result = run_s3_portfolio_backtest(
         {"BAD": _trade_frame().drop(columns=["low"])},
@@ -523,6 +589,20 @@ def _patch_signals(monkeypatch, signals_by_symbol: dict[str, list[Signal]]) -> N
         "veridian_quant.v2.backtesting.s3_portfolio_runner."
         "generate_s3_trend_pullback_signals",
         fake_generate,
+    )
+
+
+def _patch_rawrs_overlay_features(monkeypatch, values: list[float]) -> None:
+    def fake_build(data: pd.DataFrame, *, feature: str) -> pd.DataFrame:
+        return pd.DataFrame(
+            {feature: values[: len(data)]},
+            index=pd.to_datetime(data["date"]),
+        )
+
+    monkeypatch.setattr(
+        "veridian_quant.v2.backtesting.s3_portfolio_runner."
+        "build_rawrs_overlay_feature_frame",
+        fake_build,
     )
 
 

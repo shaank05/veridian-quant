@@ -1,9 +1,10 @@
 """Multi-symbol S3 trend pullback portfolio backtest runner."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from decimal import Decimal
 from time import perf_counter
+from types import MappingProxyType
 from typing import Mapping
 
 import pandas as pd
@@ -22,6 +23,13 @@ from veridian_quant.v2.backtesting.portfolio_runner import (
 from veridian_quant.v2.backtesting.setup import build_trade_setup
 from veridian_quant.v2.backtesting.sizing import build_position_plan
 from veridian_quant.v2.data.models import Signal
+from veridian_quant.v2.intelligence.rawrs_overlay import (
+    DEFAULT_RAWRS_OVERLAY_FEATURE,
+    RawrsOverlayConfig,
+    build_rawrs_overlay_feature_frame,
+    evaluate_rawrs_overlay,
+    rawrs_overlay_metadata,
+)
 from veridian_quant.v2.reporting.progress import NullProgressReporter
 from veridian_quant.v2.strategies.s3_trend_pullback_continuation import (
     S3_BASELINE,
@@ -71,14 +79,30 @@ def run_s3_portfolio_backtest(
     round_trip_cost_pct: Decimal | int | str | float = Decimal("0.004"),
     progress_reporter: object | None = None,
     strategy_variant: str = S3_BASELINE,
+    enable_rawrs_overlay: bool = False,
+    rawrs_feature: str = DEFAULT_RAWRS_OVERLAY_FEATURE,
+    rawrs_avoid_percentile_lte: float = 0.20,
+    rawrs_percentile_lookback: int = 252,
+    rawrs_min_observations: int = 126,
 ) -> PortfolioBacktestResult:
     """Run a deterministic multi-symbol S3 research portfolio backtest."""
 
     strategy_variant = validate_s3_strategy_variant(strategy_variant)
+    rawrs_config = (
+        RawrsOverlayConfig(
+            feature=rawrs_feature,
+            avoid_percentile_lte=rawrs_avoid_percentile_lte,
+            percentile_lookback=rawrs_percentile_lookback,
+            min_observations=rawrs_min_observations,
+        )
+        if enable_rawrs_overlay
+        else None
+    )
     progress = progress_reporter or NullProgressReporter()
     ledger = create_portfolio_ledger(starting_equity)
     symbols = tuple(sorted(data_by_symbol))
     data_by_valid_symbol: dict[str, pd.DataFrame] = {}
+    rawrs_features_by_symbol: dict[str, pd.DataFrame] = {}
     rejected_signals: list[PortfolioRejectedSignal] = []
     signals: list[Signal] = []
     total_generated_signals = 0
@@ -91,6 +115,11 @@ def run_s3_portfolio_backtest(
             sorted_data = _sort_chronologically(data)
             backtest_data = _rows_on_or_before(sorted_data, end_date)
             data_by_valid_symbol[symbol] = backtest_data
+            if rawrs_config is not None:
+                rawrs_features_by_symbol[symbol] = build_rawrs_overlay_feature_frame(
+                    backtest_data,
+                    feature=rawrs_config.feature,
+                )
             symbol_started = perf_counter()
             generated_signals = generate_s3_trend_pullback_signals(
                 symbol=symbol,
@@ -147,9 +176,26 @@ def run_s3_portfolio_backtest(
     pending_trades: list[_PendingTrade] = []
     trades = []
     trade_pnls = []
+    evaluated_signals: list[Signal] = []
     execution_started = perf_counter()
 
     for signal in ordered_signals:
+        if rawrs_config is not None:
+            decision = evaluate_rawrs_overlay(
+                rawrs_features_by_symbol[signal.symbol],
+                signal.generated_on,
+                config=rawrs_config,
+            )
+            signal = replace(
+                signal,
+                metadata=MappingProxyType(
+                    {
+                        **dict(signal.metadata),
+                        **rawrs_overlay_metadata(decision, rawrs_config),
+                    }
+                ),
+            )
+        evaluated_signals.append(signal)
         progress.signal(signal)
         ledger, pending_trades = _apply_due_trade_pnls(
             ledger=ledger,
@@ -160,6 +206,14 @@ def run_s3_portfolio_backtest(
             rejected_signals=rejected_signals,
             progress_reporter=progress,
         )
+
+        if rawrs_config is not None and decision.rejected:
+            _append_rejection(
+                rejected_signals,
+                _reject(signal, "RAWRS_OVERLAY_REJECTED"),
+                progress,
+            )
+            continue
 
         active_symbols = {pending.signal.symbol for pending in pending_trades}
         if signal.symbol in active_symbols:
@@ -271,7 +325,7 @@ def run_s3_portfolio_backtest(
         symbols=symbols,
         trade_pnls=tuple(trade_pnls),
         trades=tuple(trades),
-        signals=ordered_signals,
+        signals=tuple(evaluated_signals),
         rejected_signals=tuple(rejected_signals),
         ledger=ledger,
         strategy_variant=strategy_variant,

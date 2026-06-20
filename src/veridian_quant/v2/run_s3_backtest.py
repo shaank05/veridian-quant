@@ -11,6 +11,9 @@ from veridian_quant.v2.backtesting.s3_portfolio_runner import (
     run_s3_portfolio_backtest,
 )
 from veridian_quant.v2.data.loaders import SQLAlchemyDailyOHLCVLoader
+from veridian_quant.v2.intelligence.rawrs_overlay import (
+    DEFAULT_RAWRS_OVERLAY_FEATURE,
+)
 from veridian_quant.v2.reporting.exporters import export_portfolio_backtest_csvs
 from veridian_quant.v2.reporting.progress import ProgressReporter
 from veridian_quant.v2.strategies.s3_trend_pullback_continuation import (
@@ -121,6 +124,11 @@ def main(argv: Iterable[str] | None = None) -> int:
         round_trip_cost_pct=Decimal("0.004"),
         progress_reporter=reporter,
         strategy_variant=_s3_variant_from_cli(args.s3_variant),
+        enable_rawrs_overlay=args.enable_rawrs_overlay,
+        rawrs_feature=args.rawrs_feature,
+        rawrs_avoid_percentile_lte=args.rawrs_avoid_percentile_lte,
+        rawrs_percentile_lookback=args.rawrs_percentile_lookback,
+        rawrs_min_observations=args.rawrs_min_observations,
     )
     reporter.info(
         f"Finished S3 portfolio backtest in "
@@ -191,6 +199,26 @@ def _parse_args(argv: Iterable[str] | None) -> Namespace:
         default="baseline",
     )
     parser.add_argument("--skip-all-signal-diagnostics", action="store_true")
+    parser.add_argument("--enable-rawrs-overlay", action="store_true")
+    parser.add_argument(
+        "--rawrs-feature",
+        default=DEFAULT_RAWRS_OVERLAY_FEATURE,
+    )
+    parser.add_argument(
+        "--rawrs-avoid-percentile-lte",
+        default=0.20,
+        type=float,
+    )
+    parser.add_argument(
+        "--rawrs-percentile-lookback",
+        default=252,
+        type=int,
+    )
+    parser.add_argument(
+        "--rawrs-min-observations",
+        default=126,
+        type=int,
+    )
     parser.add_argument(
         "--verbosity",
         choices=["quiet", "normal", "verbose"],
@@ -211,6 +239,16 @@ def _parse_args(argv: Iterable[str] | None) -> Namespace:
     ):
         if getattr(args, name) <= 0:
             parser.error(f"--{name.replace('_', '-')} must be positive")
+    if not 0.0 <= args.rawrs_avoid_percentile_lte <= 1.0:
+        parser.error("--rawrs-avoid-percentile-lte must be between 0 and 1")
+    if args.rawrs_percentile_lookback <= 0:
+        parser.error("--rawrs-percentile-lookback must be positive")
+    if args.rawrs_min_observations <= 0:
+        parser.error("--rawrs-min-observations must be positive")
+    if args.rawrs_min_observations > args.rawrs_percentile_lookback:
+        parser.error(
+            "--rawrs-min-observations cannot exceed --rawrs-percentile-lookback"
+        )
     return args
 
 

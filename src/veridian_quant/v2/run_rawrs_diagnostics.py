@@ -21,6 +21,12 @@ from veridian_quant.v2.intelligence.rawrs_exports import (
     build_rawrs_trade_diagnostics,
     export_rawrs_diagnostic_csvs,
 )
+from veridian_quant.v2.intelligence.rawrs_impact import (
+    build_rawrs_feature_impact_leaderboard,
+    build_rawrs_keep_avoid_impact_summary,
+    export_rawrs_impact_csvs,
+    infer_rawrs_feature_columns,
+)
 
 
 LIGHT_REQUIRED_FILES = [
@@ -397,7 +403,19 @@ def run_rawrs_diagnostics_from_frames(
     )
     if not diagnostics:
         raise ValueError("no RAWRS diagnostics could be built from provided frames")
-    return export_rawrs_diagnostic_csvs(output_dir=output_dir, **diagnostics)
+    written = export_rawrs_diagnostic_csvs(output_dir=output_dir, **diagnostics)
+    trade_diagnostics = diagnostics.get("trade_diagnostics")
+    if _can_build_rawrs_impact(trade_diagnostics):
+        keep_avoid = build_rawrs_keep_avoid_impact_summary(trade_diagnostics)
+        leaderboard = build_rawrs_feature_impact_leaderboard(keep_avoid)
+        written.update(
+            export_rawrs_impact_csvs(
+                output_dir=output_dir,
+                keep_avoid_summary=keep_avoid,
+                feature_impact_leaderboard=leaderboard,
+            )
+        )
+    return written
 
 
 def parse_args(argv: Iterable[str] | None = None) -> Namespace:
@@ -447,6 +465,14 @@ def _read_csv(path: Path) -> pd.DataFrame:
         return pd.read_csv(path)
     except pd.errors.EmptyDataError:
         return pd.DataFrame()
+
+
+def _can_build_rawrs_impact(trades: pd.DataFrame | None) -> bool:
+    if trades is None or trades.empty:
+        return False
+    if "net_pnl" not in trades.columns or "rawrs_realized_r" not in trades.columns:
+        return False
+    return bool(infer_rawrs_feature_columns(trades))
 
 
 def _has_trade_timestamp_compatibility(trade_log: pd.DataFrame) -> bool:

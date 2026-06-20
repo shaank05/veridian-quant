@@ -346,6 +346,37 @@ def test_cli_path_computes_rawrs_realized_r_and_bucket_summary_uses_it(tmp_path)
     assert set(bucket_summary["mean_r"]) == {2.0, -0.5}
 
 
+def test_cli_path_writes_rawrs_impact_outputs_when_trade_metrics_are_available(tmp_path) -> None:
+    frames = _csv_frames()
+    frames["trade_log.csv"] = pd.DataFrame(
+        {
+            "trade_id": range(1, 11),
+            "symbol": ["AAA"] * 10,
+            "entry_date": pd.date_range("2026-01-01", periods=10).astype(str),
+            "net_pnl": [-20, -10, -5, 0, 5, 10, 15, 20, 25, 30],
+            "initial_risk_amount": [10.0] * 10,
+        }
+    )
+    features = {
+        "AAA": _rawrs_frame(
+            pd.date_range("2026-01-01", periods=10).astype(str).tolist(),
+            list(range(1, 11)),
+        )
+    }
+
+    paths = run_rawrs_diagnostics_from_frames(
+        csv_frames=frames,
+        rawrs_features_by_symbol=features,
+        output_dir=tmp_path,
+        mode="light",
+    )
+
+    assert paths["keep_avoid_summary"].name == "rawrs_keep_avoid_impact_summary.csv"
+    assert paths["feature_impact_leaderboard"].name == "rawrs_feature_impact_leaderboard.csv"
+    assert paths["keep_avoid_summary"].exists()
+    assert paths["feature_impact_leaderboard"].exists()
+
+
 def test_full_mode_end_to_end_writes_rejection_diagnostics(tmp_path) -> None:
     strategy_dir = tmp_path / "strategy"
     rawrs_dir = tmp_path / "rawrs"

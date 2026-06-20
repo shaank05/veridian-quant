@@ -21,6 +21,13 @@ Current status:
 - Phase 30A docs/spec only.
 - Phase 30B implemented initial research feature utilities.
 - Phase 30C defines signal-time diagnostic usage before ranking or overlays.
+- Phase 30G implemented standalone diagnostics across compatible strategy
+  outputs.
+- Phase 30H found useful but mixed keep/avoid separation.
+- Phase 30I rejected S3 spectral-concentration hard gates at p20 and p10 after
+  true portfolio backtests underperformed baseline.
+- Phase 30J consolidates the evidence in
+  `docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`.
 - Not S5.
 - Not a strategy.
 - Not an entry model.
@@ -102,6 +109,17 @@ Initial signal-time diagnostic feature candidates:
 - `rawrs_micro_meso_energy_ratio`
 - `rawrs_meso_macro_energy_ratio`
 - `rawrs_direction_change_rate`
+
+Current evidence treatment:
+
+- Keep meso/macro energy and strategy-specific spectral/entropy features as
+  diagnostic research candidates.
+- `rawrs_macro_energy` remains the broadest, though often modest,
+  cross-strategy diagnostic candidate.
+- Do not use `rawrs_fft_spectral_concentration` as an S3 p20 or p10 hard gate.
+- Do not infer hard-filter viability for S1/S2/S4 from completed-trade buckets.
+- Prefer stability/significance work and capacity-aware ranking hypotheses over
+  new hard filters.
 
 ---
 

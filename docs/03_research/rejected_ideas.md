@@ -73,6 +73,30 @@ Current S3 decision:
 - Do not continue near-term S3 variants.
 - Revisit only if regime modeling, ranking/capacity logic, sector/relative-strength features, or ensemble needs materially change.
 
+### Rejected S3 RAWRS Hard-Filter Overlay
+
+Rejected:
+
+- `rawrs_fft_spectral_concentration` signal-time hard filter at p20.
+- `rawrs_fft_spectral_concentration` signal-time hard filter at p10.
+
+Reason:
+
+- Both true portfolio backtests underperformed the retained S3 baseline despite
+  promising completed-trade keep/avoid diagnostics.
+- P20 worsened PnL, drawdown, profit factor, and mean R.
+- P10 rejected fewer signals but performed materially worse than P20 and nearly
+  eliminated total PnL.
+- The filters removed profitable baseline trades, admitted losing replacement
+  trades, and changed chronology, capacity, sizing, and compounding.
+
+Decision:
+
+- Do not test more thresholds for the same S3 hard-filter mechanism without a
+  materially new hypothesis.
+- RAWRS remains diagnostic-only.
+- Do not implement S1/S2/S4 RAWRS hard filters from post-hoc evidence alone.
+
 ---
 
 ## S4 Rejected / Parked Items

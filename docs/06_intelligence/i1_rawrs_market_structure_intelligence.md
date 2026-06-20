@@ -16,6 +16,12 @@ Phase 30C adds the signal-time diagnostic design in `docs/06_intelligence/i1_raw
 
 Phase 30F adds `docs/06_intelligence/i1_rawrs_strategy_output_compatibility.md` as a docs-only prerequisite for any future standalone RAWRS CLI design. It audits S1/S2/S3/S4 output compatibility and defines light versus full diagnostic modes based on available strategy output files.
 
+Phase 30J consolidates the implemented infrastructure, cross-strategy
+diagnostics, keep/avoid findings, and true S3 overlay evidence in
+`docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`. RAWRS remains
+diagnostic-only. The S3 spectral-concentration hard filter failed at both p20
+and p10 and is rejected as an overlay hypothesis.
+
 I1 RAWRS should help answer questions such as:
 
 - Why did accepted trades win or lose?
@@ -412,6 +418,7 @@ Related docs:
 - `docs/00_foundation/v2_research_roadmap.md`
 - `docs/06_intelligence/i1_rawrs_signal_time_diagnostics.md`
 - `docs/06_intelligence/i1_rawrs_strategy_output_compatibility.md`
+- `docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`
 - `docs/03_research/feature_ideas.md`
 - `docs/03_research/regime_models.md`
 - `docs/03_research/portfolio_construction.md`

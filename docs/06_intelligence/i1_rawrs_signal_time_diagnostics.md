@@ -327,6 +327,20 @@ Weak or invalid evidence includes:
 - Complex feature combinations that are not interpretable or stable.
 - Any result that depends on lookahead alignment.
 
+## True-Overlay Evidence Update
+
+Phase 30I tested the strongest S3 completed-trade diagnostic candidate,
+`rawrs_fft_spectral_concentration`, as leakage-safe signal-time hard filters at
+p20 and p10. Both true portfolio overlays underperformed the retained S3
+baseline. The filters changed chronology, capacity, replacement trades,
+equity-dependent sizing, and compounding; profitable baseline trades were
+removed while weaker replacement cohorts entered.
+
+This result confirms the design warning in this document: post-hoc bucket
+separation is explanatory evidence, not proof that a causal portfolio filter
+will improve results. See
+`docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`.
+
 ---
 
 ## Future Implementation Phases
@@ -367,6 +381,7 @@ Related docs:
 
 - `docs/06_intelligence/i1_rawrs_market_structure_intelligence.md`
 - `docs/06_intelligence/i1_rawrs_strategy_output_compatibility.md`
+- `docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`
 - `docs/00_foundation/v2_research_roadmap.md`
 - `docs/03_research/regime_models.md`
 - `docs/03_research/feature_ideas.md`

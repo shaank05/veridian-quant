@@ -17,7 +17,11 @@ S3 tested a different alpha source: buying structurally strong stocks after cont
 
 S4 tested a different alpha source: long-only breakouts after prior volatility, range, or entropy/noise compression. The best raw S4 variant was positive but too weak relative to drawdown for production. S4 should remain available as a research benchmark, but immediate S4 threshold tuning is parked.
 
-Phase 30A begins `I1_RAWRS_MARKET_STRUCTURE_INTELLIGENCE` as a docs-only non-strategy intelligence specification. RAWRS is not S5, not a signal generator, and not a backtest runner. Implementation is not started in Phase 30A.
+I1 RAWRS research has progressed through Phase 30J: feature utilities,
+standalone diagnostics, cross-strategy keep/avoid analysis, true S3 p20/p10
+overlay tests, and the combined evidence audit. RAWRS is not S5 or a signal
+generator. It remains a diagnostic-only intelligence layer; the tested S3 hard
+filters are rejected.
 
 ---
 
@@ -247,6 +251,48 @@ Outcome:
 - Does not integrate into S1/S2/S3/S4 runners.
 - Does not change strategy behavior, backtest behavior, standard exporters, portfolio logic, PnL, trades, exits, sizing, rejected signals, or capacity.
 
+### Phase 30H: I1 RAWRS Keep/Avoid Impact Diagnostics
+
+Evaluate completed-trade RAWRS buckets as diagnostic keep/avoid subsets across
+S1/S2/S3/S4 outputs.
+
+Outcome:
+
+- Low-bucket avoidance showed several promising descriptive separations.
+- Energy features were directionally broad but often modest.
+- Spectral features were stronger but strategy-specific.
+- Highest-bucket-only retention was considered dangerous because it removed too
+  many trades.
+- Results remained post-hoc diagnostics, not portfolio evidence.
+
+### Phase 30I: I1 RAWRS True S3 Overlay Experiment
+
+Translate the promising S3 spectral-concentration diagnostic into leakage-safe
+signal-time hard filters at p20 and p10.
+
+Outcome:
+
+- Both overlays underperformed `S3_STRONG_TREND_ABOVE_SMA50_V1`.
+- P20 reduced PnL and worsened drawdown, profit factor, and mean R.
+- P10 performed worse than both baseline and P20.
+- Chronology, capacity, replacement trades, sizing, and compounding explained
+  why the post-hoc result did not translate.
+- Reject S3 spectral-concentration p20/p10 hard filtering.
+
+### Phase 30J: I1 RAWRS Combined Evidence Audit
+
+Consolidate RAWRS infrastructure, cross-strategy diagnostics, keep/avoid impact,
+and true S3 overlay evidence.
+
+Outcome:
+
+- Docs-only audit in
+  `docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`.
+- RAWRS remains diagnostic-only and non-production.
+- S3 spectral-concentration p20/p10 hard filters are rejected.
+- Future work should prioritize stability, significance, and capacity-aware
+  ranking research rather than hard gates.
+
 ---
 
 ## Retained S2 Benchmarks
@@ -335,7 +381,10 @@ Next direction:
 
 - Do not continue immediate S2 or S3 tuning.
 - Do not continue immediate S4 tuning.
-- Continue I1 RAWRS intelligence work through signal-time diagnostics, not S5 strategy implementation.
+- Keep I1 RAWRS diagnostic-only after the failed S3 p20/p10 hard-filter tests.
+- Prioritize feature stability, significance, and capacity-aware ordering
+  research before considering another true overlay.
+- Do not convert S1/S2/S4 post-hoc RAWRS findings directly into hard filters.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 

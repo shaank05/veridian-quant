@@ -337,6 +337,17 @@ Current Phase 30G status:
 - RAWRS feature computation and diagnostic CSV export are implemented.
 - Precomputed-feature diagnostic build/export helpers remain available.
 
+Phase 30J evidence update:
+
+- Standalone output compatibility enabled light-mode RAWRS diagnostics across
+  retained or benchmark S1/S2/S3/S4 outputs.
+- Those compatible outputs supported keep/avoid subset analysis and a true S3
+  baseline-versus-overlay comparison.
+- The S3 p20 and p10 spectral-concentration hard filters failed despite a
+  promising completed-trade diagnostic.
+- Detailed evidence is consolidated in
+  `docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`.
+
 ## Guardrails
 
 - RAWRS diagnostics are diagnostic only.
@@ -394,5 +405,6 @@ Related files and docs:
 - `src/veridian_quant/v2/backtesting/s4_portfolio_runner.py`
 - `docs/06_intelligence/i1_rawrs_market_structure_intelligence.md`
 - `docs/06_intelligence/i1_rawrs_signal_time_diagnostics.md`
+- `docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`
 - `docs/00_foundation/v2_research_roadmap.md`
 - `docs/05_decisions/decision_log.md`

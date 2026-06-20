@@ -446,3 +446,42 @@ Strategy outputs differ by runner and diagnostic-skip flags. A standalone valida
 Consequence:
 
 RAWRS diagnostics can be run separately from strategy backtests. Runner integration remains deferred. The CLI should consume existing output folders, validate required files, warn on optional or incomplete inputs, write RAWRS outputs separately, and avoid changing PnL, trades, exits, sizing, rejected signals, capacity, or strategy behavior.
+
+---
+
+## 2026-06-19 - Reject S3 RAWRS Spectral-Concentration Hard Filters
+
+Decision:
+
+Reject the S3 `rawrs_fft_spectral_concentration` hard-filter overlay at p20 and
+p10.
+
+Reason:
+
+Completed-trade diagnostics suggested that avoiding the lowest spectral-
+concentration bucket might improve S3 trade quality. Leakage-safe true
+backtests did not confirm that result:
+
+- Baseline: about Rs 3.16L net PnL, 4.43% CAGR, 28.20% max drawdown, and 1.104
+  profit factor.
+- P20: about Rs 2.37L net PnL, 3.42% CAGR, 31.45% max drawdown, and 1.079 profit
+  factor.
+- P10: about Rs 0.10L net PnL, 0.15% CAGR, 31.98% max drawdown, and 1.004 profit
+  factor.
+
+The true overlays changed chronology, capacity, replacement trades,
+equity-dependent sizing, and compounding. Both removed profitable baseline
+trades and admitted losing replacement cohorts. The less aggressive p10 rule
+did not repair the p20 failure.
+
+Consequence:
+
+- RAWRS remains diagnostic-only and non-production.
+- Do not test additional thresholds for the same S3 hard-filter hypothesis
+  unless the mechanism changes materially.
+- Do not implement S1/S2/S4 RAWRS hard filters from post-hoc keep/avoid evidence
+  alone.
+- Future RAWRS work should focus on stability, statistical significance,
+  ranking-only research, and capacity-aware ordering rather than hard gates.
+- Consolidated evidence is recorded in
+  `docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`.

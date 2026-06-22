@@ -485,3 +485,37 @@ Consequence:
   ranking-only research, and capacity-aware ordering rather than hard gates.
 - Consolidated evidence is recorded in
   `docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`.
+
+---
+
+## 2026-06-19 - Start Portfolio Robustness Validation Before External Model Exploration
+
+Decision:
+
+Start the Portfolio Robustness Validation Layer before external-model
+exploration. Phase 31A is docs/design only; later phases may implement and run
+post-backtest Monte Carlo validation under a separately reviewed scope.
+
+Reason:
+
+Existing and future strategies need stronger common validation before the
+project adds complex external AI/model dependencies. Completed-trade shuffle and
+bootstrap analysis can expose sequence risk, adverse drawdown tails, loss
+probability, streaks, and ruin/near-ruin risk without changing strategy signals
+or historical portfolio results.
+
+Consequence:
+
+- Define the validation contract in
+  `docs/04_validation/portfolio_robustness_validation.md`.
+- Evaluate downside distributions and risk-adjusted robustness rather than only
+  nominal PnL or best simulated outcomes.
+- Do not use Monte Carlo as a signal generator, parameter optimizer, or evidence
+  to excuse overfitting.
+- Kronos and TradingAgents remain future candidates under an external-model
+  intelligence lane. They are postponed because validation infrastructure comes
+  first; they are not rejected.
+- If Kronos later produces strong standalone results under disciplined testing,
+  evaluate it both standalone and, where justified, as an integrated Veridian
+  feature/model layer. Both forms remain subject to the normal backtest and
+  robustness-validation standards.

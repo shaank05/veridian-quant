@@ -1120,6 +1120,24 @@ Performance should be evaluated across:
 
 Stable performance is preferred over peak performance.
 
+### 9.7.1 Post-Backtest Monte Carlo Robustness Validation
+
+Monte Carlo validation is applied only after a strategy has produced a completed
+trade ledger. It resamples realized net trade PnL to study sequence risk,
+drawdown tails, loss probability, streaks, and ruin/near-ruin risk.
+
+Monte Carlo is not a strategy or signal generator. It does not change entries,
+exits, sizing, capacity, execution, or original portfolio PnL, and it must not be
+used to optimize strategy parameters or justify an overfitted strategy.
+
+Shuffle mode permutes the same completed trades to expose sequence risk.
+Bootstrap mode samples completed trades with replacement to expose empirical
+mix/resampling risk. Results are conditional on the realized sample and do not
+prove future profitability or model unknown future regimes.
+
+The design contract and interpretation guardrails are defined in
+`docs/04_validation/portfolio_robustness_validation.md`.
+
 ---
 
 ### 9.8 Reporting Priority

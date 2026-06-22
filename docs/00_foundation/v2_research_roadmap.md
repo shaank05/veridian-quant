@@ -23,6 +23,11 @@ overlay tests, and the combined evidence audit. RAWRS is not S5 or a signal
 generator. It remains a diagnostic-only intelligence layer; the tested S3 hard
 filters are rejected.
 
+Phase 31 begins the Portfolio Robustness Validation Layer before external-model
+exploration. Phase 31A is docs/design only. It defines post-backtest Monte Carlo
+validation for retained S1/S2/S3/S4 outputs; it does not generate signals or
+change strategy behavior.
+
 ---
 
 ## Completed Phases
@@ -293,6 +298,39 @@ Outcome:
 - Future work should prioritize stability, significance, and capacity-aware
   ranking research rather than hard gates.
 
+### Phase 31A: Portfolio Robustness Validation Design
+
+Define the standalone post-backtest validation contract and Monte Carlo methods.
+
+Outcome:
+
+- Docs-only design in `docs/04_validation/portfolio_robustness_validation.md`.
+- Defines shuffle and bootstrap simulation, required inputs/outputs, downside
+  metrics, interpretation guardrails, limitations, and open questions.
+- Monte Carlo remains validation/reporting, not signal generation or parameter
+  optimization.
+- No code, tests, runners, backtesting logic, exporters, reports, config, or data
+  are changed by Phase 31A.
+
+### Phase 31B: Portfolio Robustness Validation Utilities
+
+Implement standalone, reproducible Monte Carlo utilities after the Phase 31A
+contract is reviewed. Add strict input validation, deterministic seed handling,
+tests, and isolated validation exporters without changing strategy runners or
+signals by default.
+
+### Phase 31C: S1/S2/S3/S4 Benchmark Validation
+
+Run the frozen Phase 31 protocol on retained S1/S2/S3/S4 completed-trade outputs.
+Produce shuffle and bootstrap evidence using like-for-like settings and preserve
+all source backtest artifacts.
+
+### Phase 31D: Cross-Strategy Robustness Audit
+
+Compare downside distributions, drawdown tails, loss probability, streaks, and
+ruin/near-ruin risk. Judge risk-adjusted robustness rather than highest PnL or
+best simulated outcome, and document any follow-up validation requirements.
+
 ---
 
 ## Retained S2 Benchmarks
@@ -385,6 +423,8 @@ Next direction:
 - Prioritize feature stability, significance, and capacity-aware ordering
   research before considering another true overlay.
 - Do not convert S1/S2/S4 post-hoc RAWRS findings directly into hard filters.
+- Complete the Phase 31 robustness-validation lane before external-model
+  exploration.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 
@@ -409,5 +449,10 @@ The following are future research directions, not accepted production rules:
 - Wavelet strategy.
 - Markov/S1 voting layer.
 - Meta-ranking / capital allocation layer.
+- Walk-forward validation, regime splits, parameter sensitivity, and capacity
+  stress testing after the Phase 31 Monte Carlo baseline.
+- Kronos and TradingAgents under a future external-model intelligence lane. They
+  are postponed, not rejected, until common validation infrastructure is
+  stronger.
 
 These ideas may be researched later only after standalone evidence and auditability requirements are satisfied.

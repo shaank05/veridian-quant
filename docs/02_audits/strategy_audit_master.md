@@ -32,11 +32,37 @@ No strategy is production-approved.
 | `S4_ATR_COMPRESSION_BREAKOUT_V1` | Weak benchmark / parked | Yes | Yes | Retain as weak S4 benchmark only; not production-ready; do not continue tuning now |
 | `S4_RANGE_COMPRESSION_BREAKOUT_V1` | Rejected raw baseline | Yes | Yes | Do not promote; negative PnL and high drawdown |
 | `S4_ENTROPY_GATED_BREAKOUT_V1` | Not promoted / parked | Yes | Yes | Near breakeven but negative and unstable; do not promote |
+| `S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` | Design stage only | No | No | Phase 32A specification only; future Research200 comparison uses S2 as primary robustness benchmark |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
 | S1/S2 voting layer | Future research | No | No | Deferred until strategy-family evidence improves |
 | Meta-ranking / capital allocation layer | Future research | No | No | Deferred; not current behavior |
+
+---
+
+## S5 Design-Stage Status
+
+S5 Relative Strength / Momentum Rotation begins in Phase 32A as a standalone,
+ranked Research200 strategy hypothesis.
+
+Current status:
+
+- Design document: `docs/01_strategies/s5_relative_strength_momentum_rotation.md`.
+- No implementation, backtest, Monte Carlo output, or audit result exists yet.
+- S5 does not mix with S1/S2/S3/S4, RAWRS, Kronos, or TradingAgents in its first
+  research cycle.
+- S2's retained `exclude_ret_down` run is the primary robustness benchmark for
+  future S5 comparison; S1, S3, and S4 ATR are secondary benchmarks.
+- No S5 variant is accepted, retained, rejected, production-ready, or
+  production-approved at the design stage.
+
+Proposed first-pass variants:
+
+- `S5_SIMPLE_RS_126D_V1`
+- `S5_DUAL_MOMENTUM_63_126D_V1`
+- `S5_VOL_ADJUSTED_RS_V1`
+- Optional later `S5_52W_HIGH_PROXIMITY_V1`
 
 ---
 
@@ -265,4 +291,6 @@ Current decision:
 - Keep both retained S2 benchmarks for comparison.
 - Freeze S3 and S4 research for now.
 - Keep retained S3 and weak S4 benchmarks for comparison.
-- Move the next research effort to broader robustness, portfolio construction, or a materially new independent hypothesis.
+- Advance S5 only through the reviewed Phase 32 design, implementation,
+  Research200, audit, and Monte Carlo steps; do not treat design status as
+  evidence.

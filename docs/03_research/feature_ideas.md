@@ -8,6 +8,67 @@ Feature ideas are not accepted trading rules. They must be tested through the no
 
 ---
 
+## S5 Relative Strength / Momentum Rotation Candidate Features
+
+`S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` is a design-stage standalone strategy
+family. Its first research cycle should use a small, transparent feature set and
+cross-sectional ranking under Research200 capacity pressure.
+
+Current status:
+
+- Phase 32A design only.
+- No implementation, backtest results, or production status.
+- Independent from S1/S2/S3/S4.
+- No RAWRS, Kronos, TradingAgents, or other external-model inputs initially.
+- Future comparison uses S2 as the primary robustness benchmark.
+
+Return momentum candidates:
+
+- 63-session return.
+- 126-session return.
+- 252-session return.
+- Skip-month momentum: 126-session anchor with the most recent 21 sessions
+  excluded.
+
+Trend and extension candidates:
+
+- Distance above SMA200.
+- Price above SMA200 flag.
+- Proximity to trailing 52-week high.
+
+Risk-adjusted momentum candidates:
+
+- Momentum return divided by realized volatility over a compatible window.
+- Cross-sectional percentile rank of volatility-adjusted momentum.
+- Explicit invalid-score policy for missing or near-zero volatility.
+
+Benchmark-relative candidates:
+
+- Stock return minus NIFTY return over matched 63/126/252-session horizons.
+- Cross-sectional rank of NIFTY-relative return.
+- Use only when benchmark history is complete and timestamp-aligned.
+
+Ranking metadata:
+
+- Raw score.
+- Cross-sectional rank and percentile.
+- Eligible-universe count.
+- Same-day candidate count.
+- Accepted/rejected decision and reason.
+- Deterministic tie-break value.
+
+First-pass variants should consume only the features they declare:
+
+- `S5_SIMPLE_RS_126D_V1`
+- `S5_DUAL_MOMENTUM_63_126D_V1`
+- `S5_VOL_ADJUSTED_RS_V1`
+- Optional later `S5_52W_HIGH_PROXIMITY_V1`
+
+These are research candidates, not accepted trading rules. Avoid large feature
+composites, threshold grids, or post-hoc filters in the first cycle.
+
+---
+
 ## I1 RAWRS Market Structure Intelligence Feature Ideas
 
 `I1_RAWRS_MARKET_STRUCTURE_INTELLIGENCE` is a reusable non-strategy intelligence layer.

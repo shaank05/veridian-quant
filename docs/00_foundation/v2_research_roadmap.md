@@ -31,6 +31,12 @@ weak/moderate benchmark, and S4 ATR ranks weakest. This is validation evidence,
 not production approval; Monte Carlo does not generate signals or change
 strategy behavior.
 
+Phase 32A begins the docs-only design of S5 Relative Strength / Momentum
+Rotation. S5 is a standalone, ranked Research200 strategy hypothesis with no
+implementation or backtest evidence yet. It does not mix with S1/S2/S3/S4,
+RAWRS, or external models. S2 is the primary robustness benchmark for future S5
+comparison.
+
 ---
 
 ## Completed Phases
@@ -347,6 +353,53 @@ Outcome:
 - S2 becomes the primary robustness benchmark for future S5 comparisons.
 - No current strategy receives production approval.
 
+### Phase 32A: S5 Relative Strength / Momentum Rotation Design
+
+Define the standalone S5 hypothesis, Research200 scope, momentum feature
+candidates, cross-sectional ranking, capacity behavior, first-pass variants,
+outputs, validation plan, and acceptance/rejection boundaries.
+
+Outcome:
+
+- Docs-only design in
+  `docs/01_strategies/s5_relative_strength_momentum_rotation.md`.
+- S5 remains independent from S1/S2/S3/S4 and excludes RAWRS and external
+  models from the initial research cycle.
+- No implementation, backtest, report, or production decision in Phase 32A.
+
+### Phase 32B (Proposed): S5 Feature Utilities
+
+Implement and test only the frozen return, trend, high-proximity,
+volatility-adjusted, and optional benchmark-relative features required by the
+declared variants. Freeze lookback endpoints, missing-history behavior, and
+signal-time calculation rules.
+
+### Phase 32C (Proposed): S5 Signal Generation
+
+Implement standalone S5 eligibility, scoring, cross-sectional ranking,
+deterministic tie-breaking, next-open signal metadata, and accepted/rejected
+candidate diagnostics without mixing earlier strategy logic.
+
+### Phase 32D (Proposed): S5 Portfolio Runner and CLI
+
+Connect S5 to shared v2 trade mechanics, ATR risk sizing, five-position capacity,
+costs, ledger, standard exporters, and an isolated runner/CLI. Preserve ranked
+candidate ordering and explicit rejection reasons.
+
+### Phase 32E (Proposed): S5 Research200 Backtests
+
+Run frozen first-pass variants independently over 2020-01-01 through 2026-04-30.
+Review performance, yearly stability, concentration, trade count, turnover, and
+capacity pressure without post-result threshold tuning.
+
+### Phase 32F (Proposed): S5 Audit and Monte Carlo Comparison
+
+Reconcile outputs, audit failure modes and ranking behavior, run the standard
+post-backtest shuffle/bootstrap protocol, and compare S5 primarily with the S2
+robustness benchmark and secondarily with S1/S3/S4 ATR. Decide retain, reject,
+park, or continue-research status; do not infer production approval from a
+single backtest or Monte Carlo result.
+
 ---
 
 ## Retained S2 Benchmarks
@@ -439,8 +492,8 @@ Next direction:
 - Prioritize feature stability, significance, and capacity-aware ordering
   research before considering another true overlay.
 - Do not convert S1/S2/S4 post-hoc RAWRS findings directly into hard filters.
-- Complete the Phase 31 robustness-validation lane before external-model
-  exploration.
+- Execute the S5 design/implementation/validation lane independently before
+  external-model exploration.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 

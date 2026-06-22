@@ -550,3 +550,35 @@ Consequence:
   diagnostic-only.
 - Record the full evidence in
   `docs/04_validation/monte_carlo_robustness_audit.md`.
+
+---
+
+## 2026-06-19 - Start S5 Relative Strength / Momentum Rotation Design
+
+Decision:
+
+Begin Phase 32A as a docs-only design for the standalone
+`S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` strategy family after completion of the
+Phase 31 robustness-validation lane.
+
+Reason:
+
+Relative strength / intermediate-term momentum is a simple, well-known, and
+portfolio-friendly independent hypothesis. It naturally supports ranked
+candidate selection when the broad Research200 universe produces more signals
+than the five-position portfolio can accept. This transparent strategy family
+should be tested before external AI/model integrations or more threshold tuning
+of S2/S3/S4.
+
+Consequence:
+
+- Specify S5 independently from S1/S2/S3/S4.
+- Use the audited Research200 universe and standard v2 methodology.
+- Make ranking and capacity-rejection diagnostics integral to S5.
+- Keep first-pass variants simple and exclude RAWRS, Kronos, TradingAgents, and
+  other external models.
+- Use S2's retained `exclude_ret_down` run as the primary robustness benchmark;
+  use S1, S3, and S4 ATR as secondary comparisons.
+- Require standalone backtests and post-backtest Monte Carlo validation in later
+  reviewed phases before any retain/reject/park decision.
+- Make no production decision in Phase 32A.

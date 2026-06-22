@@ -325,6 +325,68 @@ Expected edge comes from:
 
 ---
 
+# H9 - Intermediate-Term Relative Strength / Momentum Persistence
+
+## Hypothesis
+
+Stocks that outperform peers over intermediate horizons may continue to
+outperform because information diffusion, institutional positioning, and
+investor underreaction can persist across multiple sessions.
+
+S5 will test this hypothesis as the standalone
+`S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` strategy family.
+
+The audited Research200 universe is central to the test. Earlier Phase 23/24
+work used only approximately 19-20 symbols; Research200 should materially change
+candidate volume, rank dispersion, rejected opportunities, capacity pressure,
+and portfolio chronology.
+
+## Expected Edge
+
+- Hold or enter the strongest eligible stocks rather than treating simultaneous
+  candidates as interchangeable.
+- Use cross-sectional ranking to allocate scarce portfolio slots.
+- Capture persistent intermediate-term leadership without relying on oversold
+  mean reversion, Markov recurrence, pullback depth, or compression breakouts.
+
+## Why This May Work
+
+- Institutional accumulation and capital flows may persist.
+- Investors may underreact to information, allowing trends to continue.
+- Broad-universe ranking may identify leadership more effectively than isolated
+  absolute thresholds.
+- Relative comparison can direct finite capacity toward stronger opportunities.
+
+## When It May Fail
+
+- Momentum leadership reverses abruptly.
+- Crowded trades unwind together.
+- Sideways markets cause rank churn and whipsaw.
+- The strategy enters after trends are already exhausted.
+- A broad market or sector reversal overwhelms stock-level momentum.
+- Ranking overfits one lookback, period, or universe.
+- Capacity constraints and replacement trades erase signal-level advantage.
+
+## Candidate Features
+
+- 63-day, 126-day, and 252-day returns.
+- 126-day return excluding the most recent 21 sessions.
+- Distance above SMA200.
+- Proximity to the trailing 52-week high.
+- Volatility-adjusted momentum.
+- Optional NIFTY-relative return when benchmark data is available.
+- Cross-sectional rank and percentile.
+
+Audit status:
+
+- Phase 32A design only.
+- No implementation or backtest evidence yet.
+- S5 is independent from S1/S2/S3/S4.
+- No RAWRS or external-model features in the first research cycle.
+- S2 is the primary robustness benchmark for later comparison.
+
+---
+
 # Rejected or Deferred Hypotheses
 
 The following are not accepted production rules.
@@ -397,4 +459,8 @@ S3 Trend Pullback Continuation has now been tested independently and is parked a
 
 S4 Entropy / Volatility Compression Breakout has now been raw-tested independently and is parked as a weak benchmark-only strategy family, not a production strategy.
 
-The next research priority should not be more S2, S3, or S4 threshold tuning. Future work should move to broader robustness, portfolio construction, or a materially new independent hypothesis.
+The next research priority should not be more S2, S3, or S4 threshold tuning.
+Phase 32A begins the independent S5 Relative Strength / Momentum Rotation design
+after completion of the Phase 31 robustness audit. S5 remains design-stage only
+and must be tested independently on Research200 before any promotion or strategy
+combination.

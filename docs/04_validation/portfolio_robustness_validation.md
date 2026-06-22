@@ -12,7 +12,10 @@ Its primary questions are:
 - How often could the strategy finish below starting equity or reach ruin?
 - Which benchmark has the strongest downside-adjusted robustness rather than merely the highest nominal PnL?
 
-This document is the Phase 31A design specification. It does not implement or run validation.
+This document began as the Phase 31A design specification. Phases 31B and 31C
+subsequently implemented and ran the standalone protocol, and Phase 31D records
+the first cross-strategy audit in
+`docs/04_validation/monte_carlo_robustness_audit.md`.
 
 ## 2. Scope
 
@@ -244,10 +247,10 @@ The same principle applies to TradingAgents or another external system. Model ou
 
 ## 17. Phase Plan
 
-- **Phase 31A — Design:** docs-only specification, methodology boundary, roadmap, and decision record.
-- **Phase 31B — Implementation:** standalone Monte Carlo validation utilities, input validation, deterministic seeds, tests, and isolated exporters. No runner or signal integration by default.
-- **Phase 31C — Benchmark execution:** run audited shuffle and bootstrap validation on retained S1/S2/S3/S4 outputs using a frozen protocol.
-- **Phase 31D — Robustness audit:** compare benchmark downside distributions, document findings, and define evidence-based follow-up without selecting by best outcome.
+- **Phase 31A — Design (complete):** docs-only specification, methodology boundary, roadmap, and decision record.
+- **Phase 31B — Implementation (complete):** standalone Monte Carlo validation utilities, input validation, deterministic seeds, tests, and isolated exporters. No runner or signal integration by default.
+- **Phase 31C — Benchmark execution (complete):** audited shuffle and bootstrap validation on retained S1/S2/S3/S4 ATR outputs using a frozen protocol.
+- **Phase 31D — Robustness audit (complete):** first cross-strategy audit recorded in `docs/04_validation/monte_carlo_robustness_audit.md`; S2 ranked strongest and S4 ATR weakest, with no production approval.
 - **Later validation:** walk-forward validation, regime splits, parameter sensitivity, block/regime-aware bootstrap, capacity and liquidity stress testing, and external-model evaluation.
 
 ## 18. Open Questions
@@ -277,4 +280,3 @@ The same principle applies to TradingAgents or another external system. Model ou
 - `docs/02_audits/s4_audit.md`
 - `docs/05_decisions/decision_log.md`
 - `docs/06_intelligence/i1_rawrs_combined_evidence_audit.md`
-

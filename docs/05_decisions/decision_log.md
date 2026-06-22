@@ -519,3 +519,34 @@ Consequence:
   evaluate it both standalone and, where justified, as an integrated Veridian
   feature/model layer. Both forms remain subject to the normal backtest and
   robustness-validation standards.
+
+---
+
+## 2026-06-19 - Rank Current Benchmarks Using Monte Carlo Robustness Evidence
+
+Decision:
+
+Use the completed Phase 31 Monte Carlo robustness audit to rank the current
+retained and benchmark strategies under a common validation protocol.
+
+Finding:
+
+- S2's retained `exclude_ret_down` benchmark is strongest overall. It is the
+  only tested strategy with bootstrap p05 final equity above starting equity and
+  has the lowest bootstrap loss probability at 3.48%.
+- S1 ranks second and remains the original useful baseline.
+- S3 remains a weak/moderate retained benchmark.
+- S4 ATR ranks weakest and remains a weak benchmark only.
+- Sequence and drawdown risk remain meaningful, including for S2.
+
+Consequence:
+
+- Use S2 as the primary robustness benchmark for future strategy comparisons,
+  including future S5 work.
+- Preserve Monte Carlo review as standard post-backtest validation.
+- Grant no current strategy production approval from this audit.
+- Keep S2 frozen and not production-ready despite its comparative lead.
+- Keep S4 Range rejected, S4 Entropy parked/not promoted, and RAWRS
+  diagnostic-only.
+- Record the full evidence in
+  `docs/04_validation/monte_carlo_robustness_audit.md`.

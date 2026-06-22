@@ -1136,7 +1136,12 @@ mix/resampling risk. Results are conditional on the realized sample and do not
 prove future profitability or model unknown future regimes.
 
 The design contract and interpretation guardrails are defined in
-`docs/04_validation/portfolio_robustness_validation.md`.
+`docs/04_validation/portfolio_robustness_validation.md`. The first completed
+S1/S2/S3/S4 ATR comparison is documented in
+`docs/04_validation/monte_carlo_robustness_audit.md`. Comparable Monte Carlo
+review is now part of post-backtest validation for future strategy candidates;
+it supplements, but does not replace, chronological, regime, walk-forward,
+parameter-sensitivity, capacity, and production-readiness evidence.
 
 ---
 

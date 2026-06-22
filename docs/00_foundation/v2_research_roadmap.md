@@ -23,10 +23,13 @@ overlay tests, and the combined evidence audit. RAWRS is not S5 or a signal
 generator. It remains a diagnostic-only intelligence layer; the tested S3 hard
 filters are rejected.
 
-Phase 31 begins the Portfolio Robustness Validation Layer before external-model
-exploration. Phase 31A is docs/design only. It defines post-backtest Monte Carlo
-validation for retained S1/S2/S3/S4 outputs; it does not generate signals or
-change strategy behavior.
+Phase 31 is complete. It designed and implemented the standalone Portfolio
+Robustness Validation Layer, ran common Monte Carlo validation for retained
+S1/S2/S3/S4 ATR outputs, and completed the Phase 31D cross-strategy audit. S2 is
+the strongest current robustness benchmark, S1 ranks second, S3 remains a
+weak/moderate benchmark, and S4 ATR ranks weakest. This is validation evidence,
+not production approval; Monte Carlo does not generate signals or change
+strategy behavior.
 
 ---
 
@@ -314,10 +317,9 @@ Outcome:
 
 ### Phase 31B: Portfolio Robustness Validation Utilities
 
-Implement standalone, reproducible Monte Carlo utilities after the Phase 31A
-contract is reviewed. Add strict input validation, deterministic seed handling,
-tests, and isolated validation exporters without changing strategy runners or
-signals by default.
+Completed standalone, reproducible Monte Carlo utilities with strict input
+validation, deterministic seed handling, tests, and isolated validation
+exporters without changing strategy runners or signals.
 
 ### Phase 31C: S1/S2/S3/S4 Benchmark Validation
 
@@ -325,11 +327,25 @@ Run the frozen Phase 31 protocol on retained S1/S2/S3/S4 completed-trade outputs
 Produce shuffle and bootstrap evidence using like-for-like settings and preserve
 all source backtest artifacts.
 
+Outcome:
+
+- Complete: 10,000 shuffle and 10,000 bootstrap simulations for each retained
+  S1, S2, S3, and S4 ATR benchmark.
+- Source backtest artifacts remained unchanged; validation outputs were written
+  separately under `reports/v2/validation/monte_carlo/`.
+
 ### Phase 31D: Cross-Strategy Robustness Audit
 
 Compare downside distributions, drawdown tails, loss probability, streaks, and
 ruin/near-ruin risk. Judge risk-adjusted robustness rather than highest PnL or
 best simulated outcome, and document any follow-up validation requirements.
+
+Outcome:
+
+- Complete: `docs/04_validation/monte_carlo_robustness_audit.md`.
+- S2 ranks strongest overall, S1 second, S3 weak/moderate, and S4 ATR weakest.
+- S2 becomes the primary robustness benchmark for future S5 comparisons.
+- No current strategy receives production approval.
 
 ---
 

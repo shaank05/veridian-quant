@@ -42,6 +42,29 @@ No strategy is production-approved.
 
 ## Current Benchmark Evidence
 
+### Phase 31D Robustness Ranking
+
+The first common Monte Carlo audit used 10,000 shuffle and 10,000 bootstrap
+simulations per strategy with ₹1,000,000 starting equity, seed 42, and the same
+drawdown thresholds. The validation-evidence ranking is:
+
+1. **S2 retained Markov benchmark — strongest:** highest nominal and bootstrap
+   median equity, only bootstrap p05 above starting equity, and lowest bootstrap
+   loss probability at 3.48%.
+2. **S1 baseline — second:** good nominal return and 8.62% bootstrap loss
+   probability, but bootstrap p05 falls below starting equity.
+3. **S3 retained trend-pullback benchmark — weak/moderate:** weaker return edge
+   and 16.25% bootstrap loss probability, despite somewhat lower drawdown-breach
+   frequencies.
+4. **S4 ATR compression baseline — weakest:** lowest nominal PnL, worst
+   bootstrap p05 equity, 35.30% loss probability, and 56.62% probability of
+   maximum drawdown >=30%.
+
+This ranking is validation evidence, not production approval. S2 remains
+regime-fragile and shows meaningful sequence risk; no strategy is
+production-approved. Full evidence and limitations are in
+`docs/04_validation/monte_carlo_robustness_audit.md`.
+
 ### S1 Baseline
 
 - Strategy: `S1_BASELINE`

@@ -10,17 +10,18 @@ Feature ideas are not accepted trading rules. They must be tested through the no
 
 ## S5 Relative Strength / Momentum Rotation Candidate Features
 
-`S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` is a design-stage standalone strategy
-family. Its first research cycle should use a small, transparent feature set and
-cross-sectional ranking under Research200 capacity pressure.
+`S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` is a standalone strategy family whose
+first-pass Research200 feature set has been tested.
 
 Current status:
 
-- Phase 32A design only.
-- No implementation, backtest results, or production status.
+- Phase 32A through 32F first-pass lane complete.
+- First-pass feature set produced weak evidence.
+- Simple RS 126D and Vol-Adjusted RS are rejected.
+- Dual Momentum 63/126D is weak and parked only as a benchmark.
 - Independent from S1/S2/S3/S4.
 - No RAWRS, Kronos, TradingAgents, or other external-model inputs initially.
-- Future comparison uses S2 as the primary robustness benchmark.
+- S2 remains the primary robustness benchmark and was not challenged by S5.
 
 Return momentum candidates:
 
@@ -57,15 +58,17 @@ Ranking metadata:
 - Accepted/rejected decision and reason.
 - Deterministic tie-break value.
 
-First-pass variants should consume only the features they declare:
+First-pass variants consumed only the features they declared:
 
-- `S5_SIMPLE_RS_126D_V1`
-- `S5_DUAL_MOMENTUM_63_126D_V1`
-- `S5_VOL_ADJUSTED_RS_V1`
+- `S5_SIMPLE_RS_126D_V1`: rejected.
+- `S5_DUAL_MOMENTUM_63_126D_V1`: weak / parked.
+- `S5_VOL_ADJUSTED_RS_V1`: rejected.
 - Optional later `S5_52W_HIGH_PROXIMITY_V1`
 
-These are research candidates, not accepted trading rules. Avoid large feature
-composites, threshold grids, or post-hoc filters in the first cycle.
+These are not accepted trading rules. The first-pass S5 momentum feature set is
+tested with a weak result. Future momentum ideas should be kept only if they are
+materially redesigned rather than small threshold, lookback, or weighting tweaks
+to the rejected/parked variants.
 
 ---
 

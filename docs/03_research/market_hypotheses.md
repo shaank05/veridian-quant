@@ -333,7 +333,7 @@ Stocks that outperform peers over intermediate horizons may continue to
 outperform because information diffusion, institutional positioning, and
 investor underreaction can persist across multiple sessions.
 
-S5 will test this hypothesis as the standalone
+S5 tested this hypothesis as the standalone
 `S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` strategy family.
 
 The audited Research200 universe is central to the test. Earlier Phase 23/24
@@ -379,11 +379,15 @@ and portfolio chronology.
 
 Audit status:
 
-- Phase 32A design only.
-- No implementation or backtest evidence yet.
+- Phase 32A through 32F first-pass lane complete.
+- First-pass Research200 evidence is weak/mixed.
+- Broad momentum rotation did not produce a strong edge under the current ATR
+  stop/target/time-stop portfolio design.
+- Simple RS 126D and Vol-Adjusted RS are rejected.
+- Dual Momentum 63/126D is weak and parked only as a benchmark.
 - S5 is independent from S1/S2/S3/S4.
 - No RAWRS or external-model features in the first research cycle.
-- S2 is the primary robustness benchmark for later comparison.
+- S2 remains the primary robustness benchmark and was not challenged by S5.
 
 ---
 
@@ -459,8 +463,10 @@ S3 Trend Pullback Continuation has now been tested independently and is parked a
 
 S4 Entropy / Volatility Compression Breakout has now been raw-tested independently and is parked as a weak benchmark-only strategy family, not a production strategy.
 
-The next research priority should not be more S2, S3, or S4 threshold tuning.
-Phase 32A begins the independent S5 Relative Strength / Momentum Rotation design
-after completion of the Phase 31 robustness audit. S5 remains design-stage only
-and must be tested independently on Research200 before any promotion or strategy
-combination.
+S5 Relative Strength / Momentum Rotation has now been first-pass tested
+independently. Simple RS and Vol-Adjusted RS are rejected; Dual Momentum is weak
+and parked as a benchmark only. S5 is not a production strategy.
+
+The next research priority should not be more S2, S3, S4, or immediate S5
+threshold tuning. Future S5 work should require a materially redesigned momentum
+hypothesis rather than small parameter changes to the first-pass variants.

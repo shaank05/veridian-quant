@@ -582,3 +582,45 @@ Consequence:
 - Require standalone backtests and post-backtest Monte Carlo validation in later
   reviewed phases before any retain/reject/park decision.
 - Make no production decision in Phase 32A.
+
+---
+
+## 2026-06-19 - Park S5 After First-Pass Research200 Audit
+
+Decision:
+
+Reject the Simple RS and Vol-Adjusted S5 variants, and park Dual Momentum as a
+weak benchmark only.
+
+Variant decisions:
+
+- `S5_SIMPLE_RS_126D_V1`: rejected.
+- `S5_DUAL_MOMENTUM_63_126D_V1`: weak / parked.
+- `S5_VOL_ADJUSTED_RS_V1`: rejected.
+
+Reason:
+
+The Phase 32E first-pass Research200 results did not challenge S2, S1, or S3.
+Simple RS and Vol-Adjusted RS were negative with weak profit factor and severe
+drawdown. Dual Momentum was the only profitable S5 variant, but its edge was
+thin and concentrated.
+
+Approximate evidence:
+
+- Simple RS: about -Rs 4.90L net PnL, about -10.08% CAGR, about 58.29% maximum
+  drawdown, and about 0.819 profit factor.
+- Dual Momentum: about Rs 2.01L net PnL, about 2.94% CAGR, about 29.10% maximum
+  drawdown, and about 1.051 profit factor.
+- Vol-Adjusted RS: about -Rs 4.19L net PnL, about -8.23% CAGR, about 51.39%
+  maximum drawdown, and about 0.849 profit factor.
+
+Consequence:
+
+- No immediate S5 tuning.
+- S2 remains the primary robustness benchmark.
+- No S5 variant is production-approved.
+- Do not run Monte Carlo for all S5 variants.
+- Dual Momentum Monte Carlo is optional only if a later phase wants
+  weak-benchmark robustness validation.
+- Future work should move to a new hypothesis or materially redesigned momentum
+  logic rather than small changes to these first-pass variants.

@@ -133,6 +133,37 @@ Current S4 decision:
 
 ---
 
+## S5 Rejected / Parked Items
+
+`S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` completed its first-pass Research200
+audit in Phase 32F. S5 is not production-approved.
+
+Rejected first-pass variants:
+
+- `S5_SIMPLE_RS_126D_V1`: rejected because it produced about -Rs 4.90L net PnL,
+  about -10.08% CAGR, about 58.29% maximum drawdown, and about 0.819 profit
+  factor.
+- `S5_VOL_ADJUSTED_RS_V1`: rejected because it produced about -Rs 4.19L net
+  PnL, about -8.23% CAGR, about 51.39% maximum drawdown, and about 0.849 profit
+  factor.
+
+Parked, not rejected:
+
+- `S5_DUAL_MOMENTUM_63_126D_V1`: weak / parked. It was the only profitable S5
+  first-pass variant, at about Rs 2.01L net PnL, about 2.94% CAGR, about 29.10%
+  maximum drawdown, and about 1.051 profit factor, but it did not challenge
+  S2/S1/S3 and was highly symbol-concentrated.
+
+Current S5 decision:
+
+- Do not tune S5 immediately.
+- Do not run Monte Carlo for all S5 variants.
+- Treat Dual Momentum Monte Carlo as optional weak-benchmark validation only if
+  a later phase explicitly requests it.
+- Revisit S5 only with a materially redesigned momentum hypothesis.
+
+---
+
 ## Deferred Advanced Strategy Families
 
 The following remain future research directions:

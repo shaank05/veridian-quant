@@ -4,8 +4,8 @@
 
 S5 tests whether a simple, ranked, long-only relative-strength strategy can
 capture intermediate-term momentum persistence across the audited Research200
-universe. Phase 32A defines the research contract only. It does not implement,
-run, tune, or approve the strategy.
+universe. Phase 32A defined the research contract. Phase 32E completed the
+first-pass Research200 runs, and Phase 32F records the parking decision.
 
 ## 2. Strategy Family Classification
 
@@ -14,7 +14,9 @@ run, tune, or approve the strategy.
 - Direction: long-only.
 - Frequency: daily signal evaluation with swing-position holding periods.
 - Portfolio behavior: ranked candidate selection under finite capacity.
-- Status: design-stage research hypothesis; no backtest evidence yet.
+- Status: first-pass Research200 results completed; Simple RS and Vol-Adjusted
+  RS are rejected, Dual Momentum is weak/parked, and no S5 variant is
+  production-approved.
 
 S5 is a standalone strategy family. It is not an S1, S2, S3, or S4 variant,
 filter, overlay, vote, or blend. The initial strategy will not use RAWRS,
@@ -45,7 +47,18 @@ strategy families.
 
 ## 5. Non-Goals
 
-Phase 32A does not authorize:
+Phase 32F status note:
+
+- Phase 32E Research200 first-pass backtests are complete for Simple RS 126D,
+  Dual Momentum 63/126D, and Vol-Adjusted RS.
+- Simple RS 126D and Vol-Adjusted RS are rejected after negative PnL, weak
+  profit factor, and severe drawdown.
+- Dual Momentum 63/126D is the only profitable S5 first-pass variant, but it is
+  weak, concentrated, and parked as a benchmark only.
+- S5 does not challenge S2, S1, or S3, and no S5 variant is production-approved.
+- Detailed audit: `docs/02_audits/s5_audit.md`.
+
+Phase 32A did not authorize:
 
 - Code, tests, backtests, reports, configuration, or data changes.
 - Mixing S5 signals with S1/S2/S3/S4.
@@ -371,11 +384,11 @@ operational, capacity, and broader validation requirements still apply.
   eligibility, scoring, ranking, signal metadata, and deterministic tie-breaking.
 - **Phase 32D - Portfolio runner/CLI:** integrate S5 with shared trade mechanics,
   ATR risk sizing, capacity handling, diagnostics, and isolated CLI/config scope.
-- **Phase 32E - Research200 backtests:** run frozen first-pass variants over the
-  common window without post-result threshold tuning.
-- **Phase 32F - Audit and Monte Carlo comparison:** reconcile outputs, review
-  failures and concentration, run post-backtest robustness validation, compare
-  with S2/S1/S3/S4 ATR, and decide retain/reject/park status.
+- **Phase 32E - Research200 backtests:** complete. Frozen first-pass variants
+  were run over the common window without post-result threshold tuning.
+- **Phase 32F - Audit and parking decision:** complete as a docs-only first-pass
+  audit. Simple RS and Vol-Adjusted RS are rejected; Dual Momentum is weak and
+  parked. Monte Carlo was not run in this phase.
 
 Each later phase requires its own reviewed scope. Phase 32A authorizes none of
 the implementation or execution work.
@@ -398,8 +411,9 @@ the implementation or execution work.
   initial or later variant?
 - Are sector identifiers available for concentration diagnostics without adding
   an entry filter?
-- What minimum trade count and Monte Carlo stability are required before an S5
-  result is considered publishable rather than exploratory?
+- What minimum trade count and Monte Carlo stability would be required before a
+  materially redesigned S5 result is considered publishable rather than
+  exploratory?
 
 ## 26. References / Related Docs
 
@@ -411,6 +425,7 @@ the implementation or execution work.
 - `docs/04_validation/portfolio_robustness_validation.md`
 - `docs/04_validation/monte_carlo_robustness_audit.md`
 - `docs/02_audits/strategy_audit_master.md`
+- `docs/02_audits/s5_audit.md`
 - `docs/01_strategies/s1_zscore_mean_reversion.md`
 - `docs/01_strategies/s2_markov_state_transition.md`
 - `docs/01_strategies/s3_trend_pullback_continuation.md`

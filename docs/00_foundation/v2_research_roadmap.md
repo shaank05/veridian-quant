@@ -31,11 +31,12 @@ weak/moderate benchmark, and S4 ATR ranks weakest. This is validation evidence,
 not production approval; Monte Carlo does not generate signals or change
 strategy behavior.
 
-Phase 32A begins the docs-only design of S5 Relative Strength / Momentum
-Rotation. S5 is a standalone, ranked Research200 strategy hypothesis with no
-implementation or backtest evidence yet. It does not mix with S1/S2/S3/S4,
-RAWRS, or external models. S2 is the primary robustness benchmark for future S5
-comparison.
+Phase 32A through 32F completed the first S5 Relative Strength / Momentum
+Rotation lane. S5 is a standalone, ranked Research200 strategy family and does
+not mix with S1/S2/S3/S4, RAWRS, or external models. First-pass results did not
+challenge S2, S1, or S3. Simple RS and Vol-Adjusted RS are rejected, while Dual
+Momentum is weak and parked only as a benchmark. No immediate S5 tuning is
+planned.
 
 ---
 
@@ -367,38 +368,66 @@ Outcome:
   models from the initial research cycle.
 - No implementation, backtest, report, or production decision in Phase 32A.
 
-### Phase 32B (Proposed): S5 Feature Utilities
+### Phase 32B: S5 Feature Utilities
 
 Implement and test only the frozen return, trend, high-proximity,
 volatility-adjusted, and optional benchmark-relative features required by the
 declared variants. Freeze lookback endpoints, missing-history behavior, and
 signal-time calculation rules.
 
-### Phase 32C (Proposed): S5 Signal Generation
+Outcome:
+
+- Completed for the first-pass S5 feature set.
+
+### Phase 32C: S5 Signal Generation
 
 Implement standalone S5 eligibility, scoring, cross-sectional ranking,
 deterministic tie-breaking, next-open signal metadata, and accepted/rejected
 candidate diagnostics without mixing earlier strategy logic.
 
-### Phase 32D (Proposed): S5 Portfolio Runner and CLI
+Outcome:
+
+- Completed for the first-pass S5 variants.
+
+### Phase 32D: S5 Portfolio Runner and CLI
 
 Connect S5 to shared v2 trade mechanics, ATR risk sizing, five-position capacity,
 costs, ledger, standard exporters, and an isolated runner/CLI. Preserve ranked
 candidate ordering and explicit rejection reasons.
 
-### Phase 32E (Proposed): S5 Research200 Backtests
+Outcome:
+
+- Completed for the isolated S5 runner and CLI lane.
+
+### Phase 32E: S5 Research200 Backtests
 
 Run frozen first-pass variants independently over 2020-01-01 through 2026-04-30.
 Review performance, yearly stability, concentration, trade count, turnover, and
 capacity pressure without post-result threshold tuning.
 
-### Phase 32F (Proposed): S5 Audit and Monte Carlo Comparison
+Outcome:
 
-Reconcile outputs, audit failure modes and ranking behavior, run the standard
-post-backtest shuffle/bootstrap protocol, and compare S5 primarily with the S2
-robustness benchmark and secondarily with S1/S3/S4 ATR. Decide retain, reject,
-park, or continue-research status; do not infer production approval from a
-single backtest or Monte Carlo result.
+- Complete first-pass backtests for `S5_SIMPLE_RS_126D_V1`,
+  `S5_DUAL_MOMENTUM_63_126D_V1`, and `S5_VOL_ADJUSTED_RS_V1`.
+- Simple RS and Vol-Adjusted RS were negative and severe-drawdown variants.
+- Dual Momentum was the only profitable S5 run, but was weak and concentrated.
+
+### Phase 32F: S5 First-Pass Audit and Parking Decision
+
+Reconcile outputs, audit failure modes and ranking behavior, compare S5
+primarily with the S2 robustness benchmark and secondarily with S1/S3/S4 ATR,
+and decide reject/park status. This phase is docs-only and does not run Monte
+Carlo.
+
+Outcome:
+
+- Complete: `docs/02_audits/s5_audit.md`.
+- Reject `S5_SIMPLE_RS_126D_V1`.
+- Park `S5_DUAL_MOMENTUM_63_126D_V1` as a weak benchmark only.
+- Reject `S5_VOL_ADJUSTED_RS_V1`.
+- No immediate S5 tuning is planned.
+- Monte Carlo for Dual Momentum remains optional only if a later phase wants
+  weak-benchmark robustness validation.
 
 ---
 
@@ -483,6 +512,8 @@ The current evidence says:
 - Additional S2 tuning has reached diminishing returns.
 - Additional S3 tuning risks overfitting.
 - Additional S4 threshold tuning risks overfitting.
+- S5 first-pass momentum rotation did not challenge S2/S1/S3; immediate S5
+  tuning is parked.
 
 Next direction:
 
@@ -492,8 +523,8 @@ Next direction:
 - Prioritize feature stability, significance, and capacity-aware ordering
   research before considering another true overlay.
 - Do not convert S1/S2/S4 post-hoc RAWRS findings directly into hard filters.
-- Execute the S5 design/implementation/validation lane independently before
-  external-model exploration.
+- Keep S5 parked after the first-pass audit unless future work proposes a
+  materially redesigned momentum hypothesis.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 

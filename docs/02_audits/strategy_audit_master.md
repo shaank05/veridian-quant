@@ -34,6 +34,7 @@ No strategy is production-approved.
 | `S4_RANGE_COMPRESSION_BREAKOUT_V1` | Rejected raw baseline | Yes | Yes | Do not promote; negative PnL and high drawdown |
 | `S4_ENTROPY_GATED_BREAKOUT_V1` | Not promoted / parked | Yes | Yes | Near breakeven but negative and unstable; do not promote |
 | `S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` | First-pass audited / weak parked family | Yes | Yes | Simple RS rejected; Dual Momentum weak/parked; Vol-Adjusted rejected; does not challenge S2/S1/S3 |
+| Benchmark/sector/cap context layer | Phase 33A design / foundational validation context | No | No | Docs-only design complete; prioritize before major new strategy-family exploration |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
@@ -285,6 +286,12 @@ Promotion requires:
 - Clear separation between actual portfolio PnL and diagnostic-only counterfactual PnL.
 - Regime fragility review.
 - Portfolio capacity and accepted-trade-selection review.
+- Benchmark-relative review against broad-market and Research200 passive
+  baselines where available.
+- Sector and market-cap bucket exposure review.
+- Capital-utilization and cash-drag review.
+- Clear labeling of point-in-time versus current/static classification when
+  sector, cap, or index-membership metadata is used.
 
 Current decision:
 
@@ -296,3 +303,7 @@ Current decision:
   Dual Momentum only as a weak parked benchmark unless a later phase explicitly
   requests weak-benchmark Monte Carlo validation or a materially redesigned
   momentum hypothesis.
+- Prioritize the Phase 33 benchmark, sector, market-cap, regime, exposure, and
+  capital-utilization context foundation before major new strategy-family
+  exploration. Design reference:
+  `docs/04_validation/benchmark_sector_cap_context.md`.

@@ -38,6 +38,13 @@ challenge S2, S1, or S3. Simple RS and Vol-Adjusted RS are rejected, while Dual
 Momentum is weak and parked only as a benchmark. No immediate S5 tuning is
 planned.
 
+Phase 33 begins before new strategy-family work because benchmark, sector, and
+market-cap context is now foundational. S1 through S5 have mostly been compared
+against each other; Veridian still needs passive broad-market, Research200
+equal-weight, sector, cap-segment, regime, exposure, and capital-utilization
+context before making stronger claims about alpha or designing additional
+strategy families.
+
 ---
 
 ## Completed Phases
@@ -429,6 +436,42 @@ Outcome:
 - Monte Carlo for Dual Momentum remains optional only if a later phase wants
   weak-benchmark robustness validation.
 
+### Phase 33A: Benchmark, Sector, and Market-Cap Context Design
+
+Design the context/data layer needed to compare strategy performance against
+broad-market, Research200, sector, and cap-segment baselines and to diagnose
+sector/cap concentration, risk-on/risk-off dependence, and capital utilization.
+
+Outcome:
+
+- Complete: `docs/04_validation/benchmark_sector_cap_context.md`.
+- Phase 33A is docs/design only.
+- Defines index OHLCV, instrument classification, market-cap bucket, and index
+  membership data requirements.
+- Proposes `market_indices`, `market_index_bars`,
+  `instrument_classification`, and later `index_constituents` data contracts.
+- Establishes benchmark-relative, sector-relative, cap-relative, regime, and
+  portfolio-exposure diagnostic ideas.
+- Requires all benchmark/context reports to label classification as
+  point-in-time or current/static.
+- Explicitly warns that using today's Research200, index membership, sector, or
+  cap classification for historical work can create survivorship bias.
+- Makes no code, test, report, config, data, runner, exporter, or production
+  behavior changes.
+
+### Phase 33B-33G: Benchmark/Context Foundation Roadmap
+
+Planned follow-up phases:
+
+- **Phase 33B:** index metadata and schema/data contracts.
+- **Phase 33C:** index OHLC ingestion for broad, sector, and cap-segment
+  indices.
+- **Phase 33D:** static stock sector/cap classification ingestion.
+- **Phase 33E:** benchmark/context feature utilities.
+- **Phase 33F:** benchmark and capital-utilization audit for S1-S5.
+- **Phase 33G:** strategy exposure and regime audit.
+- **Later:** historical index constituents and point-in-time classification.
+
 ---
 
 ## Retained S2 Benchmarks
@@ -525,6 +568,8 @@ Next direction:
 - Do not convert S1/S2/S4 post-hoc RAWRS findings directly into hard filters.
 - Keep S5 parked after the first-pass audit unless future work proposes a
   materially redesigned momentum hypothesis.
+- Complete Phase 33 benchmark/sector/cap context foundation before major new
+  strategy-family exploration.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 
@@ -551,6 +596,8 @@ The following are future research directions, not accepted production rules:
 - Meta-ranking / capital allocation layer.
 - Walk-forward validation, regime splits, parameter sensitivity, and capacity
   stress testing after the Phase 31 Monte Carlo baseline.
+- Benchmark, sector, market-cap, capital-utilization, and exposure context from
+  the Phase 33 roadmap.
 - Kronos and TradingAgents under a future external-model intelligence lane. They
   are postponed, not rejected, until common validation infrastructure is
   stronger.

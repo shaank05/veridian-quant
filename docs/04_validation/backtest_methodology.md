@@ -193,6 +193,31 @@ Production Universe:
 * Must satisfy data quality requirements
 * Must satisfy minimum history requirements
 
+### 2.12 Benchmark, Sector, and Market-Cap Context
+
+Future strategy audits should include benchmark, sector, and market-cap context
+where data is available.
+
+Required context should include:
+
+* Broad-market benchmark comparison, such as Nifty 50 and Nifty 500.
+* Equal-weight Research200 passive baselines where the universe is applicable.
+* Sector benchmark comparison where sector index data exists.
+* Market-cap segment comparison where cap-segment index data exists.
+* Portfolio exposure and PnL by sector and market-cap bucket.
+* Capital utilization and cash-drag diagnostics.
+
+All reports using sector, market-cap, or index-membership classification must
+label whether the classification is point-in-time or current/static.
+
+Current/static classification may be acceptable for exploratory diagnostics, but
+production-grade historical claims require point-in-time membership and
+classification where practical.
+
+Design reference:
+
+* `docs/04_validation/benchmark_sector_cap_context.md`
+
 ## Current Data Availability
 
 Current database contains:

@@ -8,6 +8,63 @@ Feature ideas are not accepted trading rules. They must be tested through the no
 
 ---
 
+## Benchmark, Sector, and Market-Cap Context Features
+
+Phase 33A defines these as context and diagnostic candidates, not accepted
+trading rules.
+
+Design reference:
+
+- `docs/04_validation/benchmark_sector_cap_context.md`
+
+Benchmark-relative candidates:
+
+- Stock return minus NIFTY 50 return over matched 21/63/126/252-session
+  horizons.
+- Stock return minus NIFTY 500 return over matched horizons.
+- Stock return minus equal-weight Research200 return.
+- Strategy equity return minus NIFTY and NIFTY 500 buy-and-hold return.
+- Strategy equity return minus monthly equal-weight Research200 rebalance.
+- Benchmark above SMA200 flag.
+- Benchmark drawdown from recent high.
+- Benchmark volatility and trend regime.
+
+Sector-relative candidates:
+
+- Stock return minus sector index return.
+- Stock rank or percentile within sector.
+- Sector momentum rank across sectors.
+- Sector above SMA200 flag.
+- Sector breadth if constituent data exists.
+- Strategy PnL, accepted signals, rejected signals, and capacity rejections by
+  sector.
+
+Market-cap-relative candidates:
+
+- Stock return minus cap-segment index return.
+- Stock rank or percentile within market-cap bucket.
+- Cap-segment momentum rank.
+- Cap-segment above SMA200 flag.
+- Smallcap versus largecap relative strength.
+- Midcap versus largecap relative strength.
+- Strategy PnL, accepted signals, rejected signals, and capacity rejections by
+  market-cap bucket.
+
+Regime and exposure candidates:
+
+- Risk-on/risk-off regime using smallcap or midcap relative strength versus
+  largecap.
+- Sector leadership and cap-segment leadership rotation.
+- Portfolio exposure by sector and market-cap bucket.
+- Capital utilization and cash-drag diagnostics.
+- Benchmark-relative performance by broad-market, sector, and cap-segment
+  regime.
+
+All features using sector, cap, or index-membership classification must label
+whether the classification is point-in-time or current/static.
+
+---
+
 ## S5 Relative Strength / Momentum Rotation Candidate Features
 
 `S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` is a standalone strategy family whose

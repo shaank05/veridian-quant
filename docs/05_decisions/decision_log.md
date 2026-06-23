@@ -624,3 +624,35 @@ Consequence:
   weak-benchmark robustness validation.
 - Future work should move to a new hypothesis or materially redesigned momentum
   logic rather than small changes to these first-pass variants.
+
+---
+
+## 2026-06-19 - Prioritize Benchmark/Sector/Cap Context Before More Strategy Families
+
+Decision:
+
+Prioritize benchmark, sector, and market-cap context before major new strategy
+family exploration.
+
+Reason:
+
+S1 through S5 comparisons are incomplete without passive broad-market,
+Research200 equal-weight, cap-segment, and sector baselines. Current strategy
+results may reflect stock-specific alpha, sector beta, market-cap segment beta,
+broad-market exposure, risk-on/risk-off regimes, accidental concentration, cash
+drag, or wrong benchmark framing.
+
+Consequence:
+
+- Phase 33 will build the benchmark/context foundation before major new strategy
+  exploration.
+- Phase 33A is docs/design only and is recorded in
+  `docs/04_validation/benchmark_sector_cap_context.md`.
+- Later Phase 33 work should add index metadata, index OHLC ingestion, static
+  classification, benchmark/context feature utilities, S1-S5 benchmark and
+  capital-utilization audits, and exposure/regime audits.
+- Benchmark/context reports must label whether sector, cap, and index-membership
+  classifications are point-in-time or current/static.
+- Current/static classification may support first-pass diagnostics, but
+  production-grade historical claims require historical membership and
+  classification where possible.

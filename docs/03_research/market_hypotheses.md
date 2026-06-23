@@ -391,6 +391,72 @@ Audit status:
 
 ---
 
+# H10 - Sector, Market-Cap, and Benchmark Context Dependence
+
+## Hypothesis
+
+Strategy performance may differ materially by sector, market-cap segment, and
+benchmark regime.
+
+A strategy that appears profitable in aggregate may be expressing sector beta,
+market-cap segment beta, broad-market exposure, or risk-on/risk-off exposure
+rather than stock-specific alpha.
+
+Phase 33A designs the context layer needed to study this hypothesis:
+
+- `docs/04_validation/benchmark_sector_cap_context.md`
+
+## Expected Edge
+
+Expected research value comes from:
+
+- Distinguishing stock-specific alpha from passive benchmark exposure.
+- Identifying whether sector-relative strength improves candidate ranking.
+- Identifying whether smallcap/midcap risk-on regimes dominate long-only
+  strategy returns.
+- Detecting sector or cap-bucket concentration before it is mistaken for robust
+  alpha.
+- Understanding whether weak CAGR is caused by low capital utilization, cash
+  drag, or true lack of edge.
+
+## Why This May Work
+
+- Indian sector leadership can persist for long enough to affect swing strategy
+  outcomes.
+- Smallcap and midcap phases can materially change the opportunity set.
+- Broad-market rallies can make weak stock selection look better than it is.
+- Sector-relative comparison may separate true stock strength from a rising
+  sector tide.
+- Cap-segment-relative comparison may reveal whether a strategy is only riding
+  risk appetite.
+
+## When It May Fail
+
+- Current/static sector or market-cap classification introduces survivorship
+  bias when used historically.
+- Sector indices may not match the tradable universe or classification source.
+- Market-cap bucket definitions may shift through time.
+- Benchmark-relative features may overfit one regime or universe.
+- Passive benchmark framing may be incomplete if dividends, rebalancing, or
+  total-return treatment are inconsistent.
+
+## Candidate Features
+
+- Stock return minus NIFTY return.
+- Stock return minus sector index return.
+- Stock return minus cap-segment index return.
+- Sector momentum rank.
+- Cap-segment momentum rank.
+- Sector above SMA200 flag.
+- Cap-segment above SMA200 flag.
+- Smallcap versus largecap relative strength.
+- Midcap versus largecap relative strength.
+- Strategy PnL by sector and cap bucket.
+- Accepted/rejected/capacity signals by sector and cap bucket.
+- Capital utilization and cash-drag metrics.
+
+---
+
 # Rejected or Deferred Hypotheses
 
 The following are not accepted production rules.
@@ -470,3 +536,7 @@ and parked as a benchmark only. S5 is not a production strategy.
 The next research priority should not be more S2, S3, S4, or immediate S5
 threshold tuning. Future S5 work should require a materially redesigned momentum
 hypothesis rather than small parameter changes to the first-pass variants.
+
+Before major new strategy-family exploration, the project should prioritize the
+Phase 33 benchmark, sector, market-cap, regime, exposure, and
+capital-utilization context foundation.

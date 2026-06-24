@@ -112,6 +112,11 @@ class InstrumentClassification:
     effective_to: date | datetime | str | None = None
     classification_mode: ClassificationMode | str = ClassificationMode.UNKNOWN
     notes: str | None = None
+    instrument_key: str | None = None
+    isin: str | None = None
+    company_name: str | None = None
+    basic_industry: str | None = None
+    ingested_at: datetime | None = None
 
     def __post_init__(self) -> None:
         effective_from = _normalize_date(self.effective_from, "effective_from")
@@ -143,6 +148,10 @@ class InstrumentClassification:
             "classification_mode",
             _coerce_enum(self.classification_mode, ClassificationMode, "classification_mode"),
         )
+        object.__setattr__(self, "instrument_key", _optional_text(self.instrument_key))
+        object.__setattr__(self, "isin", _optional_text(self.isin))
+        object.__setattr__(self, "company_name", _optional_text(self.company_name))
+        object.__setattr__(self, "basic_industry", _optional_text(self.basic_industry))
 
 
 @dataclass(frozen=True, slots=True)
@@ -277,3 +286,10 @@ def _non_empty_text(value: object, field_name: str) -> str:
     if not text:
         raise ValueError(f"{field_name} must be non-empty")
     return text
+
+
+def _optional_text(value: object) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None

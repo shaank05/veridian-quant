@@ -84,6 +84,50 @@ def test_cli_argument_parsing_supports_comma_separated_indices(monkeypatch) -> N
     assert observed["indices"] == ["NIFTY_50", "NIFTY_BANK"]
 
 
+def test_cli_audit_db_uses_read_only_audit_helper(monkeypatch, capsys) -> None:
+    observed = {}
+
+    monkeypatch.setattr(
+        run_market_index_ingestion.IngestionConfig,
+        "from_env",
+        staticmethod(lambda: _config()),
+    )
+    monkeypatch.setattr(run_market_index_ingestion.DatabaseClient, "__init__", lambda self: None)
+    monkeypatch.setattr(
+        run_market_index_ingestion.DatabaseClient,
+        "get_engine",
+        lambda self: "engine",
+    )
+    monkeypatch.setattr(
+        run_market_index_ingestion,
+        "audit_market_index_daily_bars",
+        lambda engine, **kwargs: FakeAuditReport(observed, engine, kwargs),
+    )
+    monkeypatch.setattr(
+        run_market_index_ingestion,
+        "MarketIndexIngestionRunner",
+        lambda **kwargs: (_ for _ in ()).throw(AssertionError("audit must not ingest")),
+    )
+
+    exit_code = run_market_index_ingestion.main(
+        [
+            "--audit-db",
+            "--indices",
+            "NIFTY_50,NIFTY_AUTO",
+            "--start-date",
+            "2026-01-01",
+            "--end-date",
+            "2026-01-31",
+        ]
+    )
+
+    payload = json.loads(capsys.readouterr().out)
+    assert exit_code == 0
+    assert observed["engine"] == "engine"
+    assert observed["kwargs"]["index_symbols"] == ["NIFTY_50", "NIFTY_AUTO"]
+    assert payload["audit"] is True
+
+
 def _config():
     from pathlib import Path
 
@@ -129,3 +173,12 @@ class FakeSummary:
 
     def to_dict(self):
         return {"dry_run": self.dry_run, "candles_inserted": 0}
+
+
+class FakeAuditReport:
+    def __init__(self, observed, engine, kwargs):
+        observed["engine"] = engine
+        observed["kwargs"] = kwargs
+
+    def to_dict(self):
+        return {"audit": True}

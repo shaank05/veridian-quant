@@ -23,15 +23,17 @@ def test_aliases_resolve_fake_upstox_instruments() -> None:
             [
                 _instrument("NSE_INDEX|Nifty 50", "Nifty 50"),
                 _instrument("NSE_INDEX|Nifty Bank", "NIFTY BANK", trading_symbol="BANKNIFTY"),
+                _instrument("NSE_INDEX|NIFTY SMLCAP 250", "NIFTY SMLCAP 250"),
             ]
         )
     )
 
-    result = resolver.resolve(["NIFTY_50", "NIFTY_BANK"])
+    result = resolver.resolve(["NIFTY_50", "NIFTY_BANK", "NIFTY_SMALLCAP_250"])
 
     assert [item.instrument_key for item in result.resolved] == [
         "NSE_INDEX|Nifty 50",
         "NSE_INDEX|Nifty Bank",
+        "NSE_INDEX|NIFTY SMLCAP 250",
     ]
     assert result.unresolved == ()
     assert result.ambiguous == ()

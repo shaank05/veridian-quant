@@ -73,7 +73,13 @@ MARKET_INDEX_REGISTRY: tuple[MarketIndexDefinition, ...] = (
         "NIFTY_SMALLCAP_250",
         "NIFTY Smallcap 250",
         IndexType.CAP_SEGMENT,
-        ("NIFTY SMALLCAP 250", "Nifty Smallcap 250", "SMALLCAP250"),
+        (
+            "NIFTY SMALLCAP 250",
+            "Nifty Smallcap 250",
+            "NIFTY SMLCAP 250",
+            "SMALLCAP250",
+            "SMLCAP250",
+        ),
     ),
     MarketIndexDefinition("NIFTY_IT", "NIFTY IT", IndexType.SECTOR, ("NIFTY IT",)),
     MarketIndexDefinition(

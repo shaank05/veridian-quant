@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from veridian_quant.v2.data.instrument_classification_ingestion import UNKNOWN
 from veridian_quant.v2.data.upstox_fundamentals_client import (
@@ -46,6 +46,7 @@ class ParsedCompanyFundamentals:
     shareholding: list[dict[str, Any]] = field(default_factory=list)
     corporate_actions: list[dict[str, Any]] = field(default_factory=list)
     competitors: list[dict[str, Any]] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
 
     def extend(self, other: "ParsedCompanyFundamentals") -> None:
         self.profiles.extend(other.profiles)
@@ -54,6 +55,7 @@ class ParsedCompanyFundamentals:
         self.shareholding.extend(other.shareholding)
         self.corporate_actions.extend(other.corporate_actions)
         self.competitors.extend(other.competitors)
+        self.warnings.extend(other.warnings)
 
 
 @dataclass(slots=True)
@@ -153,7 +155,7 @@ class CompanyFundamentalsStorage:
                         reporting_frequency TEXT,
                         fiscal_year TEXT,
                         fiscal_quarter TEXT,
-                        period_end_date TEXT NOT NULL,
+                        period_end_date TEXT,
                         source TEXT NOT NULL,
                         fetched_at TIMESTAMP NOT NULL,
                         is_point_in_time_safe BOOLEAN NOT NULL,
@@ -177,7 +179,7 @@ class CompanyFundamentalsStorage:
                         symbol TEXT NOT NULL,
                         holder_category TEXT NOT NULL,
                         holding_percent TEXT,
-                        period_end_date TEXT NOT NULL,
+                        period_end_date TEXT,
                         source TEXT NOT NULL,
                         fetched_at TIMESTAMP NOT NULL,
                         is_point_in_time_safe BOOLEAN NOT NULL,
@@ -208,12 +210,14 @@ class CompanyFundamentalsStorage:
                     """
                 )
             )
+            _drop_legacy_competitors_table_if_needed(conn)
             conn.execute(
                 text(
                     f"""
                     CREATE TABLE IF NOT EXISTS {COMPETITORS_TABLE} (
                         isin TEXT NOT NULL,
                         symbol TEXT NOT NULL,
+                        competitor_key TEXT NOT NULL,
                         competitor_name TEXT NOT NULL,
                         competitor_symbol TEXT,
                         competitor_isin TEXT,
@@ -222,7 +226,7 @@ class CompanyFundamentalsStorage:
                         fetched_at TIMESTAMP NOT NULL,
                         is_point_in_time_safe BOOLEAN NOT NULL,
                         raw_payload TEXT NOT NULL,
-                        PRIMARY KEY (isin, competitor_name, source, snapshot_date)
+                        PRIMARY KEY (isin, competitor_key, source, snapshot_date)
                     )
                     """
                 )
@@ -238,15 +242,18 @@ class CompanyFundamentalsStorage:
             ACTIONS_TABLE: parsed.corporate_actions,
             COMPETITORS_TABLE: parsed.competitors,
         }
+        rows_upserted = {table: 0 for table in rows_by_table}
         with self.engine.begin() as conn:
             for table, rows in rows_by_table.items():
                 if not rows:
                     continue
                 delete_sql, insert_sql = _upsert_sql(table)
-                for row in rows:
+                deduped_rows = _dedupe_rows(rows, _upsert_keys(table))
+                for row in deduped_rows:
                     conn.execute(text(delete_sql), row)
-                conn.execute(text(insert_sql), rows)
-        return {table: len(rows) for table, rows in rows_by_table.items()}
+                conn.execute(text(insert_sql), deduped_rows)
+                rows_upserted[table] = len(deduped_rows)
+        return rows_upserted
 
 
 class CompanyFundamentalsIngestionRunner:
@@ -296,9 +303,12 @@ class CompanyFundamentalsIngestionRunner:
                 failures_by_symbol.setdefault(entry.symbol, []).append("missing ISIN")
                 continue
             for endpoint in endpoint_list:
-                result = self.client.fetch_endpoint(entry.isin, endpoint)
+                identifier = entry.instrument_key if endpoint == "competitors" else entry.isin
+                result = self.client.fetch_endpoint(identifier, endpoint)
                 if result.no_data:
                     no_data += 1
+                    if result.error:
+                        warnings.append(f"{entry.symbol} {endpoint}: {result.error}")
                     if not result.ok:
                         failures_by_symbol.setdefault(entry.symbol, []).append(
                             f"{endpoint}: {result.error or 'no data'}"
@@ -316,6 +326,8 @@ class CompanyFundamentalsIngestionRunner:
                 except ValueError as error:
                     failures += 1
                     failures_by_symbol.setdefault(entry.symbol, []).append(f"{endpoint}: {error}")
+
+        warnings.extend(parsed.warnings)
 
         rows_upserted = _empty_counts()
         if not dry_run:
@@ -438,12 +450,16 @@ def parse_endpoint_payload(
             ]
         )
     if endpoint in {"income_statement", "balance_sheet", "cash_flow"}:
-        return ParsedCompanyFundamentals(
-            financial_statements=[
-                _statement_row(entry, endpoint, statement, source, fetched_at)
-                for statement in _statement_items(payload)
-            ]
-        )
+        rows = [
+            _statement_row(entry, endpoint, statement, source, fetched_at)
+            for statement in _statement_items(payload, endpoint)
+        ]
+        warnings = [
+            f"{entry.symbol} {endpoint}: statement row missing period/date; stored raw payload with null period"
+            for row in rows
+            if row["period_end_date"] is None
+        ]
+        return ParsedCompanyFundamentals(financial_statements=rows, warnings=warnings)
     if endpoint == "shareholding":
         return ParsedCompanyFundamentals(
             shareholding=[
@@ -475,8 +491,11 @@ def update_classification_csv_from_profiles(
     source: str,
 ) -> tuple[int, int]:
     rows, fieldnames = _read_csv_with_fields(classification_file)
+    if not rows:
+        raise ValueError("classification CSV has no data rows; refusing to write header-only update")
     rows_updated, fields_updated = _apply_profile_updates(rows, profile_rows, source)
     if rows_updated:
+        fieldnames = _fieldnames_with_row_keys(fieldnames, rows)
         with Path(classification_file).open("w", newline="", encoding="utf-8") as handle:
             writer = csv.DictWriter(handle, fieldnames=fieldnames)
             writer.writeheader()
@@ -529,7 +548,12 @@ def _key_ratio_row(
         "isin": entry.isin,
         "symbol": entry.symbol,
         "ratio_name": _first_text(ratio, "ratio_name", "name", "key") or "UNKNOWN",
-        "ratio_value": _scalar(ratio.get("ratio_value") or ratio.get("value")),
+        "ratio_value": _scalar(
+            ratio.get("ratio_value")
+            or ratio.get("value")
+            or ratio.get("company_value")
+            or ratio.get("companyValue")
+        ),
         "unit": _first_text(ratio, "unit"),
         "snapshot_date": snapshot_date,
         "source": source,
@@ -546,15 +570,20 @@ def _statement_row(
     source: str,
     fetched_at: datetime,
 ) -> dict[str, Any]:
-    period_end = _date_like(statement, "period_end_date", "periodEndDate", "date")
-    if not period_end:
-        raise ValueError(f"{statement_type} statement missing period_end_date")
+    period_end = _date_like(
+        statement,
+        "period_end_date",
+        "periodEndDate",
+        "period",
+        "date",
+        "year",
+    )
     return {
         "isin": entry.isin,
         "symbol": entry.symbol,
         "statement_type": statement_type,
-        "reporting_frequency": _first_text(statement, "reporting_frequency", "frequency"),
-        "fiscal_year": _scalar(statement.get("fiscal_year") or statement.get("year")),
+        "reporting_frequency": _first_text(statement, "reporting_frequency", "frequency", "time_period"),
+        "fiscal_year": _scalar(statement.get("fiscal_year") or statement.get("year") or statement.get("period")),
         "fiscal_quarter": _scalar(statement.get("fiscal_quarter") or statement.get("quarter")),
         "period_end_date": period_end,
         "source": source,
@@ -595,14 +624,16 @@ def _corporate_action_row(
         "isin": entry.isin,
         "symbol": entry.symbol,
         "event_key": hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
-        "action_type": _first_text(row, "action_type", "type"),
-        "ex_date": _date_like(row, "ex_date", "exDate"),
+        "action_type": _first_text(row, "action_type", "type", "name"),
+        "ex_date": _date_like(row, "ex_date", "exDate", "expiry_date", "expiryDate"),
         "record_date": _date_like(row, "record_date", "recordDate"),
         "announced_date": _date_like(row, "announced_date", "announcementDate"),
-        "value": _scalar(row.get("value") or row.get("ratio")),
+        "value": _scalar(row.get("value") or row.get("amount") or row.get("ratio")),
         "source": source,
         "fetched_at": fetched_at,
-        "is_point_in_time_safe": bool(_date_like(row, "ex_date", "exDate", "record_date", "recordDate")),
+        "is_point_in_time_safe": bool(
+            _date_like(row, "ex_date", "exDate", "expiry_date", "expiryDate", "record_date", "recordDate")
+        ),
         "raw_payload": payload_json,
     }
 
@@ -613,13 +644,28 @@ def _competitor_row(
     source: str,
     fetched_at: datetime,
 ) -> dict[str, Any]:
+    profile = row.get("company_profile") if isinstance(row.get("company_profile"), dict) else {}
     snapshot_date = _date_like(row, "snapshot_date", "as_of_date", "date") or fetched_at.date().isoformat()
+    competitor_key = (
+        _first_text(row, "competitor_key", "instrument_key", "instrumentKey", "competitor_isin", "isin")
+        or _first_text(profile, "instrument_key", "instrumentKey", "isin")
+        or hashlib.sha256(_json_dumps(row).encode("utf-8")).hexdigest()
+    )
     return {
         "isin": entry.isin,
         "symbol": entry.symbol,
-        "competitor_name": _first_text(row, "competitor_name", "company_name", "name") or "UNKNOWN",
-        "competitor_symbol": _first_text(row, "competitor_symbol", "symbol"),
-        "competitor_isin": _first_text(row, "competitor_isin", "isin"),
+        "competitor_key": competitor_key,
+        "competitor_name": (
+            _first_text(row, "competitor_name", "company_name", "name")
+            or _first_text(profile, "company_name", "name")
+            or "UNKNOWN"
+        ),
+        "competitor_symbol": _first_text(row, "competitor_symbol", "symbol", "trading_symbol"),
+        "competitor_isin": (
+            _first_text(row, "competitor_isin", "isin")
+            or _first_text(profile, "isin")
+            or _isin_from_instrument_key(competitor_key)
+        ),
         "snapshot_date": snapshot_date,
         "source": source,
         "fetched_at": fetched_at,
@@ -629,6 +675,8 @@ def _competitor_row(
 
 
 def _ratio_items(payload: Any) -> list[dict[str, Any]]:
+    if isinstance(payload, list):
+        return [_payload_dict(item) for item in payload]
     payload = _payload_dict(payload)
     ratios = payload.get("ratios", payload)
     if isinstance(ratios, list):
@@ -642,8 +690,49 @@ def _ratio_items(payload: Any) -> list[dict[str, Any]]:
     raise ValueError("key_ratios payload must contain a dict or list")
 
 
-def _statement_items(payload: Any) -> list[dict[str, Any]]:
+def _statement_items(payload: Any, endpoint: str) -> list[dict[str, Any]]:
     payload = _payload_dict(payload)
+    if endpoint in {"income_statement", "cash_flow"}:
+        section_key = "income_statement" if endpoint == "income_statement" else "cash_flow"
+        section = payload.get(section_key)
+        if isinstance(section, list):
+            by_period: dict[str, dict[str, Any]] = {}
+            missing_period: list[dict[str, Any]] = []
+            for item in section:
+                item = _payload_dict(item)
+                category = _first_text(item, "category", "name") or "UNKNOWN"
+                history = item.get("history")
+                if not isinstance(history, list):
+                    continue
+                for history_item in history:
+                    history_item = _payload_dict(history_item)
+                    period = _first_text(history_item, "period", "period_end_date", "date")
+                    statement = {
+                        "type": payload.get("type"),
+                        "time_period": payload.get("time_period"),
+                        "units_in": payload.get("units_in"),
+                        "period": period,
+                        "metrics": {category: history_item},
+                    }
+                    if period:
+                        existing = by_period.setdefault(period, statement)
+                        existing.setdefault("metrics", {})[category] = history_item
+                    else:
+                        missing_period.append(statement)
+            return [*by_period.values(), *missing_period]
+
+    history = payload.get("history")
+    if isinstance(history, list):
+        return [
+            {
+                **_payload_dict(item),
+                "type": payload.get("type"),
+                "time_period": payload.get("time_period"),
+                "units_in": payload.get("units_in"),
+            }
+            for item in history
+        ]
+
     statements = payload.get("statements", payload.get("periods", payload))
     if isinstance(statements, list):
         return [_payload_dict(item) for item in statements]
@@ -653,6 +742,8 @@ def _statement_items(payload: Any) -> list[dict[str, Any]]:
 
 
 def _list_items(payload: Any, key: str) -> list[dict[str, Any]]:
+    if isinstance(payload, list):
+        return [_payload_dict(item) for item in payload]
     payload = _payload_dict(payload)
     items = payload.get(key, payload)
     if isinstance(items, list):
@@ -704,15 +795,23 @@ def _apply_profile_updates(
     return rows_updated, fields_updated
 
 
+def _drop_legacy_competitors_table_if_needed(conn: object) -> None:
+    inspector = inspect(conn)
+    if not inspector.has_table(COMPETITORS_TABLE):
+        return
+    column_names = {column["name"] for column in inspector.get_columns(COMPETITORS_TABLE)}
+    pk_columns = set(inspector.get_pk_constraint(COMPETITORS_TABLE).get("constrained_columns") or [])
+    if "competitor_key" not in column_names or pk_columns != {
+        "isin",
+        "competitor_key",
+        "source",
+        "snapshot_date",
+    }:
+        conn.execute(text(f"DROP TABLE {COMPETITORS_TABLE}"))
+
+
 def _upsert_sql(table: str) -> tuple[str, str]:
-    keys = {
-        PROFILE_TABLE: ("isin", "source", "snapshot_date"),
-        KEY_RATIOS_TABLE: ("isin", "ratio_name", "source", "snapshot_date"),
-        STATEMENTS_TABLE: ("isin", "statement_type", "reporting_frequency", "period_end_date", "source"),
-        SHAREHOLDING_TABLE: ("isin", "holder_category", "period_end_date", "source"),
-        ACTIONS_TABLE: ("isin", "event_key", "source"),
-        COMPETITORS_TABLE: ("isin", "competitor_name", "source", "snapshot_date"),
-    }[table]
+    keys = _upsert_keys(table)
     columns = _table_columns(table)
     where = " AND ".join(f"{key} = :{key}" for key in keys)
     insert_columns = ", ".join(columns)
@@ -721,6 +820,24 @@ def _upsert_sql(table: str) -> tuple[str, str]:
         f"DELETE FROM {table} WHERE {where}",
         f"INSERT INTO {table} ({insert_columns}) VALUES ({values})",
     )
+
+
+def _upsert_keys(table: str) -> tuple[str, ...]:
+    return {
+        PROFILE_TABLE: ("isin", "source", "snapshot_date"),
+        KEY_RATIOS_TABLE: ("isin", "ratio_name", "source", "snapshot_date"),
+        STATEMENTS_TABLE: ("isin", "statement_type", "reporting_frequency", "period_end_date", "source"),
+        SHAREHOLDING_TABLE: ("isin", "holder_category", "period_end_date", "source"),
+        ACTIONS_TABLE: ("isin", "event_key", "source"),
+        COMPETITORS_TABLE: ("isin", "competitor_key", "source", "snapshot_date"),
+    }[table]
+
+
+def _dedupe_rows(rows: list[dict[str, Any]], keys: tuple[str, ...]) -> list[dict[str, Any]]:
+    deduped: dict[tuple[Any, ...], dict[str, Any]] = {}
+    for row in rows:
+        deduped[tuple(row.get(key) for key in keys)] = row
+    return list(deduped.values())
 
 
 def _table_columns(table: str) -> tuple[str, ...]:
@@ -795,6 +912,7 @@ def _table_columns(table: str) -> tuple[str, ...]:
         COMPETITORS_TABLE: (
             "isin",
             "symbol",
+            "competitor_key",
             "competitor_name",
             "competitor_symbol",
             "competitor_isin",
@@ -838,6 +956,17 @@ def _read_csv_with_fields(path: Path) -> tuple[list[dict[str, str]], list[str]]:
     with Path(path).open(newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
         return list(reader), list(reader.fieldnames or [])
+
+
+def _fieldnames_with_row_keys(fieldnames: list[str], rows: list[dict[str, str]]) -> list[str]:
+    updated = list(fieldnames)
+    seen = set(updated)
+    for row in rows:
+        for key in row:
+            if key not in seen:
+                updated.append(key)
+                seen.add(key)
+    return updated
 
 
 def _isin_from_instrument_key(instrument_key: str | None) -> str | None:

@@ -10,6 +10,7 @@ import logging
 import time
 from dataclasses import dataclass
 from typing import Any
+from urllib.parse import quote
 
 import requests
 
@@ -30,14 +31,14 @@ SUPPORTED_FUNDAMENTALS_ENDPOINTS = (
 )
 
 DEFAULT_ENDPOINT_PATHS = {
-    "profile": "/company/profile/{isin}",
-    "key_ratios": "/company/key-ratios/{isin}",
-    "income_statement": "/company/income-statement/{isin}",
-    "balance_sheet": "/company/balance-sheet/{isin}",
-    "cash_flow": "/company/cash-flow/{isin}",
-    "shareholding": "/company/shareholding/{isin}",
-    "corporate_actions": "/company/corporate-actions/{isin}",
-    "competitors": "/company/competitors/{isin}",
+    "profile": "/fundamentals/{isin}/profile",
+    "key_ratios": "/fundamentals/{isin}/key-ratios",
+    "income_statement": "/fundamentals/{isin}/income-statement",
+    "balance_sheet": "/fundamentals/{isin}/balance-sheet",
+    "cash_flow": "/fundamentals/{isin}/cash-flow",
+    "shareholding": "/fundamentals/{isin}/shareholding",
+    "corporate_actions": "/fundamentals/{isin}/corporate-actions",
+    "competitors": "/fundamentals/{isin}/competitors",
 }
 
 
@@ -70,7 +71,7 @@ class UpstoxFundamentalsClient:
         self.endpoint_paths = {**DEFAULT_ENDPOINT_PATHS, **(endpoint_paths or {})}
 
     def fetch_endpoint(self, isin: str | None, endpoint: str) -> FundamentalsEndpointResult:
-        """Fetch one supported fundamentals endpoint for one ISIN."""
+        """Fetch one supported fundamentals endpoint for one identifier."""
 
         endpoint = _normalize_endpoint(endpoint)
         isin = (isin or "").strip().upper()
@@ -84,7 +85,7 @@ class UpstoxFundamentalsClient:
                 no_data=True,
             )
 
-        url = self.base_url + self.endpoint_paths[endpoint].format(isin=isin)
+        url = self.base_url + self.endpoint_paths[endpoint].format(isin=quote(isin, safe=""))
         headers = {
             "Accept": "application/json",
             "Authorization": f"Bearer {self.config.access_token or ''}",
@@ -117,13 +118,24 @@ class UpstoxFundamentalsClient:
                 attempt += 1
                 continue
 
-            if response.status_code == 404:
+            if response.status_code == 204:
                 return FundamentalsEndpointResult(
                     isin=isin,
                     endpoint=endpoint,
                     payload=None,
                     ok=True,
                     status_code=response.status_code,
+                    no_data=True,
+                )
+
+            if response.status_code == 404 and endpoint == "shareholding":
+                return FundamentalsEndpointResult(
+                    isin=isin,
+                    endpoint=endpoint,
+                    payload=None,
+                    ok=True,
+                    status_code=response.status_code,
+                    error=f"HTTP 404: {response.text[:200]}",
                     no_data=True,
                 )
 
@@ -152,10 +164,21 @@ class UpstoxFundamentalsClient:
             except ValueError as error:
                 return _failed(isin, endpoint, f"malformed JSON: {error}", response.status_code)
 
+            data = _extract_data(payload)
+            if _is_empty_payload(data):
+                return FundamentalsEndpointResult(
+                    isin=isin,
+                    endpoint=endpoint,
+                    payload=data,
+                    ok=True,
+                    status_code=response.status_code,
+                    no_data=True,
+                )
+
             return FundamentalsEndpointResult(
                 isin=isin,
                 endpoint=endpoint,
-                payload=_extract_data(payload),
+                payload=data,
                 status_code=response.status_code,
             )
 
@@ -208,6 +231,10 @@ def _extract_data(payload: Any) -> Any:
     if isinstance(payload, dict) and "data" in payload:
         return payload["data"]
     return payload
+
+
+def _is_empty_payload(payload: Any) -> bool:
+    return payload is None or payload == [] or payload == {}
 
 
 def _failed(

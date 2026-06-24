@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
+import pytest
 from sqlalchemy import create_engine, text
 
 from veridian_quant.v2.data.company_fundamentals_ingestion import (
@@ -93,12 +94,48 @@ def test_ratios_statements_shareholding_actions_and_competitors_are_stored() -> 
         action_count = conn.execute(text(f"SELECT COUNT(*) FROM {ACTIONS_TABLE}")).scalar_one()
         competitor = conn.execute(text(f"SELECT * FROM {COMPETITORS_TABLE}")).mappings().one()
     assert ratio["ratio_name"] == "pe"
+    assert ratio["ratio_value"] == "21.5"
     assert not ratio["is_point_in_time_safe"]
-    assert statement["period_end_date"] == "2026-03-31"
+    assert statement["period_end_date"] == "Mar 2026"
     assert statement["is_point_in_time_safe"]
     assert shareholding["holder_category"] == "Promoter"
     assert action_count == 1
     assert competitor["competitor_name"] == "Beta Ltd"
+    assert competitor["competitor_key"] == "NSE_EQ|INE000B01010"
+    assert competitor["competitor_isin"] == "INE000B01010"
+
+
+def test_competitors_with_unknown_names_use_instrument_key_for_idempotent_upsert() -> None:
+    engine = create_engine("sqlite:///:memory:")
+    entry = CompanyUniverseEntry(symbol="AAA", isin="INE000A01010", instrument_key="NSE_EQ|INE000A01010")
+    parsed = parse_endpoint_payload(
+        entry,
+        "competitors",
+        [
+            {"instrument_key": "NSE_EQ|INE000B01010"},
+            {"instrument_key": "NSE_EQ|INE000C01010"},
+            {"instrument_key": "NSE_EQ|INE000B01010"},
+        ],
+        "UPSTOX_FUNDAMENTALS",
+        datetime(2026, 6, 24),
+    )
+    storage = CompanyFundamentalsStorage(engine)
+
+    first_counts = storage.upsert(parsed)
+    second_counts = storage.upsert(parsed)
+
+    assert first_counts[COMPETITORS_TABLE] == 2
+    assert second_counts[COMPETITORS_TABLE] == 2
+    with engine.connect() as conn:
+        rows = conn.execute(
+            text(f"SELECT competitor_key, competitor_name, competitor_isin FROM {COMPETITORS_TABLE}")
+        ).mappings().all()
+    assert {row["competitor_key"] for row in rows} == {
+        "NSE_EQ|INE000B01010",
+        "NSE_EQ|INE000C01010",
+    }
+    assert {row["competitor_name"] for row in rows} == {"UNKNOWN"}
+    assert {row["competitor_isin"] for row in rows} == {"INE000B01010", "INE000C01010"}
 
 
 def test_runner_handles_missing_isin_no_data_and_endpoint_failure(tmp_path) -> None:
@@ -211,13 +248,48 @@ def test_classification_csv_update_preserves_unknowns_when_profile_has_no_classi
     assert "UNKNOWN" in classification_file.read_text(encoding="utf-8")
 
 
-def test_client_handles_404_malformed_json_and_retries_transient_status(monkeypatch) -> None:
+def test_classification_csv_update_adds_missing_output_fields(tmp_path) -> None:
+    classification_file = tmp_path / "classifications.csv"
+    classification_file.write_text(
+        "symbol,company_name,sector\n"
+        "AAA,Alpha,UNKNOWN\n",
+        encoding="utf-8",
+    )
+
+    rows_updated, fields_updated = update_classification_csv_from_profiles(
+        classification_file,
+        [{"symbol": "AAA", "company_name": "Alpha Ltd", "sector": "Energy"}],
+        source="UPSTOX_FUNDAMENTALS",
+    )
+
+    assert (rows_updated, fields_updated) == (1, 4)
+    written = classification_file.read_text(encoding="utf-8")
+    assert "classification_mode" in written.splitlines()[0]
+    assert "UPSTOX_FUNDAMENTALS" in written
+
+
+def test_classification_csv_update_refuses_header_only_file(tmp_path) -> None:
+    classification_file = tmp_path / "classifications.csv"
+    classification_file.write_text("symbol,company_name,sector\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="no data rows"):
+        update_classification_csv_from_profiles(
+            classification_file,
+            [{"symbol": "AAA", "sector": "Energy"}],
+            source="UPSTOX_FUNDAMENTALS",
+        )
+
+    assert classification_file.read_text(encoding="utf-8") == "symbol,company_name,sector\n"
+
+
+def test_client_handles_404_empty_payload_malformed_json_and_retries_transient_status(monkeypatch) -> None:
     monkeypatch.setattr("veridian_quant.v2.data.upstox_fundamentals_client.time.sleep", lambda _: None)
     session = FakeSession(
         [
             FakeResponse(500, {"error": "temporary"}),
             FakeResponse(200, {"data": {"sector": "IT"}}),
             FakeResponse(404, {"error": "missing"}),
+            FakeResponse(200, {"data": []}),
             FakeResponse(200, ValueError("bad json")),
         ]
     )
@@ -225,11 +297,16 @@ def test_client_handles_404_malformed_json_and_retries_transient_status(monkeypa
 
     retried = client.fetch_endpoint("INE000A01010", "profile")
     missing = client.fetch_endpoint("INE000A01010", "profile")
+    empty = client.fetch_endpoint("INE000A01010", "profile")
     malformed = client.fetch_endpoint("INE000A01010", "profile")
 
     assert retried.ok is True
     assert retried.payload == {"sector": "IT"}
-    assert missing.no_data is True
+    assert session.urls[0] == "https://example.test/fundamentals/INE000A01010/profile"
+    assert missing.ok is False
+    assert missing.status_code == 404
+    assert "HTTP 404" in missing.error
+    assert empty.no_data is True
     assert malformed.ok is False
     assert "malformed JSON" in malformed.error
 
@@ -240,7 +317,7 @@ def _all_endpoint_payloads():
     parsed = parse_endpoint_payload(
         entry,
         "key_ratios",
-        {"ratios": [{"ratio_name": "pe", "ratio_value": 21.5, "snapshot_date": "2026-06-24"}]},
+        [{"name": "pe", "company_value": 21.5, "sector_value": 20.1}],
         "UPSTOX_FUNDAMENTALS",
         fetched_at,
     )
@@ -249,11 +326,12 @@ def _all_endpoint_payloads():
             entry,
             "income_statement",
             {
-                "statements": [
+                "type": "annual",
+                "time_period": "yearly",
+                "income_statement": [
                     {
-                        "period_end_date": "2026-03-31",
-                        "reporting_frequency": "annual",
-                        "revenue": 1000,
+                        "category": "Revenue",
+                        "history": [{"period": "Mar 2026", "value": 1000, "change": 1.2}],
                     }
                 ]
             },
@@ -274,7 +352,7 @@ def _all_endpoint_payloads():
         parse_endpoint_payload(
             entry,
             "corporate_actions",
-            {"actions": [{"action_type": "DIVIDEND", "ex_date": "2026-05-01", "value": "10"}]},
+            [{"name": "DIVIDEND", "expiry_date": "2026-05-01", "amount": "10"}],
             "UPSTOX_FUNDAMENTALS",
             fetched_at,
         )
@@ -283,7 +361,7 @@ def _all_endpoint_payloads():
         parse_endpoint_payload(
             entry,
             "competitors",
-            {"competitors": [{"name": "Beta Ltd", "symbol": "BET"}]},
+            [{"company_profile": {"company_name": "Beta Ltd"}, "instrument_key": "NSE_EQ|INE000B01010"}],
             "UPSTOX_FUNDAMENTALS",
             fetched_at,
         )

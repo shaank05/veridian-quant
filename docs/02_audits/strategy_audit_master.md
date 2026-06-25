@@ -34,7 +34,7 @@ No strategy is production-approved.
 | `S4_RANGE_COMPRESSION_BREAKOUT_V1` | Rejected raw baseline | Yes | Yes | Do not promote; negative PnL and high drawdown |
 | `S4_ENTROPY_GATED_BREAKOUT_V1` | Not promoted / parked | Yes | Yes | Near breakeven but negative and unstable; do not promote |
 | `S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` | First-pass audited / weak parked family | Yes | Yes | Simple RS rejected; Dual Momentum weak/parked; Vol-Adjusted rejected; does not challenge S2/S1/S3 |
-| Benchmark/sector/cap context layer | Phase 33A design / foundational validation context | No | No | Docs-only design complete; prioritize before major new strategy-family exploration |
+| Benchmark/sector/cap context layer | Phase 33 foundation in progress | Partial | Partial | Index/context and company fundamentals data are now ingested/audited as research context; no strategy has been upgraded or approved |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
@@ -276,6 +276,16 @@ Each variant addressed part of the 2025 problem, but reduced overall portfolio q
 ## Audit Rules
 
 No strategy, variant, ranking method, or voting layer may be promoted solely because it looks attractive in a partial diagnostic.
+
+Company fundamentals note:
+
+- Company profile and fundamentals data are now ingested and audited as
+  Research200 research data. Status is recorded in
+  `docs/02_audits/company_fundamentals_audit.md`.
+- This does not upgrade any strategy or approve fundamentals-derived signals.
+- Current snapshot ratios and static classifications must not be used as
+  historical signal-time facts without separate point-in-time-safe feature
+  engineering.
 
 Promotion requires:
 

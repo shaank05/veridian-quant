@@ -550,9 +550,12 @@ Required feature checks:
   and migration plan if needed.
 - **Phase 33C - Index OHLC ingestion:** ingest broad, sector, and cap-segment
   index histories under the approved data contract.
-- **Phase 33D - Static stock sector/cap classification ingestion:** add
-  current/static classification for Research200 diagnostics with explicit
-  static labels.
+- **Phase 33D - Static stock sector/cap classification and company
+  fundamentals ingestion:** add current/static classification for Research200
+  diagnostics with explicit static labels, and store Upstox company profile and
+  fundamentals data in separate research layers. Phase 33D.3 ingestion and
+  Phase 33D.4 audit are complete; status is documented in
+  `docs/02_audits/company_fundamentals_audit.md`.
 - **Phase 33E - Benchmark/context feature utilities:** implement
   leakage-safe benchmark, sector-relative, cap-relative, and regime feature
   utilities.

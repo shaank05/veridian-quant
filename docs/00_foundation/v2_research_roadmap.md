@@ -459,14 +459,26 @@ Outcome:
 - Makes no code, test, report, config, data, runner, exporter, or production
   behavior changes.
 
-### Phase 33B-33G: Benchmark/Context Foundation Roadmap
+### Phase 33B-33D.5: Benchmark/Context Data Foundation
 
-Planned follow-up phases:
+Outcome:
 
-- **Phase 33B:** index metadata and schema/data contracts.
+- **Phase 33B:** index metadata and schema/data contracts completed.
 - **Phase 33C:** index OHLC ingestion for broad, sector, and cap-segment
-  indices.
-- **Phase 33D:** static stock sector/cap classification ingestion.
+  indices completed.
+- **Phase 33D.3:** Upstox company profile and fundamentals ingestion completed
+  for Research200. Populated profiles, key ratios, financial statements,
+  corporate actions, competitors, and an empty shareholding layer.
+- **Phase 33D.4:** company fundamentals audit completed and approved for
+  research-data readiness. Duplicate logical keys were zero across audited
+  tables. Profiles covered 200/200 symbols; key ratios 199/200; financial
+  statements 184/200; corporate actions 154/200; competitors 200/200;
+  shareholding 0/200 because the current Upstox route returned 404 no-data.
+- **Phase 33D.5:** documentation/status update completed in
+  `docs/02_audits/company_fundamentals_audit.md`.
+
+Remaining planned follow-up phases:
+
 - **Phase 33E:** benchmark/context feature utilities.
 - **Phase 33F:** benchmark and capital-utilization audit for S1-S5.
 - **Phase 33G:** strategy exposure and regime audit.
@@ -570,6 +582,10 @@ Next direction:
   materially redesigned momentum hypothesis.
 - Complete Phase 33 benchmark/sector/cap context foundation before major new
   strategy-family exploration.
+- Continue next with Phase 33E benchmark/context feature utilities. Company
+  fundamentals are now ingested and audited as research context, but current
+  snapshot ratios and static classifications must not be used as historical
+  signal-time facts.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 

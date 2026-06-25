@@ -656,3 +656,39 @@ Consequence:
 - Current/static classification may support first-pass diagnostics, but
   production-grade historical claims require historical membership and
   classification where possible.
+
+---
+
+## 2026-06-25 - Store Company Fundamentals as Separate Research Layers
+
+Decision:
+
+Store broader Upstox company profile and fundamentals data now for future
+research convenience, but keep it in separate company fundamentals tables/layers
+rather than overloading the static classification table.
+
+Reason:
+
+Phase 33 needs benchmark, sector, market-cap, and company context before further
+strategy-family exploration. Fundamentals are useful reference data, but current
+snapshot fields can create lookahead risk if used as historical signal-time
+features without explicit timing controls.
+
+Consequence:
+
+- Company profiles, key ratios, financial statements, shareholding, corporate
+  actions, and competitors are stored as separate research layers.
+- The static classification CSV remains a lightweight current/static context
+  file, not a general fundamentals store.
+- Current key ratios are stored for research convenience but are not
+  point-in-time safe for 2018 historical backtests.
+- Static classification is usable for context and diagnostics only, with
+  explicit current/static labeling.
+- Shareholding via the current Upstox route is parked because the endpoint
+  returned HTTP 404 Resource not Found.
+- Competitor names are incomplete, but competitor IDs/ISINs are stored and
+  uniqueness is safe.
+- Financial statements are stored as raw period payload rows; normalized
+  `line_item` / `value` extraction is future work.
+- No strategy logic, backtesting behavior, exporters, or production decisions
+  are changed by this data foundation.

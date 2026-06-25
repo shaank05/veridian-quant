@@ -65,6 +65,48 @@ whether the classification is point-in-time or current/static.
 
 ---
 
+## Company Fundamentals Research Layer Ideas
+
+Phase 33D.3 ingested Research200 company profile and fundamentals data. Phase
+33D.4 audited the data as research-ready context, not as approved strategy
+features.
+
+Current audited status:
+
+- Profiles cover 200/200 Research200 symbols.
+- Key ratios cover 199/200 symbols, missing `HDFCSENSEX`.
+- Financial statements cover 184/200 symbols.
+- Corporate actions cover 154/200 symbols.
+- Competitors cover 200/200 symbols.
+- Shareholding is parked at 0 rows because the current Upstox route returned
+  HTTP 404 Resource not Found.
+- Static classification has 199 known sectors and one unknown sector
+  (`HDFCSENSEX`), but industry, basic industry, market-cap bucket, and index
+  membership remain unknown.
+
+Future data-model and research candidates:
+
+- Normalize financial statements into explicit `line_item` / `value` features.
+- Derive `market_cap_bucket` if reliable company market-cap values can be
+  extracted and audited.
+- Enrich `industry` and `basic_industry` from NSE or another reliable source.
+- Investigate an alternate shareholding source.
+- Enrich competitor display names while preserving existing competitor keys.
+- Build a fundamentals research layer with explicit point-in-time-safe feature
+  engineering.
+- Study corporate action and statement-period context only with event/period
+  dates available at the signal timestamp.
+
+Safety rules:
+
+- Do not use current snapshot ratios for 2018 historical signals.
+- Do not treat current/static profile or classification fields as historical
+  point-in-time truth.
+- Do not promote any fundamentals-derived ranking, filter, or signal without a
+  separate implementation, backtest, audit, and robustness workflow.
+
+---
+
 ## S5 Relative Strength / Momentum Rotation Candidate Features
 
 `S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` is a standalone strategy family whose

@@ -106,6 +106,52 @@ def test_sector_proxy_resolution_for_known_examples(sector: str, expected: str) 
     assert resolution.sector_proxy_is_fallback is False
 
 
+@pytest.mark.parametrize(
+    ("sector", "expected"),
+    [
+        ("BPO/ITeS", "NIFTY_IT"),
+        ("Consumer Food", "NIFTY_FMCG"),
+        ("Gases & Fuels", "NIFTY_ENERGY"),
+        ("Household Products", "NIFTY_FMCG"),
+        ("Ratings", "NIFTY_FIN_SERVICE"),
+        ("Refineries", "NIFTY_ENERGY"),
+        ("Tobacco", "NIFTY_FMCG"),
+        ("Tyres & Allied", "NIFTY_AUTO"),
+        ("Breweries", "NIFTY_FMCG"),
+        ("Construction", "NIFTY_REALTY"),
+        ("Minerals", "NIFTY_METAL"),
+    ],
+)
+def test_approved_static_sector_labels_resolve_to_proxy(
+    sector: str,
+    expected: str,
+) -> None:
+    resolution = resolve_sector_proxy(sector)
+
+    assert resolution.sector_proxy == expected
+    assert resolution.sector_proxy_unmapped is False
+    assert resolution.sector_proxy_is_fallback is False
+
+
+@pytest.mark.parametrize(
+    "sector",
+    [
+        "Electric Equipment",
+        "Healthcare Services",
+        "IT - Hardware",
+        "Investment",
+        "Lubricants",
+        "Sugar",
+    ],
+)
+def test_explicitly_unmapped_static_sector_labels_remain_unmapped(sector: str) -> None:
+    resolution = resolve_sector_proxy(sector)
+
+    assert resolution.sector_proxy is None
+    assert resolution.sector_proxy_unmapped is True
+    assert resolution.sector_proxy_is_fallback is False
+
+
 def test_unknown_sector_can_return_unmapped_without_fallback() -> None:
     resolution = resolve_sector_proxy("Glass")
 
@@ -116,6 +162,14 @@ def test_unknown_sector_can_return_unmapped_without_fallback() -> None:
 
 def test_unknown_sector_can_return_nifty500_fallback_flag() -> None:
     resolution = resolve_sector_proxy("Glass", fallback_to_nifty500=True)
+
+    assert resolution.sector_proxy == "NIFTY_500"
+    assert resolution.sector_proxy_unmapped is True
+    assert resolution.sector_proxy_is_fallback is True
+
+
+def test_explicit_unmapped_sector_can_return_nifty500_fallback_flag() -> None:
+    resolution = resolve_sector_proxy("Electric Equipment", fallback_to_nifty500=True)
 
     assert resolution.sector_proxy == "NIFTY_500"
     assert resolution.sector_proxy_unmapped is True
@@ -211,3 +265,4 @@ def _frame(values: list[float], start: str = "2026-01-01") -> pd.DataFrame:
             "volume": [1000] * len(values),
         }
     )
+

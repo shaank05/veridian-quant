@@ -75,11 +75,15 @@ Current implementation status:
 
 Future context work:
 
+- Design S2-only context-aware diagnostic experiments with pre-declared rules
+  and anti-overfitting guardrails.
+- Keep S1-S5 context audit findings diagnostic until controlled experiments are
+  designed and reviewed.
+- Add R-multiple availability to future trade PnL logs or provide reliable join
+  logic when R-bucket diagnostics are needed.
 - Expand sector mapping only when a reliable sector/index proxy exists.
 - Add cap bucket derivation after reliable company market-cap extraction and
   audit.
-- Build Research200 benchmark-relative and sector-relative diagnostics for
-  S1-S5.
 - Produce an optional full feature dump later if needed.
 - Use market/sector context for rejection analysis and diagnostics first, not
   live signal filtering.
@@ -124,6 +128,7 @@ Future data-model and research candidates:
 Safety rules:
 
 - Do not use current snapshot ratios for 2018 historical signals.
+- Do not use current fundamentals ratios as historical context filters.
 - Do not treat current/static profile or classification fields as historical
   point-in-time truth.
 - Do not promote any fundamentals-derived ranking, filter, or signal without a

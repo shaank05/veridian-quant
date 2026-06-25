@@ -34,7 +34,7 @@ No strategy is production-approved.
 | `S4_RANGE_COMPRESSION_BREAKOUT_V1` | Rejected raw baseline | Yes | Yes | Do not promote; negative PnL and high drawdown |
 | `S4_ENTROPY_GATED_BREAKOUT_V1` | Not promoted / parked | Yes | Yes | Near breakeven but negative and unstable; do not promote |
 | `S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` | First-pass audited / weak parked family | Yes | Yes | Simple RS rejected; Dual Momentum weak/parked; Vol-Adjusted rejected; does not challenge S2/S1/S3 |
-| Benchmark/sector/cap context layer | Phase 33E docs freeze complete | Yes | Diagnostic audit only | Market/sector/cap context utilities and Research200 audit exist; no S1-S5 strategy has been changed, promoted, or approved |
+| Benchmark/sector/cap context layer | Phase 33F.3 context audit documented | Yes | Diagnostic audit only | Retained S1-S5 trade PnL logs audited; S2 remains strongest; no context filter or strategy promotion approved |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
@@ -46,21 +46,31 @@ No strategy is production-approved.
 ## Benchmark/Sector/Cap Context Status
 
 Phase 33E through 33E.4 completed the reusable context layer and documentation
-freeze. Market-relative, sector-relative, cap-relative interface, sector proxy
-resolution, and Research200 audit/export utilities exist for diagnostics.
+freeze. Phase 33F through 33F.3 applied read-only context diagnostics to retained
+S1-S5 trade PnL logs and documented the findings in
+`docs/02_audits/s1_s5_context_audit.md`.
 
 Current status:
 
 - Sector proxy mapping is exact normalized-label based, not broad substring
   based.
-- Research200 sector coverage is 25/68 mapped labels and 43/68 intentionally
-  unmapped labels.
-- Conservative fallback is opt-in and flagged; default audit fallback count is
-  0.
-- Cap-relative context remains inactive until audited cap buckets exist.
-- No S1-S5 strategy has been changed, promoted, filtered, ranked, or approved
-  because of these features.
-- Phase 33F will apply context diagnostics to existing S1-S5 results.
+- Conservative fallback is opt-in and flagged; default retained-strategy audits
+  used no fallback.
+- Missing stock and benchmark context are 0% across retained S1-S5 audits after
+  the Phase 33F utility fix.
+- Missing sector context reflects intentionally unmapped sector proxies under
+  the conservative no-fallback policy.
+- S1 remains baseline only; strong benchmark tailwind helped heavily.
+- S2 remains the strongest retained candidate after context audit and was
+  profitable even in negative benchmark context.
+- S3 remains weak/moderate and context-sensitive.
+- S4 remains a weak benchmark only; context did not rescue it.
+- S5 remains weak/parked; gains concentrated in strong benchmark/sector
+  contexts.
+- No context filter, ranking rule, strategy change, or production approval is
+  authorized.
+- Phase 33G should design controlled S2-only context experiments before any
+  experiment runs.
 
 ---
 

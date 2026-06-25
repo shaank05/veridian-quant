@@ -720,3 +720,34 @@ Consequence:
   for strategy signals, ranking, filters, or production behavior.
 - Phase 33F should apply benchmark/sector context to existing S1-S5 results
   before any strategy-family conclusions are upgraded.
+
+---
+
+## 2026-06-25 - Freeze S1-S5 Context Audit Interpretation Before S2 Experiments
+
+Decision:
+
+Treat the Phase 33F/33F.2 retained S1-S5 benchmark and sector context audit as
+diagnostic evidence only. No context filter, ranking rule, strategy change, or
+production approval is authorized from these findings.
+
+Reason:
+
+The audit showed that all retained strategies benefited from strong-positive
+benchmark 20D context, but S2 remained the only retained strategy with strong
+positive PnL in both negative benchmark context and strong-positive benchmark
+context. S1, S3, S4, and S5 showed more visible dependence on favorable market
+or sector context. These findings are useful hypotheses, but they can easily
+lead to overfit filters if tested open-endedly.
+
+Consequence:
+
+- S2 remains the only strategy worth controlled context experiments next.
+- Conservative exact-label sector mapping and no default fallback remain active.
+- Missing sector context must continue to mean intentionally unmapped sector
+  proxy context, not a data failure.
+- Phase 33G must pre-declare S2-only context experiments, thresholds, acceptance
+  criteria, and anti-overfitting guardrails before any run.
+- Candidate improvements must be checked against PF, drawdown, trade count,
+  yearly consistency, and rejected-trade behavior.
+- Current snapshot fundamentals must not be used as historical signal filters.

@@ -572,11 +572,15 @@ Required feature checks:
   conservative default.
 - **Phase 33E.4 - Documentation/status freeze:** complete. Documents the Phase
   33E context layer without changing strategy logic or promoting signals.
-- **Phase 33F - Apply benchmark/sector context audit to S1-S5 results:** compare
-  retained strategy outputs against passive, equal-weight, sector, cap, and
-  cash-drag baselines.
-- **Phase 33G - Strategy exposure and regime audit:** add sector/cap exposure,
-  accepted/rejected/capacity diagnostics, and risk-on/risk-off regime review.
+- **Phase 33F - Apply benchmark/sector context audit to S1-S5 results:**
+  complete. Read-only trade context audit utilities annotate existing trade PnL
+  logs with benchmark/sector context.
+- **Phase 33F.2 - Retained S1-S5 trade context audit:** complete. Retained
+  S1-S5 `trade_pnl_log.csv` files were audited with no sector fallback.
+- **Phase 33F.3 - S1-S5 context audit documentation:** complete. Interpretation
+  is frozen in `docs/02_audits/s1_s5_context_audit.md`.
+- **Phase 33G - S2 controlled context experiment design:** design pre-declared
+  S2-only context experiments and acceptance criteria before any experiment run.
 - **Later - Historical constituents / point-in-time classification:** replace
   or supplement static classification for production-grade historical claims.
 
@@ -640,11 +644,30 @@ Explicitly unmapped examples:
 - `Lubricants`
 - `Sugar`
 
-No S1-S5 strategy has been changed or promoted due to these utilities. The next
-phase is Phase 33F, applying benchmark/sector context diagnostics to existing
-S1-S5 results.
+No S1-S5 strategy has been changed or promoted due to these utilities.
 
-## 23. Open Questions
+## 23. Phase 33F Retained Strategy Context Audit Status
+
+Phase 33F through 33F.3 applied the context layer to retained S1-S5 trade PnL
+logs and documented the results in `docs/02_audits/s1_s5_context_audit.md`.
+
+Key findings:
+
+- All five retained strategies performed best in strong-positive benchmark 20D
+  context.
+- Plain positive benchmark context was not consistently favorable.
+- S2 remained strongest and was profitable even in negative benchmark context,
+  so its retained edge is not solely broad-market tailwind.
+- S1, S3, S4, and S5 showed more visible dependence on strong benchmark and/or
+  sector context.
+- Conservative sector mapping/no fallback remains active; missing sector context
+  equals intentionally unmapped sector-proxy trades.
+- No context filter is approved and no strategy is promoted.
+
+Next phase: Phase 33G should design controlled S2-only context experiments with
+pre-declared anti-overfitting guardrails.
+
+## 24. Open Questions
 
 - Which official or vendor source should be preferred for NSE index OHLCV?
 - Are sector index histories available with reliable OHLC or only close values?
@@ -664,7 +687,7 @@ S1-S5 results.
 - What benchmark-relative threshold, if any, should affect future retain/park
   decisions?
 
-## 24. References / Related Docs
+## 25. References / Related Docs
 
 - `docs/00_foundation/v2_design_document.md`
 - `docs/00_foundation/v2_research_roadmap.md`
@@ -672,6 +695,7 @@ S1-S5 results.
 - `docs/04_validation/portfolio_robustness_validation.md`
 - `docs/04_validation/monte_carlo_robustness_audit.md`
 - `docs/02_audits/strategy_audit_master.md`
+- `docs/02_audits/s1_s5_context_audit.md`
 - `docs/01_strategies/s5_relative_strength_momentum_rotation.md`
 - `docs/02_audits/s5_audit.md`
 - `docs/03_research/feature_ideas.md`

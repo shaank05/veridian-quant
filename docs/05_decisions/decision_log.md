@@ -692,3 +692,31 @@ Consequence:
   `line_item` / `value` extraction is future work.
 - No strategy logic, backtesting behavior, exporters, or production decisions
   are changed by this data foundation.
+
+---
+
+## 2026-06-25 - Freeze Phase 33E Context Mapping as Conservative Diagnostics
+
+Decision:
+
+Use exact normalized-label sector proxy mapping for Phase 33E context utilities,
+not broad substring matching.
+
+Reason:
+
+Broad matching can create incorrect sector proxies, such as mapping `Electric
+Equipment` to `NIFTY_ENERGY`, `Healthcare Services` to `NIFTY_PHARMA`, or
+`IT - Hardware` to `NIFTY_IT`. The context layer should prefer missing sector
+relative features over false precision.
+
+Consequence:
+
+- Ambiguous sectors remain unmapped rather than forced into incorrect proxies.
+- Sector fallback to `NIFTY_500` is opt-in and must be flagged when used.
+- Research200 sector coverage is 25/68 mapped labels and 43/68 intentionally
+  unmapped labels after Phase 33E.3.
+- Cap context remains inactive until reliable audited cap buckets exist.
+- Market/sector context utilities are approved for audit and diagnostics, not
+  for strategy signals, ranking, filters, or production behavior.
+- Phase 33F should apply benchmark/sector context to existing S1-S5 results
+  before any strategy-family conclusions are upgraded.

@@ -38,11 +38,13 @@ challenge S2, S1, or S3. Simple RS and Vol-Adjusted RS are rejected, while Dual
 Momentum is weak and parked only as a benchmark. No immediate S5 tuning is
 planned.
 
-Phase 33 begins before new strategy-family work because benchmark, sector, and
-market-cap context is now foundational. S1 through S5 have mostly been compared
-against each other; Veridian still needs passive broad-market, Research200
-equal-weight, sector, cap-segment, regime, exposure, and capital-utilization
-context before making stronger claims about alpha or designing additional
+Phase 33 began before new strategy-family work because benchmark, sector, and
+market-cap context is now foundational. Phase 33E through 33E.4 completed the
+reusable market/sector/cap context utility layer, real Research200 audit runner,
+conservative sector proxy mapping refinement, and documentation/status freeze.
+S1 through S5 still need Phase 33F diagnostics against passive broad-market,
+Research200 equal-weight, sector, cap-segment, regime, exposure, and
+capital-utilization context before stronger claims about alpha or additional
 strategy families.
 
 ---
@@ -477,10 +479,20 @@ Outcome:
 - **Phase 33D.5:** documentation/status update completed in
   `docs/02_audits/company_fundamentals_audit.md`.
 
+Completed follow-up phases:
+
+- **Phase 33E:** benchmark/context feature utilities completed for
+  market-relative, sector-relative, and cap-relative diagnostics.
+- **Phase 33E.2:** real-data audit/export runner completed and processed
+  Research200 successfully.
+- **Phase 33E.3:** exact normalized-label sector proxy mapping completed;
+  mapped sector labels improved from 17/68 to 25/68 while 43/68 remain
+  intentionally unmapped.
+- **Phase 33E.4:** documentation/status freeze completed.
+
 Remaining planned follow-up phases:
 
-- **Phase 33E:** benchmark/context feature utilities.
-- **Phase 33F:** benchmark and capital-utilization audit for S1-S5.
+- **Phase 33F:** apply benchmark/sector context audit to existing S1-S5 results.
 - **Phase 33G:** strategy exposure and regime audit.
 - **Later:** historical index constituents and point-in-time classification.
 
@@ -580,12 +592,12 @@ Next direction:
 - Do not convert S1/S2/S4 post-hoc RAWRS findings directly into hard filters.
 - Keep S5 parked after the first-pass audit unless future work proposes a
   materially redesigned momentum hypothesis.
-- Complete Phase 33 benchmark/sector/cap context foundation before major new
-  strategy-family exploration.
-- Continue next with Phase 33E benchmark/context feature utilities. Company
-  fundamentals are now ingested and audited as research context, but current
-  snapshot ratios and static classifications must not be used as historical
-  signal-time facts.
+- Treat Phase 33E through 33E.4 as complete context infrastructure, not as a
+  strategy upgrade.
+- Continue next with Phase 33F: apply benchmark/sector context audit to
+  existing S1-S5 results. Company fundamentals are now ingested and audited as
+  research context, but current snapshot ratios and static classifications must
+  not be used as historical signal-time facts.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 

@@ -34,12 +34,33 @@ No strategy is production-approved.
 | `S4_RANGE_COMPRESSION_BREAKOUT_V1` | Rejected raw baseline | Yes | Yes | Do not promote; negative PnL and high drawdown |
 | `S4_ENTROPY_GATED_BREAKOUT_V1` | Not promoted / parked | Yes | Yes | Near breakeven but negative and unstable; do not promote |
 | `S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` | First-pass audited / weak parked family | Yes | Yes | Simple RS rejected; Dual Momentum weak/parked; Vol-Adjusted rejected; does not challenge S2/S1/S3 |
-| Benchmark/sector/cap context layer | Phase 33 foundation in progress | Partial | Partial | Index/context and company fundamentals data are now ingested/audited as research context; no strategy has been upgraded or approved |
+| Benchmark/sector/cap context layer | Phase 33E docs freeze complete | Yes | Diagnostic audit only | Market/sector/cap context utilities and Research200 audit exist; no S1-S5 strategy has been changed, promoted, or approved |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
 | S1/S2 voting layer | Future research | No | No | Deferred until strategy-family evidence improves |
 | Meta-ranking / capital allocation layer | Future research | No | No | Deferred; not current behavior |
+
+---
+
+## Benchmark/Sector/Cap Context Status
+
+Phase 33E through 33E.4 completed the reusable context layer and documentation
+freeze. Market-relative, sector-relative, cap-relative interface, sector proxy
+resolution, and Research200 audit/export utilities exist for diagnostics.
+
+Current status:
+
+- Sector proxy mapping is exact normalized-label based, not broad substring
+  based.
+- Research200 sector coverage is 25/68 mapped labels and 43/68 intentionally
+  unmapped labels.
+- Conservative fallback is opt-in and flagged; default audit fallback count is
+  0.
+- Cap-relative context remains inactive until audited cap buckets exist.
+- No S1-S5 strategy has been changed, promoted, filtered, ranked, or approved
+  because of these features.
+- Phase 33F will apply context diagnostics to existing S1-S5 results.
 
 ---
 

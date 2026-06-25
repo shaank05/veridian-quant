@@ -556,10 +556,23 @@ Required feature checks:
   fundamentals data in separate research layers. Phase 33D.3 ingestion and
   Phase 33D.4 audit are complete; status is documented in
   `docs/02_audits/company_fundamentals_audit.md`.
-- **Phase 33E - Benchmark/context feature utilities:** implement
-  leakage-safe benchmark, sector-relative, cap-relative, and regime feature
-  utilities.
-- **Phase 33F - Benchmark and capital-utilization audit for S1-S5:** compare
+- **Phase 33E - Benchmark/context feature utilities:** complete. Reusable
+  market-relative, sector-relative, and cap-relative context utilities exist
+  with no-lookahead return windows, inner stock/index date alignment, no forward
+  fill, explicit unmapped/fallback flags, and inactive cap context when audited
+  cap buckets are unavailable.
+- **Phase 33E.2 - Real-data context audit/export:** complete. The Research200
+  audit runner processed 200/200 symbols against `NIFTY_500` from 2020-01-01
+  through 2026-04-30 with 0 missing stock OHLC rows and 0 missing index data
+  counts.
+- **Phase 33E.3 - Sector proxy mapping refinement:** complete. Sector proxy
+  resolution now uses exact normalized-label mapping, not broad substring
+  matching. Coverage improved from 17/68 to 25/68 mapped sector labels, with
+  43/68 labels intentionally unmapped and `fallback_count = 0` under the
+  conservative default.
+- **Phase 33E.4 - Documentation/status freeze:** complete. Documents the Phase
+  33E context layer without changing strategy logic or promoting signals.
+- **Phase 33F - Apply benchmark/sector context audit to S1-S5 results:** compare
   retained strategy outputs against passive, equal-weight, sector, cap, and
   cash-drag baselines.
 - **Phase 33G - Strategy exposure and regime audit:** add sector/cap exposure,
@@ -567,7 +580,71 @@ Required feature checks:
 - **Later - Historical constituents / point-in-time classification:** replace
   or supplement static classification for production-grade historical claims.
 
-## 22. Open Questions
+## 22. Phase 33E Completion Status
+
+Phase 33E through 33E.3 moved this document's design into reusable diagnostic
+infrastructure while preserving the original non-goals.
+
+Implemented context utilities:
+
+- `src/veridian_quant/v2/features/market_context.py`
+- `src/veridian_quant/v2/data/sector_proxy_mapping.py`
+- Market-relative return features.
+- Sector-relative return features.
+- Cap-relative interface.
+- Sector proxy resolution with explicit unmapped and fallback metadata.
+- No lookahead, no forward fill, and inner stock/index date alignment.
+- Unknown or unaudited cap context remains inactive rather than inferred.
+
+Real-data audit runner:
+
+- `src/veridian_quant/v2/run_market_context_audit.py`
+- Research200 audit processed 200/200 symbols with 0 skipped symbols.
+- Benchmark: `NIFTY_500`.
+- Index rows/date range: 1,570 rows from 2020-01-01 to 2026-04-29.
+- Stock aligned rows/date range: 311,227 rows from 2020-01-01 to 2026-04-29.
+- `missing_stock_ohlc_count = 0`.
+- `missing_index_data_count = 0`.
+- Cap context is inactive because current static cap buckets remain unknown.
+
+Sector proxy mapping status:
+
+- Sector labels: 68.
+- Mapped labels: 25.
+- Intentionally unmapped labels: 43.
+- Conservative default uses no silent fallback; fallback is opt-in and flagged.
+- Broad substring matching was removed to avoid accidental mappings such as
+  `Electric Equipment -> NIFTY_ENERGY`, `Healthcare Services -> NIFTY_PHARMA`,
+  and `IT - Hardware -> NIFTY_IT`.
+
+Approved Phase 33E.3 additions:
+
+- `BPO/ITeS -> NIFTY_IT`
+- `Consumer Food -> NIFTY_FMCG`
+- `Gases & Fuels -> NIFTY_ENERGY`
+- `Household Products -> NIFTY_FMCG`
+- `Ratings -> NIFTY_FIN_SERVICE`
+- `Refineries -> NIFTY_ENERGY`
+- `Tobacco -> NIFTY_FMCG`
+- `Tyres & Allied -> NIFTY_AUTO`
+- `Breweries -> NIFTY_FMCG`
+- `Construction -> NIFTY_REALTY`
+- `Minerals -> NIFTY_METAL`
+
+Explicitly unmapped examples:
+
+- `Electric Equipment`
+- `Healthcare Services`
+- `IT - Hardware`
+- `Investment`
+- `Lubricants`
+- `Sugar`
+
+No S1-S5 strategy has been changed or promoted due to these utilities. The next
+phase is Phase 33F, applying benchmark/sector context diagnostics to existing
+S1-S5 results.
+
+## 23. Open Questions
 
 - Which official or vendor source should be preferred for NSE index OHLCV?
 - Are sector index histories available with reliable OHLC or only close values?
@@ -587,7 +664,7 @@ Required feature checks:
 - What benchmark-relative threshold, if any, should affect future retain/park
   decisions?
 
-## 23. References / Related Docs
+## 24. References / Related Docs
 
 - `docs/00_foundation/v2_design_document.md`
 - `docs/00_foundation/v2_research_roadmap.md`

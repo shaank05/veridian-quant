@@ -10,8 +10,9 @@ Feature ideas are not accepted trading rules. They must be tested through the no
 
 ## Benchmark, Sector, and Market-Cap Context Features
 
-Phase 33A defines these as context and diagnostic candidates, not accepted
-trading rules.
+Phase 33A defined these as context and diagnostic candidates, not accepted
+trading rules. Phase 33E through 33E.4 implemented the first reusable context
+utility and audit layer for diagnostics only.
 
 Design reference:
 
@@ -59,6 +60,29 @@ Regime and exposure candidates:
 - Capital utilization and cash-drag diagnostics.
 - Benchmark-relative performance by broad-market, sector, and cap-segment
   regime.
+
+Current implementation status:
+
+- Market-relative and sector-relative return utilities exist for diagnostics.
+- Sector proxy mapping uses exact normalized labels and maps 25/68 Research200
+  sector labels.
+- 43/68 sector labels remain intentionally unmapped when no direct available
+  proxy exists.
+- Conservative sector fallback to `NIFTY_500` is opt-in and flagged.
+- Cap-relative context remains inactive until audited cap buckets exist.
+- No S1-S5 strategy signal, ranking, filter, or backtest behavior has been
+  changed due to these features.
+
+Future context work:
+
+- Expand sector mapping only when a reliable sector/index proxy exists.
+- Add cap bucket derivation after reliable company market-cap extraction and
+  audit.
+- Build Research200 benchmark-relative and sector-relative diagnostics for
+  S1-S5.
+- Produce an optional full feature dump later if needed.
+- Use market/sector context for rejection analysis and diagnostics first, not
+  live signal filtering.
 
 All features using sector, cap, or index-membership classification must label
 whether the classification is point-in-time or current/static.

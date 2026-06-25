@@ -425,11 +425,11 @@ def _ensure_annotation_columns(frame: pd.DataFrame, windows: tuple[int, ...]) ->
         )
     for window in windows:
         column = f"ret_{window}d"
+        candidates = [candidate for candidate in (f"{column}_x", f"{column}_y") if candidate in result.columns]
         if column not in result.columns:
-            for candidate in (f"{column}_x", f"{column}_y"):
-                if candidate in result.columns:
-                    result[column] = result[candidate]
-                    break
+            result[column] = np.nan
+        for candidate in candidates:
+            result[column] = result[column].combine_first(result[candidate])
     for column in base_columns:
         if column not in result.columns:
             result[column] = np.nan

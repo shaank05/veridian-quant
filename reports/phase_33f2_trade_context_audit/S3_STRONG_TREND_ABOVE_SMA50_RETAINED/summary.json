@@ -1,0 +1,59 @@
+{
+  "audit_date_range": {
+    "end": "2026-04-27",
+    "start": "2020-01-07"
+  },
+  "benchmark_index": "NIFTY_500",
+  "cap_context_status": "inactive: market_cap_bucket is unknown/unmapped; no cap buckets derived",
+  "context_date_range": {
+    "first": "2020-01-07",
+    "last": "2026-04-27"
+  },
+  "index_load_errors": {},
+  "load_date_range": {
+    "end": "2026-04-27",
+    "start": "2018-05-17"
+  },
+  "missing_context_counts": {
+    "benchmark": 0,
+    "sector": 254,
+    "stock": 0
+  },
+  "missing_stock_symbols": [],
+  "outcome_columns": {
+    "has_r_multiple": false,
+    "pnl_column": "net_pnl"
+  },
+  "outputs": {
+    "context_bucket_summary_csv": "reports\\phase_33f2_trade_context_audit\\S3_STRONG_TREND_ABOVE_SMA50_RETAINED\\context_bucket_summary.csv",
+    "exit_reason_by_context_csv": "reports\\phase_33f2_trade_context_audit\\S3_STRONG_TREND_ABOVE_SMA50_RETAINED\\exit_reason_by_context.csv",
+    "missing_context_summary_csv": "reports\\phase_33f2_trade_context_audit\\S3_STRONG_TREND_ABOVE_SMA50_RETAINED\\missing_context_summary.csv",
+    "pnl_by_context_csv": "reports\\phase_33f2_trade_context_audit\\S3_STRONG_TREND_ABOVE_SMA50_RETAINED\\pnl_by_context.csv",
+    "r_multiple_by_context_csv": "reports\\phase_33f2_trade_context_audit\\S3_STRONG_TREND_ABOVE_SMA50_RETAINED\\r_multiple_by_context.csv",
+    "sector_proxy_trade_coverage_csv": "reports\\phase_33f2_trade_context_audit\\S3_STRONG_TREND_ABOVE_SMA50_RETAINED\\sector_proxy_trade_coverage.csv",
+    "summary_json": "reports\\phase_33f2_trade_context_audit\\S3_STRONG_TREND_ABOVE_SMA50_RETAINED\\summary.json",
+    "trade_context_annotated_csv": "reports\\phase_33f2_trade_context_audit\\S3_STRONG_TREND_ABOVE_SMA50_RETAINED\\trade_context_annotated.csv"
+  },
+  "overall_metrics": {
+    "avg_net_pnl": 631.8822251542857,
+    "profit_factor": 1.1039132187316114,
+    "total_net_pnl": 315941.11257714283,
+    "win_rate": 0.444
+  },
+  "sector_proxy_trade_counts": {
+    "fallback": 0,
+    "mapped": 246,
+    "unmapped": 254
+  },
+  "strategy_name": "S3_STRONG_TREND_ABOVE_SMA50_RETAINED",
+  "symbols_requested": 160,
+  "symbols_with_stock_context": 160,
+  "trade_count": 500,
+  "trade_log_rows_read": 500,
+  "windows": [
+    5,
+    20,
+    60,
+    120
+  ]
+}

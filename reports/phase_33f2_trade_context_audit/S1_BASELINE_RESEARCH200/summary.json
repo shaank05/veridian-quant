@@ -1,0 +1,59 @@
+{
+  "audit_date_range": {
+    "end": "2026-04-27",
+    "start": "2020-01-02"
+  },
+  "benchmark_index": "NIFTY_500",
+  "cap_context_status": "inactive: market_cap_bucket is unknown/unmapped; no cap buckets derived",
+  "context_date_range": {
+    "first": "2020-01-02",
+    "last": "2026-04-27"
+  },
+  "index_load_errors": {},
+  "load_date_range": {
+    "end": "2026-04-27",
+    "start": "2018-05-12"
+  },
+  "missing_context_counts": {
+    "benchmark": 0,
+    "sector": 271,
+    "stock": 0
+  },
+  "missing_stock_symbols": [],
+  "outcome_columns": {
+    "has_r_multiple": false,
+    "pnl_column": "net_pnl"
+  },
+  "outputs": {
+    "context_bucket_summary_csv": "reports\\phase_33f2_trade_context_audit\\S1_BASELINE_RESEARCH200\\context_bucket_summary.csv",
+    "exit_reason_by_context_csv": "reports\\phase_33f2_trade_context_audit\\S1_BASELINE_RESEARCH200\\exit_reason_by_context.csv",
+    "missing_context_summary_csv": "reports\\phase_33f2_trade_context_audit\\S1_BASELINE_RESEARCH200\\missing_context_summary.csv",
+    "pnl_by_context_csv": "reports\\phase_33f2_trade_context_audit\\S1_BASELINE_RESEARCH200\\pnl_by_context.csv",
+    "r_multiple_by_context_csv": "reports\\phase_33f2_trade_context_audit\\S1_BASELINE_RESEARCH200\\r_multiple_by_context.csv",
+    "sector_proxy_trade_coverage_csv": "reports\\phase_33f2_trade_context_audit\\S1_BASELINE_RESEARCH200\\sector_proxy_trade_coverage.csv",
+    "summary_json": "reports\\phase_33f2_trade_context_audit\\S1_BASELINE_RESEARCH200\\summary.json",
+    "trade_context_annotated_csv": "reports\\phase_33f2_trade_context_audit\\S1_BASELINE_RESEARCH200\\trade_context_annotated.csv"
+  },
+  "overall_metrics": {
+    "avg_net_pnl": 1083.0914058104145,
+    "profit_factor": 1.1428305269354497,
+    "total_net_pnl": 579453.9021085717,
+    "win_rate": 0.4616822429906542
+  },
+  "sector_proxy_trade_counts": {
+    "fallback": 0,
+    "mapped": 264,
+    "unmapped": 271
+  },
+  "strategy_name": "S1_BASELINE_RESEARCH200",
+  "symbols_requested": 181,
+  "symbols_with_stock_context": 181,
+  "trade_count": 535,
+  "trade_log_rows_read": 535,
+  "windows": [
+    5,
+    20,
+    60,
+    120
+  ]
+}

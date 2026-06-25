@@ -1,0 +1,59 @@
+{
+  "audit_date_range": {
+    "end": "2026-04-28",
+    "start": "2020-01-02"
+  },
+  "benchmark_index": "NIFTY_500",
+  "cap_context_status": "inactive: market_cap_bucket is unknown/unmapped; no cap buckets derived",
+  "context_date_range": {
+    "first": "2020-01-02",
+    "last": "2026-04-28"
+  },
+  "index_load_errors": {},
+  "load_date_range": {
+    "end": "2026-04-28",
+    "start": "2018-05-12"
+  },
+  "missing_context_counts": {
+    "benchmark": 0,
+    "sector": 345,
+    "stock": 0
+  },
+  "missing_stock_symbols": [],
+  "outcome_columns": {
+    "has_r_multiple": false,
+    "pnl_column": "net_pnl"
+  },
+  "outputs": {
+    "context_bucket_summary_csv": "reports\\phase_33f2_trade_context_audit\\S2_EXCLUDE_RET_DOWN_RETAINED\\context_bucket_summary.csv",
+    "exit_reason_by_context_csv": "reports\\phase_33f2_trade_context_audit\\S2_EXCLUDE_RET_DOWN_RETAINED\\exit_reason_by_context.csv",
+    "missing_context_summary_csv": "reports\\phase_33f2_trade_context_audit\\S2_EXCLUDE_RET_DOWN_RETAINED\\missing_context_summary.csv",
+    "pnl_by_context_csv": "reports\\phase_33f2_trade_context_audit\\S2_EXCLUDE_RET_DOWN_RETAINED\\pnl_by_context.csv",
+    "r_multiple_by_context_csv": "reports\\phase_33f2_trade_context_audit\\S2_EXCLUDE_RET_DOWN_RETAINED\\r_multiple_by_context.csv",
+    "sector_proxy_trade_coverage_csv": "reports\\phase_33f2_trade_context_audit\\S2_EXCLUDE_RET_DOWN_RETAINED\\sector_proxy_trade_coverage.csv",
+    "summary_json": "reports\\phase_33f2_trade_context_audit\\S2_EXCLUDE_RET_DOWN_RETAINED\\summary.json",
+    "trade_context_annotated_csv": "reports\\phase_33f2_trade_context_audit\\S2_EXCLUDE_RET_DOWN_RETAINED\\trade_context_annotated.csv"
+  },
+  "overall_metrics": {
+    "avg_net_pnl": 1684.081823461252,
+    "profit_factor": 1.1888537113523638,
+    "total_net_pnl": 971715.2121371424,
+    "win_rate": 0.45233968804159447
+  },
+  "sector_proxy_trade_counts": {
+    "fallback": 0,
+    "mapped": 232,
+    "unmapped": 345
+  },
+  "strategy_name": "S2_EXCLUDE_RET_DOWN_RETAINED",
+  "symbols_requested": 146,
+  "symbols_with_stock_context": 146,
+  "trade_count": 577,
+  "trade_log_rows_read": 577,
+  "windows": [
+    5,
+    20,
+    60,
+    120
+  ]
+}

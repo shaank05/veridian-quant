@@ -307,7 +307,11 @@ def _normalize_price_frame(
     if missing:
         raise ValueError(f"missing required columns: {', '.join(missing)}")
     frame = data.copy(deep=True)
-    frame["session_date"] = pd.to_datetime(frame[date_col], errors="raise").dt.normalize()
+    frame["session_date"] = (
+        pd.to_datetime(frame[date_col], errors="raise", utc=True)
+        .dt.tz_convert(None)
+        .dt.normalize()
+    )
     for column in required:
         frame[column] = pd.to_numeric(frame[column], errors="coerce")
     return frame.sort_values("session_date", kind="mergesort").drop_duplicates(

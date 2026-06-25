@@ -1,0 +1,54 @@
+{
+  "audit_date_range": {
+    "end": "2020-06-29",
+    "start": "2020-01-02"
+  },
+  "benchmark_index": "NIFTY_500",
+  "cap_context_status": "inactive: market_cap_bucket is unknown/unmapped; no cap buckets derived",
+  "context_date_range": {
+    "first": "2020-01-02",
+    "last": "2020-06-29"
+  },
+  "index_load_errors": {},
+  "load_date_range": {
+    "end": "2020-06-29",
+    "start": "2018-05-12"
+  },
+  "missing_context_counts": {
+    "benchmark": 0,
+    "sector": 28,
+    "stock": 22
+  },
+  "missing_stock_symbols": [],
+  "outcome_columns": {
+    "has_r_multiple": false,
+    "pnl_column": null
+  },
+  "outputs": {
+    "context_bucket_summary_csv": "reports\\phase_33f_trade_context_audit_smoke\\context_bucket_summary.csv",
+    "exit_reason_by_context_csv": "reports\\phase_33f_trade_context_audit_smoke\\exit_reason_by_context.csv",
+    "missing_context_summary_csv": "reports\\phase_33f_trade_context_audit_smoke\\missing_context_summary.csv",
+    "pnl_by_context_csv": "reports\\phase_33f_trade_context_audit_smoke\\pnl_by_context.csv",
+    "r_multiple_by_context_csv": "reports\\phase_33f_trade_context_audit_smoke\\r_multiple_by_context.csv",
+    "sector_proxy_trade_coverage_csv": "reports\\phase_33f_trade_context_audit_smoke\\sector_proxy_trade_coverage.csv",
+    "summary_json": "reports\\phase_33f_trade_context_audit_smoke\\summary.json",
+    "trade_context_annotated_csv": "reports\\phase_33f_trade_context_audit_smoke\\trade_context_annotated.csv"
+  },
+  "overall_metrics": {},
+  "sector_proxy_trade_counts": {
+    "fallback": 0,
+    "mapped": 22,
+    "unmapped": 28
+  },
+  "strategy_name": null,
+  "symbols_requested": 46,
+  "symbols_with_stock_context": 46,
+  "trade_count": 50,
+  "trade_log_rows_read": 50,
+  "windows": [
+    5,
+    20,
+    60,
+    120
+  ]
+}

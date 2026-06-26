@@ -28,7 +28,7 @@ No strategy is production-approved.
 | `candidate-ranking s1_v1` | Parked ranking experiment | Yes | Yes | Underperformed unranked baseline; do not promote |
 | `S2_MARKOV_STATE_TRANSITION` safer benchmark | Frozen research benchmark | Yes | Yes | Retain `exclude_ret_down + ranking none`; not production-ready |
 | `S2_MARKOV_STATE_TRANSITION` high-return candidate | Frozen research candidate | Yes | Yes | Retain `exclude_ret_down + clean_state_v1`; fragile due to 2025 |
-| S2 guard/ranking variants | Rejected as benchmarks | Yes | Yes | Do not promote; improved targeted weakness but lost too much total edge |
+| S2 guard/ranking variants | Rejected as benchmarks | Yes | Yes | Reject 2025 guard, 2025 context guard, and avoid shallow uptrend pullback; direct fixes lost too much edge or worsened drawdown/year fragility |
 | S2 simple context-filter variants | Rejected | Yes | Yes | Phase 33G.1 benchmark/relative/sector context filters rejected; no second-pass variant |
 | `S3_TREND_PULLBACK_CONTINUATION` | Parked / not production-ready | Yes | Yes | Retain `S3_STRONG_TREND_ABOVE_SMA50_V1` as benchmark only; do not continue variants now |
 | `S4_ATR_COMPRESSION_BREAKOUT_V1` | Weak benchmark / parked | Yes | Yes | Retain as weak S4 benchmark only; not production-ready; do not continue tuning now |
@@ -68,6 +68,13 @@ Current status:
   filters; all were rejected.
 - The original retained S2 baseline remains unchanged and no S2 context variant
   qualifies for second pass.
+- Phase 34A reconstructed S2's failure mode from existing reports as
+  regime/state non-stationarity plus broad stop-churn during fragile periods.
+- Phase 34A.0 found existing S2 failure-audit tooling and retained/nearby
+  reports, so no new failure-audit code is currently needed.
+- Phase 34B documents prior S2 guard/state lessons: `exclude_ret_down` remains
+  the safer benchmark; `clean_state_v1` remains only a fragile higher-return
+  benchmark; no S2 variant is production-approved.
 - S3 remains weak/moderate and context-sensitive.
 - S4 remains a weak benchmark only; context did not rescue it.
 - S5 remains weak/parked; gains concentrated in strong benchmark/sector
@@ -154,10 +161,12 @@ Interpretation:
 - Strategy: `S2_MARKOV_STATE_TRANSITION`
 - `markov_signal_filter = exclude_ret_down`
 - `s2_candidate_ranking = none`
+- Trades: 577
 - Net PnL: about Rs 9.72L
 - CAGR: about 11.32%
 - Max drawdown: about 24.04%
 - Profit factor: about 1.189
+- Win rate: about 45.23%
 
 Interpretation:
 
@@ -172,10 +181,12 @@ Interpretation:
 - Strategy: `S2_MARKOV_STATE_TRANSITION`
 - `markov_signal_filter = exclude_ret_down`
 - `s2_candidate_ranking = clean_state_v1`
+- Trades: 583
 - Net PnL: about Rs 12.32L
 - CAGR: about 13.52%
 - Max drawdown: about 33.94%
 - Profit factor: about 1.223
+- Win rate: about 47.68%
 - 2025 PnL: about -Rs 7.50L
 
 Interpretation:
@@ -316,6 +327,20 @@ improvement under the preferred filter context. The Phase 33G.1 simple
 context-filter variants also failed the pre-declared acceptance criteria; no
 second-pass context variant is retained.
 
+Phase 34B reconstructed the prior-variant metrics:
+
+| Variant | Trades | Net PnL | PF | Max DD | Win rate | Decision |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| `exclude_ret_down + 2025_guard_v1` | 564 | about Rs 5.65L | 1.133 | 26.87% | 45.04% | reject |
+| `exclude_ret_down + 2025_guard_v1 + signal-time context` | 561 | about Rs 4.78L | 1.116 | 26.87% | 44.56% | reject |
+| `exclude_ret_down + clean_state_v1` | 583 | about Rs 12.32L | 1.223 | 33.94% | 47.68% | fragile higher-return benchmark only |
+| `exclude_ret_down + avoid_shallow_uptrend_pullback_v1` | 573 | about Rs 11.10L | 1.185 | 37.42% | 46.07% | reject |
+
+Do not remove months, symbols, sectors, or state labels directly from these
+reports. Do not optimize by final PnL, treat 2025-specific failures as
+production rules, or continue threshold-tweaking the same context/guard
+filters. Future S2 work requires a genuinely new hypothesis.
+
 ---
 
 ## Audit Rules
@@ -352,6 +377,8 @@ Current decision:
 
 - Freeze S2 research for now.
 - Keep both retained S2 benchmarks for comparison.
+- Do not continue simple S2 guard, context, or state-exclusion tuning unless a
+  genuinely new hypothesis is defined.
 - Freeze S3 and S4 research for now.
 - Keep retained S3 and weak S4 benchmarks for comparison.
 - Park S5 after the Phase 32F first-pass audit. Do not tune S5 immediately; use

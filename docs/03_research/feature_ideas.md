@@ -85,12 +85,27 @@ Tested/rejected context-filter work:
 - Do not continue with threshold tweaks, alternate lookbacks, combined filters,
   or post-result stacking from these failed variants.
 
+Tested/rejected S2 guard and state work:
+
+- Rejected: `exclude_ret_down + 2025_guard_v1`.
+- Rejected: `exclude_ret_down + 2025_guard_v1 + signal-time context`.
+- Rejected: `exclude_ret_down + avoid_shallow_uptrend_pullback_v1`.
+- Fragile benchmark only: `exclude_ret_down + clean_state_v1`.
+- `clean_state_v1` improved final PnL and PF, but worsened drawdown to about
+  33.94% and left 2025 severely negative at about -Rs 7.50L.
+- The 2025 guard and context guard reduced or reframed a symptom while cutting
+  too much edge versus the safer `exclude_ret_down` baseline.
+- The shallow-uptrend-pullback variant raised final PnL but worsened PF,
+  drawdown, and 2025/2026 quality.
+- Future S2 work must address regime/state reliability more robustly, not
+  direct label, month, symbol, sector, or shallow-pullback removal.
+
 Future context work:
 
 - Keep S1-S5 context audit findings diagnostic until controlled experiments are
   designed and reviewed.
 - Future S2 context work requires a genuinely new hypothesis, not minor
-  benchmark/relative/sector threshold changes.
+  benchmark/relative/sector threshold changes or renamed guard/state exclusions.
 - Add R-multiple availability to future trade PnL logs or provide reliable join
   logic when R-bucket diagnostics are needed.
 - Expand sector mapping only when a reliable sector/index proxy exists.

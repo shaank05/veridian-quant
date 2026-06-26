@@ -828,3 +828,58 @@ Consequence:
   lookbacks, combined filters, or post-result stacking.
 - Future S2 improvement work requires a genuinely new hypothesis, not minor
   threshold tweaks of the rejected context filters.
+
+---
+
+## 2026-06-26 - Preserve Prior S2 Variant Lessons Before Any New S2 Work
+
+Decision:
+
+Prior S2 improvement variants do not replace the retained safer
+`exclude_ret_down` baseline. Keep `exclude_ret_down + clean_state_v1` only as a
+fragile higher-return benchmark, and stop simple guard, context, and
+state-exclusion tuning unless a genuinely new hypothesis is defined in a
+separate decision phase.
+
+Prior variant decisions:
+
+- `exclude_ret_down + 2025_guard_v1`: rejected.
+- `exclude_ret_down + 2025_guard_v1 + signal-time context`: rejected.
+- `exclude_ret_down + clean_state_v1`: retained only as a fragile higher-return
+  benchmark.
+- `exclude_ret_down + avoid_shallow_uptrend_pullback_v1`: rejected.
+
+Approximate evidence:
+
+- Retained safer baseline `exclude_ret_down`: 577 trades, about Rs 9.72L net
+  PnL, about 1.189 PF, about 24.04% max drawdown, and about 45.23% win rate.
+- 2025 guard: 564 trades, about Rs 5.65L net PnL, 1.133 PF, 26.87% max
+  drawdown, and 45.04% win rate.
+- 2025 guard with signal-time context: 561 trades, about Rs 4.78L net PnL,
+  1.116 PF, 26.87% max drawdown, and 44.56% win rate.
+- Clean-state higher-return candidate: 583 trades, about Rs 12.32L net PnL,
+  1.223 PF, 33.94% max drawdown, and 47.68% win rate; 2025 was about -Rs
+  7.50L.
+- Avoid shallow uptrend pullback: 573 trades, about Rs 11.10L net PnL, 1.185
+  PF, 37.42% max drawdown, and 46.07% win rate.
+
+Reason:
+
+Phase 34A reconstructed the failure mode from existing reports as regime/state
+non-stationarity plus broad stop-churn during fragile periods. Phase 34A.0
+found existing S2 failure-audit tooling and reports, so new audit code is not
+currently needed. The prior S2 guard/context/state variants either destroyed
+too much edge or moved risk into worse drawdown and year fragility.
+
+Consequence:
+
+- The safer S2 `exclude_ret_down` baseline remains retained but not
+  production-approved.
+- `clean_state_v1` remains useful only as a fragile higher-return comparison.
+- Do not remove months, symbols, sectors, or state labels directly from these
+  reports.
+- Do not optimize by final PnL or treat 2025-specific failures as production
+  rules.
+- Do not continue threshold-tweaking the same S2 guard/context filters.
+- The next S2 step must be a separate decision phase, not automatic
+  implementation.

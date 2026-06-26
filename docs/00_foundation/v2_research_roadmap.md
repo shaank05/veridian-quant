@@ -51,6 +51,14 @@ Phase 33G.1 implemented and ran the fixed batch, and Phase 33G.2 froze the
 result: all simple S2 context-filter variants are rejected and the original S2
 baseline remains unchanged.
 
+Phase 34A through 34B reconstructed and documented the S2 failure-mode trail.
+Phase 34A used existing retained reports to confirm that S2's current weakness
+is regime/state non-stationarity plus broad stop-churn during fragile periods.
+Phase 34A.0 found existing S2 failure-audit tooling and reports, so no new
+failure-audit code is currently needed. Phase 34B documents prior S2 guard,
+context, and state-exclusion variant lessons. The next S2 step must be a
+separate decision phase, not automatic implementation.
+
 ---
 
 ## Completed Phases
@@ -507,11 +515,20 @@ Completed follow-up phases:
 - **Phase 33G.2:** S2 context experiment results documented and frozen. All
   four context-filter variants are rejected; no second-pass context variant is
   retained.
+- **Phase 34A:** existing-report S2 failure-mode scrutiny reconstructed. Main
+  finding: regime/state non-stationarity plus broad stop-churn during fragile
+  periods.
+- **Phase 34A.0:** discovery found existing S2 failure-audit tooling and
+  retained/nearby reports. No new failure-audit code is currently needed.
+- **Phase 34B:** prior S2 improvement variant lessons documented. 2025 guard,
+  2025 context guard, and avoid shallow uptrend pullback remain rejected;
+  `clean_state_v1` remains only a fragile higher-return benchmark.
 
 Remaining planned follow-up phases:
 
 - **Next branch:** decide separately. Do not continue with another simple S2
-  context-threshold tweak.
+  context-threshold tweak, guard tweak, state-label exclusion, or automatic
+  implementation phase.
 - **Later:** broader strategy exposure/regime audit, historical index
   constituents, and point-in-time classification.
 
@@ -529,16 +546,19 @@ Configuration:
 
 Approximate result:
 
+- Trades: 577
 - Net PnL: about Rs 9.72L
 - CAGR: about 11.32%
 - Max drawdown: about 24.04%
 - Profit factor: about 1.189
+- Win rate: about 45.23%
 
 Role:
 
 - Safer S2 benchmark.
 - Better drawdown profile.
 - Lower return than the high-return candidate.
+- Not production-approved.
 
 ### Higher-Return S2 Research Candidate
 
@@ -550,10 +570,12 @@ Configuration:
 
 Approximate result:
 
+- Trades: 583
 - Net PnL: about Rs 12.32L
 - CAGR: about 13.52%
 - Max drawdown: about 33.94%
 - Profit factor: about 1.223
+- Win rate: about 47.68%
 - 2025 PnL: about -Rs 7.50L
 
 Role:
@@ -583,8 +605,25 @@ Reasons:
 - `exclude_ret_down + avoid_shallow_uptrend_pullback_v1` increased drawdown and did not preserve the 2025 fix.
 - `exclude_ret_down + 2025_guard_v1` improved 2025 but reduced total PnL too much.
 - `exclude_ret_down + 2025_guard_v1 + signal-time context` proved Phase 27J infrastructure worked, but the final result remained weak: about Rs 4.78L net PnL, about 6.37% CAGR, about 26.87% max drawdown, about 1.116 PF, and 2025 improved to about -Rs 156K while too much total edge was lost.
+- `exclude_ret_down + avoid_shallow_uptrend_pullback_v1` had about Rs 11.10L
+  net PnL, but profit factor slipped to about 1.185 and max drawdown worsened
+  to about 37.42%, with worse 2025/2026 behavior.
+- `exclude_ret_down + 2025_guard_v1` had about Rs 5.65L net PnL, about 1.133
+  PF, and about 26.87% max drawdown, cutting too much edge versus the safer
+  baseline without meaningfully fixing 2025.
 - Phase 33G.1 simple benchmark/relative/sector context filters failed the
   pre-declared acceptance criteria. No variant qualified for second pass.
+
+Frozen lesson:
+
+- S2 cannot be rescued by simple guards, direct 2025-specific rules,
+  shallow-pullback bans, or simple state exclusions.
+- Do not remove months, symbols, sectors, or state labels directly from these
+  reports.
+- Do not optimize S2 by final PnL or promote higher-PnL variants when PF,
+  drawdown, or yearly fragility worsens.
+- Future S2 work must address regime/state reliability more robustly, through a
+  separately approved hypothesis.
 
 ---
 
@@ -596,6 +635,9 @@ The current evidence says:
 - S1 is useful as a benchmark, not as a final production strategy.
 - S2 has evidence of edge, but remains regime fragile.
 - S2 is retained as a benchmark/research candidate, not deployed live.
+- Prior S2 guard/context/state-exclusion variants do not replace the retained
+  safer baseline.
+- `clean_state_v1` is retained only as a fragile higher-return benchmark.
 - S3 is completed as a standalone trend-continuation experiment and parked.
 - The best S3 variant is retained as a benchmark only.
 - S4 is completed as a raw compression-breakout experiment and parked.

@@ -52,16 +52,19 @@ Configuration:
 
 Approximate result:
 
+- Trades: 577
 - Net PnL: about Rs 9.72L
 - CAGR: about 11.32%
 - Max drawdown: about 24.04%
 - Profit factor: about 1.189
+- Win rate: about 45.23%
 
 Role:
 
 - Safer S2 benchmark.
 - Better drawdown profile.
 - Lower return than the high-return candidate.
+- Retained for comparison only; not production-approved.
 
 ### Higher-Return S2 Research Candidate
 
@@ -73,10 +76,12 @@ Configuration:
 
 Approximate result:
 
+- Trades: 583
 - Net PnL: about Rs 12.32L
 - CAGR: about 13.52%
 - Max drawdown: about 33.94%
 - Profit factor: about 1.223
+- Win rate: about 47.68%
 - 2025 PnL: about -Rs 7.50L
 
 Role:
@@ -100,6 +105,72 @@ S2 explored:
 - Signal-time stock/Nifty/relative-strength context enrichment.
 
 Later improvements helped explain S2's failure modes and produced reusable diagnostics, but they did not produce a better final S2 benchmark.
+
+---
+
+## Prior Improvement Variant Lessons
+
+Phase 34B reconstructs prior S2 improvement-variant lessons so the current
+project trail does not repeat already-tested guard, context, or state-exclusion
+work.
+
+Retained comparison baseline:
+
+| Variant | Trades | Net PnL | PF | Max DD | Win rate | Status |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| `exclude_ret_down` | 577 | about Rs 9.72L | about 1.189 | about 24.04% | about 45.23% | retained safer benchmark |
+
+Prior S2 improvement variants:
+
+| Variant | Trades | Net PnL | PF | Max DD | Win rate | Verdict |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| `exclude_ret_down + 2025_guard_v1` | 564 | about Rs 5.65L | 1.133 | 26.87% | 45.04% | reject |
+| `exclude_ret_down + 2025_guard_v1 + signal-time context` | 561 | about Rs 4.78L | 1.116 | 26.87% | 44.56% | reject |
+| `exclude_ret_down + clean_state_v1` | 583 | about Rs 12.32L | 1.223 | 33.94% | 47.68% | fragile higher-return benchmark |
+| `exclude_ret_down + avoid_shallow_uptrend_pullback_v1` | 573 | about Rs 11.10L | 1.185 | 37.42% | 46.07% | reject |
+
+Variant lessons:
+
+- `2025_guard_v1` cut net PnL by about Rs 4.06L versus the safer baseline,
+  worsened profit factor and drawdown, and did not meaningfully fix 2025.
+- `2025_guard_v1 + signal-time context` was worse than both the retained
+  baseline and the pure 2025 guard, confirming that threshold/context tweaking
+  was not the answer.
+- `clean_state_v1` improved PnL, profit factor, and R-style quality metrics,
+  but worsened drawdown badly and made 2025 severely negative. It remains only
+  a fragile higher-return benchmark.
+- `avoid_shallow_uptrend_pullback_v1` improved final PnL but worsened profit
+  factor, sharply worsened drawdown, and made 2025/2026 behavior worse.
+
+Frozen cross-variant lesson:
+
+S2 cannot be rescued by simple guards, direct 2025-specific rules,
+shallow-pullback bans, or simple state exclusions. Direct fixes either destroy
+too much edge or move risk into worse drawdown and year fragility. The deeper
+problem remains state/regime non-stationarity plus broad stop-churn during
+fragile periods.
+
+Overfitting cautions:
+
+- Do not remove months, symbols, sectors, or state labels directly from these
+  reports.
+- Do not optimize by final PnL.
+- Do not treat 2025-specific failures as production rules.
+- Do not continue threshold-tweaking the same context or guard filters.
+- Do not promote higher-PnL variants when profit factor, drawdown, or yearly
+  fragility worsens.
+- Future S2 work needs a genuinely new hypothesis, not a renamed version of
+  these failed guards.
+
+Current Phase 34B status:
+
+- `exclude_ret_down` remains the retained safer S2 benchmark.
+- `clean_state_v1` remains only a fragile higher-return benchmark.
+- No prior S2 variant is production-approved.
+- Phase 34A existing-report scrutiny reconstructed the failure mode as
+  regime/state non-stationarity plus broad stop-churn during fragile periods.
+- Phase 34A.0 found existing S2 failure-audit tooling and reports, so no new
+  failure-audit code is currently needed.
 
 ---
 

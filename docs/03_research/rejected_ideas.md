@@ -28,9 +28,21 @@ The following S2 variants are rejected as benchmarks:
 Reasons:
 
 - `avoid_shallow_uptrend_pullback_v1` reduced 2025 damage when used alone, but weakened total profitability too much.
-- `exclude_ret_down + avoid_shallow_uptrend_pullback_v1` increased drawdown and did not preserve the 2025 fix.
-- `exclude_ret_down + 2025_guard_v1` improved 2025 but reduced total PnL too much.
-- `exclude_ret_down + 2025_guard_v1 + signal-time context` proved Phase 27J infrastructure worked, but final result remained weak: about Rs 4.78L net PnL, about 6.37% CAGR, about 26.87% max drawdown, about 1.116 PF, and 2025 improved to about -Rs 156K while too much total edge was lost.
+- `exclude_ret_down + avoid_shallow_uptrend_pullback_v1` improved final PnL to
+  about Rs 11.10L, but PF slipped to about 1.185, max drawdown worsened to
+  about 37.42%, and 2025/2026 behavior deteriorated.
+- `exclude_ret_down + 2025_guard_v1` cut too much edge: about 564 trades, about
+  Rs 5.65L net PnL, 1.133 PF, 26.87% max drawdown, and 45.04% win rate versus
+  the safer baseline's about Rs 9.72L net PnL, 1.189 PF, and 24.04% max
+  drawdown.
+- `exclude_ret_down + 2025_guard_v1 + signal-time context` proved Phase 27J
+  infrastructure worked, but final result remained weak: about 561 trades,
+  about Rs 4.78L net PnL, about 1.116 PF, about 26.87% max drawdown, and about
+  44.56% win rate. It was worse than the retained baseline and worse than the
+  pure 2025 guard.
+
+Do not revive these as direct label/month/symbol/sector removals, threshold
+tweaks, or renamed guard variants.
 
 ---
 
@@ -41,7 +53,8 @@ Reasons:
 Current S2 decision:
 
 - Retain `exclude_ret_down + ranking none` as safer S2 benchmark.
-- Retain `exclude_ret_down + clean_state_v1` as higher-return research candidate.
+- Retain `exclude_ret_down + clean_state_v1` as higher-return research
+  candidate only; it is fragile, not a safer candidate.
 - Freeze S2 research for now.
 - Do not continue immediate S2 tuning.
 - Move to a new independent strategy.
@@ -49,6 +62,10 @@ Current S2 decision:
 Reason:
 
 S2 has evidence of edge, but remains regime fragile and not production-ready.
+The clean-state candidate has stronger final PnL and PF, but drawdown worsened
+to about 33.94% and 2025 was about -Rs 7.50L, so it does not replace the safer
+baseline. Future S2 work needs a genuinely new regime/state reliability
+hypothesis rather than direct 2025-specific rules or simple state exclusions.
 
 ---
 

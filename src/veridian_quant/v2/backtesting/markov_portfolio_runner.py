@@ -4,7 +4,7 @@ from dataclasses import dataclass, replace
 from datetime import date
 from decimal import Decimal
 from time import perf_counter
-from typing import Mapping
+from typing import Callable, Mapping
 
 import pandas as pd
 
@@ -81,6 +81,7 @@ def run_s2_markov_portfolio_backtest(
     markov_signal_filter: str = MARKOV_SIGNAL_FILTER_NONE,
     s2_candidate_ranking_mode: str = S2_CANDIDATE_RANKING_NONE,
     nifty_data: pd.DataFrame | None = None,
+    signal_context_filter: Callable[[Signal], tuple[Signal, str | None]] | None = None,
 ) -> PortfolioBacktestResult:
     """Run a deterministic multi-symbol S2 Markov research backtest."""
 
@@ -173,10 +174,26 @@ def run_s2_markov_portfolio_backtest(
         data_by_symbol=data_by_valid_symbol,
         nifty_data=nifty_data,
     )
+    if signal_context_filter is not None:
+        filtered_signals: list[Signal] = []
+        for signal in ordered_all_signals:
+            if signal.metadata.get("markov_filter_decision") == "filtered":
+                filtered_signals.append(signal)
+                continue
+            context_signal, rejection_reason = signal_context_filter(signal)
+            filtered_signals.append(context_signal)
+            if rejection_reason is not None:
+                _append_rejection(
+                    rejected_signals,
+                    _reject(context_signal, rejection_reason),
+                    progress,
+                )
+        ordered_all_signals = tuple(filtered_signals)
     ordered_execution_signals = tuple(
         signal
         for signal in ordered_all_signals
         if signal.metadata.get("markov_filter_decision") != "filtered"
+        and signal.metadata.get("s2_context_filter_decision") != "filtered"
     )
     ordered_execution_signals = rank_s2_entry_candidates(
         ordered_execution_signals,

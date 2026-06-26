@@ -1,0 +1,20 @@
+{
+  "benchmark_index": "NIFTY_500",
+  "benchmark_strong_negative_threshold": -0.05,
+  "classification_file": "config\\universes\\research\\nse_eq_research_200_static_classification.csv",
+  "combined_filters": false,
+  "context_window_sessions": 20,
+  "description": "Allow entries only when rel_benchmark_ret_20d > 0.",
+  "fundamentals_ratios": false,
+  "market_cap_buckets": false,
+  "markov_signal_filter": "exclude_ret_down",
+  "phase": "33G.1",
+  "production_approval": false,
+  "relative_outperform_threshold": 0.0,
+  "relative_strong_underperform_threshold": -0.05,
+  "s2_candidate_ranking": "none",
+  "sector_fallback": false,
+  "sector_negative_threshold": 0.0,
+  "threshold_optimization": false,
+  "variant": "S2_REQUIRE_STOCK_OUTPERFORMING_BENCHMARK_20D"
+}

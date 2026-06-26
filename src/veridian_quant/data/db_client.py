@@ -20,14 +20,14 @@ class DatabaseClient:
         if DatabaseClient._engine is None:
             try:
                 # Construct the Database URI
-                # user = os.getenv("DB_USER")
-                # password = os.getenv("DB_PASSWORD")
-                # host = os.getenv("DB_HOST")
-                # port = os.getenv("DB_PORT")
-                # dbname = os.getenv("DB_NAME")
-                db_uri = os.getenv("DATABASE_URL")
+                user = os.getenv("DB_USER")
+                password = os.getenv("DB_PASSWORD")
+                host = os.getenv("DB_HOST")
+                port = os.getenv("DB_PORT")
+                dbname = os.getenv("DB_NAME")
+                # db_uri = os.getenv("DATABASE_URL")
                 
-                # db_uri = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}"
+                db_uri = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}"
                 
                 # Create the engine with a connection pool
                 DatabaseClient._engine = create_engine(

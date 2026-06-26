@@ -579,8 +579,12 @@ Required feature checks:
   S1-S5 `trade_pnl_log.csv` files were audited with no sector fallback.
 - **Phase 33F.3 - S1-S5 context audit documentation:** complete. Interpretation
   is frozen in `docs/02_audits/s1_s5_context_audit.md`.
-- **Phase 33G - S2 controlled context experiment design:** design pre-declared
-  S2-only context experiments and acceptance criteria before any experiment run.
+- **Phase 33G - S2 controlled context experiment design:** complete. The
+  pre-declared S2-only context experiment batch and acceptance criteria are
+  documented in `docs/03_research/s2_context_experiment_design.md`.
+- **Phase 33G.1 - Pre-declared S2 context experiment run:** implement/run only
+  the fixed Phase 33G batch, compare every variant against the retained S2
+  baseline, and run post-backtest context audit only where basic metrics pass.
 - **Later - Historical constituents / point-in-time classification:** replace
   or supplement static classification for production-grade historical claims.
 
@@ -664,8 +668,13 @@ Key findings:
   equals intentionally unmapped sector-proxy trades.
 - No context filter is approved and no strategy is promoted.
 
-Next phase: Phase 33G should design controlled S2-only context experiments with
-pre-declared anti-overfitting guardrails.
+Phase 33G status: controlled S2-only context experiments are now pre-declared in
+`docs/03_research/s2_context_experiment_design.md`.
+
+Next phase: Phase 33G.1 should implement/run only the fixed S2 experiment batch
+with the documented anti-overfitting guardrails. No combined filters, threshold
+grids, fundamentals ratios, market-cap buckets, or production approvals are
+authorized by the design.
 
 ## 24. Open Questions
 
@@ -686,6 +695,8 @@ pre-declared anti-overfitting guardrails.
 - Which capital-utilization metric best distinguishes cash drag from weak alpha?
 - What benchmark-relative threshold, if any, should affect future retain/park
   decisions?
+- After Phase 33G.1, do any variants justify a second-pass diagnostic run
+  without introducing threshold fishing or filter stacking?
 
 ## 25. References / Related Docs
 
@@ -696,6 +707,7 @@ pre-declared anti-overfitting guardrails.
 - `docs/04_validation/monte_carlo_robustness_audit.md`
 - `docs/02_audits/strategy_audit_master.md`
 - `docs/02_audits/s1_s5_context_audit.md`
+- `docs/03_research/s2_context_experiment_design.md`
 - `docs/01_strategies/s5_relative_strength_momentum_rotation.md`
 - `docs/02_audits/s5_audit.md`
 - `docs/03_research/feature_ideas.md`

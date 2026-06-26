@@ -112,21 +112,25 @@ Future context experiments must follow pre-declared guardrails:
 
 ## Next Phase Handoff
 
-Recommended next phase:
+Phase 33G design status:
 
-- Phase 33G - S2 Controlled Context Experiment Design.
+- Complete: `docs/03_research/s2_context_experiment_design.md`.
 
-Likely initial pre-declared S2 experiment candidates to design, not yet run or
-approve:
+Pre-declared S2 experiment candidates, not yet run or approved:
 
-- Keep S2 baseline unchanged as the control.
-- Avoid worst benchmark 20D context only if the rule is clearly defined.
-- Require or test stock outperforming benchmark 20D.
-- Avoid strong stock underperformance versus benchmark 20D.
-- Avoid mapped-sector negative 20D only where sector proxy is mapped.
+- `S2_BASELINE`.
+- `S2_AVOID_BENCHMARK_20D_STRONG_NEGATIVE`.
+- `S2_REQUIRE_STOCK_OUTPERFORMING_BENCHMARK_20D`.
+- `S2_AVOID_STOCK_STRONGLY_UNDERPERFORMING_BENCHMARK_20D`.
+- `S2_AVOID_MAPPED_SECTOR_NEGATIVE_20D`.
 
-Phase 33G should define the exact experiment set, acceptance criteria, and audit
-requirements before any experiment run.
+Next phase:
+
+- Phase 33G.1 - implement/run only the pre-declared S2 context experiment batch.
+
+No context filter is approved by this handoff. Phase 33G.1 must compare every
+variant directly against the retained S2 baseline and apply the pre-declared
+acceptance, rejection, and anti-overfitting checks before any second-pass work.
 
 ## Limitations
 

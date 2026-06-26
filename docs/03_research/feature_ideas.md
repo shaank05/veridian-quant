@@ -75,10 +75,13 @@ Current implementation status:
 
 Future context work:
 
-- Design S2-only context-aware diagnostic experiments with pre-declared rules
-  and anti-overfitting guardrails.
+- Run the Phase 33G S2-only context-aware diagnostic experiment batch with
+  pre-declared rules and anti-overfitting guardrails:
+  `docs/03_research/s2_context_experiment_design.md`.
 - Keep S1-S5 context audit findings diagnostic until controlled experiments are
   designed and reviewed.
+- Run a post-backtest context audit on any S2 context variant that passes basic
+  metrics.
 - Add R-multiple availability to future trade PnL logs or provide reliable join
   logic when R-bucket diagnostics are needed.
 - Expand sector mapping only when a reliable sector/index proxy exists.

@@ -44,8 +44,9 @@ reusable market/sector/cap context utility layer, real Research200 audit runner,
 conservative sector proxy mapping refinement, and documentation/status freeze.
 Phase 33F through 33F.3 applied benchmark/sector context diagnostics to retained
 S1-S5 trade PnL logs and froze the interpretation in
-`docs/02_audits/s1_s5_context_audit.md`. The next step is controlled S2 context
-experiment design before any experiment runs.
+`docs/02_audits/s1_s5_context_audit.md`. Phase 33G completed the controlled S2
+context experiment design in
+`docs/03_research/s2_context_experiment_design.md` before any experiment runs.
 
 ---
 
@@ -496,10 +497,12 @@ Completed follow-up phases:
   sector context.
 - **Phase 33F.3:** documentation/status freeze completed in
   `docs/02_audits/s1_s5_context_audit.md`.
+- **Phase 33G:** S2 controlled context experiment design completed in
+  `docs/03_research/s2_context_experiment_design.md`.
 
 Remaining planned follow-up phases:
 
-- **Phase 33G:** S2 controlled context experiment design.
+- **Phase 33G.1:** implement/run the pre-declared S2 context experiment batch.
 - **Later:** broader strategy exposure/regime audit, historical index
   constituents, and point-in-time classification.
 
@@ -599,12 +602,13 @@ Next direction:
 - Do not convert S1/S2/S4 post-hoc RAWRS findings directly into hard filters.
 - Keep S5 parked after the first-pass audit unless future work proposes a
   materially redesigned momentum hypothesis.
-- Treat Phase 33E through 33F.3 as complete diagnostic context infrastructure,
-  not as a strategy upgrade.
-- Continue next with Phase 33G: design controlled S2-only context experiments
-  with strict anti-overfitting guardrails before any runs. Company fundamentals
-  are now ingested and audited as research context, but current snapshot ratios
-  and static classifications must not be used as historical signal-time facts.
+- Treat Phase 33E through 33G as complete diagnostic/design context work, not
+  as a strategy upgrade.
+- Continue next with Phase 33G.1: implement and run only the pre-declared S2
+  context experiment batch with strict anti-overfitting guardrails. Company
+  fundamentals are now ingested and audited as research context, but current
+  snapshot ratios and static classifications must not be used as historical
+  signal-time facts.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 
@@ -615,6 +619,8 @@ Next direction:
 The following are future research directions, not accepted production rules:
 
 - S2 regime-aware exposure reduction.
+- S2 controlled context-aware diagnostic experiments, limited to the
+  pre-declared Phase 33G batch until reviewed.
 - Better market-regime detector.
 - More robust capacity-aware ranking.
 - Use Phase 27J signal-time context infrastructure in future rankers.

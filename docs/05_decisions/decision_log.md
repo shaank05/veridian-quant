@@ -751,3 +751,43 @@ Consequence:
 - Candidate improvements must be checked against PF, drawdown, trade count,
   yearly consistency, and rejected-trade behavior.
 - Current snapshot fundamentals must not be used as historical signal filters.
+
+---
+
+## 2026-06-26 - Pre-Declare Controlled S2 Context Experiment Batch
+
+Decision:
+
+S2 is the only retained strategy entering controlled context-aware diagnostic
+experiments after Phase 33F. The first experiment batch is pre-declared in
+`docs/03_research/s2_context_experiment_design.md` before any implementation,
+backtest, trade-context audit, or result review.
+
+Initial batch:
+
+- `S2_BASELINE`.
+- `S2_AVOID_BENCHMARK_20D_STRONG_NEGATIVE`.
+- `S2_REQUIRE_STOCK_OUTPERFORMING_BENCHMARK_20D`.
+- `S2_AVOID_STOCK_STRONGLY_UNDERPERFORMING_BENCHMARK_20D`.
+- `S2_AVOID_MAPPED_SECTOR_NEGATIVE_20D`.
+
+Reason:
+
+Phase 33F showed that S2 remains the strongest retained candidate and was
+profitable even in negative benchmark context, while other retained strategies
+showed weaker or more context-sensitive evidence. Context findings are useful
+hypotheses, but open-ended threshold search, final-PnL optimization, and
+post-result filter stacking would create high overfitting risk.
+
+Consequence:
+
+- The initial S2 context experiment batch is intentionally small.
+- Every variant must be compared directly against the retained S2
+  `exclude_ret_down` baseline.
+- No combined filters, threshold grids, 5D/60D/120D alternatives, sector
+  fallback filters, fundamentals ratios, market-cap buckets, S2 core logic
+  changes, or post-result filter stacking are authorized in the first batch.
+- No filter can be approved without strict baseline comparison, PF/drawdown/trade
+  count/yearly/rejection checks, and anti-overfitting review.
+- No 33G.1 result can become production-approved; allowed outcomes are
+  reject, park, weak benchmark, promising diagnostic, or retain for second pass.

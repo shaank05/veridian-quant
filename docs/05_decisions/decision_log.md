@@ -791,3 +791,40 @@ Consequence:
   count/yearly/rejection checks, and anti-overfitting review.
 - No 33G.1 result can become production-approved; allowed outcomes are
   reject, park, weak benchmark, promising diagnostic, or retain for second pass.
+
+---
+
+## 2026-06-26 - Reject Phase 33G.1 S2 Context Filter Variants
+
+Decision:
+
+Reject all four pre-declared Phase 33G.1 S2 context-filter variants and retain
+the original S2 `exclude_ret_down` baseline unchanged.
+
+Rejected variants:
+
+- `S2_AVOID_BENCHMARK_20D_STRONG_NEGATIVE`.
+- `S2_REQUIRE_STOCK_OUTPERFORMING_BENCHMARK_20D`.
+- `S2_AVOID_STOCK_STRONGLY_UNDERPERFORMING_BENCHMARK_20D`.
+- `S2_AVOID_MAPPED_SECTOR_NEGATIVE_20D`.
+
+Reason:
+
+None of the simple benchmark, relative-benchmark, or mapped-sector context
+filters met the pre-declared acceptance criteria. Some reduced trade count
+without improving quality, some worsened drawdown or PF, and the mapped-sector
+variant's slight net PnL improvement came with worse PF and sharply worse
+drawdown.
+
+Consequence:
+
+- The retained S2 safer benchmark remains `exclude_ret_down` with no context
+  filter.
+- No S2 context-filter variant qualifies for second pass.
+- No context filter, ranking rule, strategy change, or production approval is
+  granted.
+- No deeper Phase 33F trade-context audit is needed for the failed variants.
+- Do not continue tuning these filters with threshold fishing, alternate
+  lookbacks, combined filters, or post-result stacking.
+- Future S2 improvement work requires a genuinely new hypothesis, not minor
+  threshold tweaks of the rejected context filters.

@@ -47,6 +47,9 @@ S1-S5 trade PnL logs and froze the interpretation in
 `docs/02_audits/s1_s5_context_audit.md`. Phase 33G completed the controlled S2
 context experiment design in
 `docs/03_research/s2_context_experiment_design.md` before any experiment runs.
+Phase 33G.1 implemented and ran the fixed batch, and Phase 33G.2 froze the
+result: all simple S2 context-filter variants are rejected and the original S2
+baseline remains unchanged.
 
 ---
 
@@ -499,10 +502,16 @@ Completed follow-up phases:
   `docs/02_audits/s1_s5_context_audit.md`.
 - **Phase 33G:** S2 controlled context experiment design completed in
   `docs/03_research/s2_context_experiment_design.md`.
+- **Phase 33G.1:** pre-declared S2 context experiment implementation/run
+  completed.
+- **Phase 33G.2:** S2 context experiment results documented and frozen. All
+  four context-filter variants are rejected; no second-pass context variant is
+  retained.
 
 Remaining planned follow-up phases:
 
-- **Phase 33G.1:** implement/run the pre-declared S2 context experiment batch.
+- **Next branch:** decide separately. Do not continue with another simple S2
+  context-threshold tweak.
 - **Later:** broader strategy exposure/regime audit, historical index
   constituents, and point-in-time classification.
 
@@ -563,6 +572,10 @@ The following variants are rejected as S2 benchmarks:
 - `exclude_ret_down + avoid_shallow_uptrend_pullback_v1`
 - `exclude_ret_down + 2025_guard_v1`
 - `exclude_ret_down + 2025_guard_v1 + signal-time context`
+- `S2_AVOID_BENCHMARK_20D_STRONG_NEGATIVE`
+- `S2_REQUIRE_STOCK_OUTPERFORMING_BENCHMARK_20D`
+- `S2_AVOID_STOCK_STRONGLY_UNDERPERFORMING_BENCHMARK_20D`
+- `S2_AVOID_MAPPED_SECTOR_NEGATIVE_20D`
 
 Reasons:
 
@@ -570,6 +583,8 @@ Reasons:
 - `exclude_ret_down + avoid_shallow_uptrend_pullback_v1` increased drawdown and did not preserve the 2025 fix.
 - `exclude_ret_down + 2025_guard_v1` improved 2025 but reduced total PnL too much.
 - `exclude_ret_down + 2025_guard_v1 + signal-time context` proved Phase 27J infrastructure worked, but the final result remained weak: about Rs 4.78L net PnL, about 6.37% CAGR, about 26.87% max drawdown, about 1.116 PF, and 2025 improved to about -Rs 156K while too much total edge was lost.
+- Phase 33G.1 simple benchmark/relative/sector context filters failed the
+  pre-declared acceptance criteria. No variant qualified for second pass.
 
 ---
 
@@ -602,13 +617,15 @@ Next direction:
 - Do not convert S1/S2/S4 post-hoc RAWRS findings directly into hard filters.
 - Keep S5 parked after the first-pass audit unless future work proposes a
   materially redesigned momentum hypothesis.
-- Treat Phase 33E through 33G as complete diagnostic/design context work, not
-  as a strategy upgrade.
-- Continue next with Phase 33G.1: implement and run only the pre-declared S2
-  context experiment batch with strict anti-overfitting guardrails. Company
-  fundamentals are now ingested and audited as research context, but current
-  snapshot ratios and static classifications must not be used as historical
-  signal-time facts.
+- Treat Phase 33E through 33G.2 as complete diagnostic/design/experiment
+  context work, not as a strategy upgrade.
+- Close the simple S2 context-filter branch. Do not continue with threshold
+  fishing, filter stacking, or another minor benchmark/relative/sector context
+  tweak. Company fundamentals are now ingested and audited as research context,
+  but current snapshot ratios and static classifications must not be used as
+  historical signal-time facts.
+- Decide the next research branch separately; any future S2 work needs a
+  genuinely new hypothesis.
 - Revisit S3 only if a new regime model, ranking/capacity redesign, sector/relative-strength framework, or ensemble diversification requirement creates a specific reason.
 - Revisit S4 only if a materially new hypothesis appears, such as better market-regime gating, sector context, capacity/ranking redesign, or a broader portfolio-construction reason.
 
@@ -619,8 +636,9 @@ Next direction:
 The following are future research directions, not accepted production rules:
 
 - S2 regime-aware exposure reduction.
-- S2 controlled context-aware diagnostic experiments, limited to the
-  pre-declared Phase 33G batch until reviewed.
+- S2 controlled context-aware diagnostic experiments from Phase 33G are tested
+  and rejected; future S2 work requires a new hypothesis rather than threshold
+  tweaks to these filters.
 - Better market-regime detector.
 - More robust capacity-aware ranking.
 - Use Phase 27J signal-time context infrastructure in future rankers.

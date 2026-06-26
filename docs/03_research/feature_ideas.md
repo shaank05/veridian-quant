@@ -73,15 +73,24 @@ Current implementation status:
 - No S1-S5 strategy signal, ranking, filter, or backtest behavior has been
   changed due to these features.
 
+Tested/rejected context-filter work:
+
+- Phase 33G/33G.1 tested the pre-declared S2 simple context-filter batch:
+  `docs/03_research/s2_context_experiment_design.md`.
+- Rejected: `S2_AVOID_BENCHMARK_20D_STRONG_NEGATIVE`.
+- Rejected: `S2_REQUIRE_STOCK_OUTPERFORMING_BENCHMARK_20D`.
+- Rejected: `S2_AVOID_STOCK_STRONGLY_UNDERPERFORMING_BENCHMARK_20D`.
+- Rejected: `S2_AVOID_MAPPED_SECTOR_NEGATIVE_20D`.
+- No S2 context-filter variant qualifies for second pass.
+- Do not continue with threshold tweaks, alternate lookbacks, combined filters,
+  or post-result stacking from these failed variants.
+
 Future context work:
 
-- Run the Phase 33G S2-only context-aware diagnostic experiment batch with
-  pre-declared rules and anti-overfitting guardrails:
-  `docs/03_research/s2_context_experiment_design.md`.
 - Keep S1-S5 context audit findings diagnostic until controlled experiments are
   designed and reviewed.
-- Run a post-backtest context audit on any S2 context variant that passes basic
-  metrics.
+- Future S2 context work requires a genuinely new hypothesis, not minor
+  benchmark/relative/sector threshold changes.
 - Add R-multiple availability to future trade PnL logs or provide reliable join
   logic when R-bucket diagnostics are needed.
 - Expand sector mapping only when a reliable sector/index proxy exists.

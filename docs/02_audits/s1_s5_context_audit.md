@@ -132,6 +132,25 @@ No context filter is approved by this handoff. Phase 33G.1 must compare every
 variant directly against the retained S2 baseline and apply the pre-declared
 acceptance, rejection, and anti-overfitting checks before any second-pass work.
 
+## Phase 33G Follow-Up
+
+Phase 33G through 33G.2 tested the simple pre-declared S2 context filters
+inspired by this audit.
+
+Outcome:
+
+- `S2_AVOID_BENCHMARK_20D_STRONG_NEGATIVE`: rejected.
+- `S2_REQUIRE_STOCK_OUTPERFORMING_BENCHMARK_20D`: rejected.
+- `S2_AVOID_STOCK_STRONGLY_UNDERPERFORMING_BENCHMARK_20D`: rejected.
+- `S2_AVOID_MAPPED_SECTOR_NEGATIVE_20D`: rejected.
+- The retained S2 `exclude_ret_down` baseline remains unchanged.
+- No S2 context-filter variant qualifies for second pass.
+- No failed variant needs deeper Phase 33F trade-context audit.
+
+This confirms that Phase 33F context diagnostics should not be mistaken for
+approved filters. The diagnostics remain useful for understanding behavior, but
+simple hard filters did not improve S2 quality.
+
 ## Limitations
 
 - Static sector classification is current/static context, not point-in-time

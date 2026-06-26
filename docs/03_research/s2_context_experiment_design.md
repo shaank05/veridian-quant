@@ -199,3 +199,52 @@ Phase 33G is documentation/design only. It does not implement experiment code,
 run strategy backtests, run trade-context audits, modify S2 strategy logic,
 modify backtesting behavior, modify exporters, modify DB/OHLC/index/fundamentals
 data, use fundamentals ratios as signals, or perform API calls.
+
+## Phase 33G.1 / 33G.2 Results
+
+Phase 33G.1 implemented and ran only the pre-declared S2 context experiment
+batch. Phase 33G.2 documents the result and freezes the decision.
+
+Baseline reproduction:
+
+- `S2_BASELINE` reproduced the retained S2 benchmark as expected.
+- Trades: 577.
+- Net PnL: about Rs 971,715.
+- Profit factor: about 1.189.
+- Maximum drawdown: about 24.04%.
+- Win rate: about 45.23%.
+
+Variant results:
+
+| Variant | Verdict | Trades | Net PnL | PF | Max DD | Win Rate | Interpretation |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
+| `S2_AVOID_BENCHMARK_20D_STRONG_NEGATIVE` | REJECT | 547 | Rs 891,009 | 1.1835 | 23.36% | 44.97% | Slightly lower drawdown, but PF, PnL, and win rate worsened; 2025 remained materially negative. |
+| `S2_REQUIRE_STOCK_OUTPERFORMING_BENCHMARK_20D` | REJECT | 550 | Rs 585,460 | 1.1270 | 26.69% | 43.27% | PF, drawdown, win rate, net PnL, and expectancy worsened. |
+| `S2_AVOID_STOCK_STRONGLY_UNDERPERFORMING_BENCHMARK_20D` | REJECT | 574 | Rs 602,865 | 1.1254 | 29.30% | 44.43% | Trade count stayed meaningful, but quality worsened badly; 2025 remained heavily negative. |
+| `S2_AVOID_MAPPED_SECTOR_NEGATIVE_20D` | REJECT | 549 | Rs 1,004,066 | 1.181 | 32.70% | 45.72% | Net PnL improved slightly, but PF worsened and drawdown worsened sharply; 2025 and 2026 remained poor. |
+
+Rejection rationale:
+
+- No variant met the pre-declared acceptance criteria.
+- No variant improved PF meaningfully versus the baseline target.
+- Two variants materially worsened drawdown.
+- Three variants materially reduced net PnL.
+- The sector-negative variant improved net PnL slightly but failed on PF and
+  drawdown.
+- No failed variant justified a deeper Phase 33F trade-context audit.
+
+Frozen interpretation:
+
+- All four pre-declared S2 context filters are rejected.
+- The retained S2 `exclude_ret_down` baseline remains unchanged.
+- No S2 context-filter variant qualifies for second pass.
+- No context filter is approved.
+- No production approval is granted.
+- Simple benchmark, relative-benchmark, and mapped-sector context filters did
+  not improve S2 quality.
+- The Phase 33F context audit remains diagnostically useful, but its descriptive
+  buckets did not translate into improved S2 hard filters.
+- Do not continue threshold fishing or filter stacking from these failed
+  variants.
+- Any future S2 improvement work requires a genuinely new hypothesis, not minor
+  threshold tweaks of these context filters.

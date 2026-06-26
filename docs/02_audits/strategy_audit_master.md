@@ -29,6 +29,7 @@ No strategy is production-approved.
 | `S2_MARKOV_STATE_TRANSITION` safer benchmark | Frozen research benchmark | Yes | Yes | Retain `exclude_ret_down + ranking none`; not production-ready |
 | `S2_MARKOV_STATE_TRANSITION` high-return candidate | Frozen research candidate | Yes | Yes | Retain `exclude_ret_down + clean_state_v1`; fragile due to 2025 |
 | S2 guard/ranking variants | Rejected as benchmarks | Yes | Yes | Do not promote; improved targeted weakness but lost too much total edge |
+| S2 simple context-filter variants | Rejected | Yes | Yes | Phase 33G.1 benchmark/relative/sector context filters rejected; no second-pass variant |
 | `S3_TREND_PULLBACK_CONTINUATION` | Parked / not production-ready | Yes | Yes | Retain `S3_STRONG_TREND_ABOVE_SMA50_V1` as benchmark only; do not continue variants now |
 | `S4_ATR_COMPRESSION_BREAKOUT_V1` | Weak benchmark / parked | Yes | Yes | Retain as weak S4 benchmark only; not production-ready; do not continue tuning now |
 | `S4_RANGE_COMPRESSION_BREAKOUT_V1` | Rejected raw baseline | Yes | Yes | Do not promote; negative PnL and high drawdown |
@@ -63,14 +64,17 @@ Current status:
 - S1 remains baseline only; strong benchmark tailwind helped heavily.
 - S2 remains the strongest retained candidate after context audit and was
   profitable even in negative benchmark context.
+- Phase 33G.1 tested simple pre-declared S2 benchmark/relative/sector context
+  filters; all were rejected.
+- The original retained S2 baseline remains unchanged and no S2 context variant
+  qualifies for second pass.
 - S3 remains weak/moderate and context-sensitive.
 - S4 remains a weak benchmark only; context did not rescue it.
 - S5 remains weak/parked; gains concentrated in strong benchmark/sector
   contexts.
 - No context filter, ranking rule, strategy change, or production approval is
   authorized.
-- Phase 33G should design controlled S2-only context experiments before any
-  experiment runs.
+- No context filter, including the Phase 33G.1 S2 context batch, is approved.
 
 ---
 
@@ -159,6 +163,8 @@ Interpretation:
 
 - Retain as the safer S2 benchmark.
 - Better drawdown profile than the high-return S2 candidate.
+- Still the retained S2 benchmark after Phase 33G.1 rejected simple
+  context-filter variants.
 - Not production-ready.
 
 ### S2 Higher-Return Research Candidate
@@ -297,10 +303,18 @@ Rejected as benchmarks:
 - `exclude_ret_down + avoid_shallow_uptrend_pullback_v1`
 - `exclude_ret_down + 2025_guard_v1`
 - `exclude_ret_down + 2025_guard_v1 + signal-time context`
+- `S2_AVOID_BENCHMARK_20D_STRONG_NEGATIVE`
+- `S2_REQUIRE_STOCK_OUTPERFORMING_BENCHMARK_20D`
+- `S2_AVOID_STOCK_STRONGLY_UNDERPERFORMING_BENCHMARK_20D`
+- `S2_AVOID_MAPPED_SECTOR_NEGATIVE_20D`
 
 Reason:
 
-Each variant addressed part of the 2025 problem, but reduced overall portfolio quality too much or failed to preserve the targeted improvement under the preferred filter context.
+The earlier guard variants addressed part of the 2025 problem, but reduced
+overall portfolio quality too much or failed to preserve the targeted
+improvement under the preferred filter context. The Phase 33G.1 simple
+context-filter variants also failed the pre-declared acceptance criteria; no
+second-pass context variant is retained.
 
 ---
 

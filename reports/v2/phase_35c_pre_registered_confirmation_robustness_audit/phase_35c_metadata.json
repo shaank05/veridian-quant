@@ -1,0 +1,64 @@
+{
+  "anchor_strategy": "S2",
+  "caveat": "Phase 35C is a pre-registered read-only robustness audit, not a voting ensemble, combined portfolio backtest, capital allocation model, optimization pass, or production approval.",
+  "conclusion_style": "Report robustness only; do not automatically approve S2xS4.",
+  "confirming_strategies": [
+    "S1",
+    "S3",
+    "S4",
+    "S5"
+  ],
+  "future_diagnostic_sessions": 3,
+  "generated_at": "2026-06-27T10:26:18.978541+00:00",
+  "input_folders": {
+    "S1": "reports\\v2\\s1_2020_2026_research200_baseline_all_signal_diagnostics",
+    "S2": "reports\\v2\\s2_markov_2020_2026_research200_exclude_ret_down_full_diagnostics",
+    "S3": "reports\\v2\\s3_trend_pullback_2020_2026_research200_strong_trend_above_sma50_v1",
+    "S4": "reports\\v2\\s4\\raw_baselines\\research200_atr_compression_v1",
+    "S5": "reports\\v2\\s5_momentum\\research200_dual_momentum_63_126d_v1"
+  },
+  "lookahead_warning": "Signals after S2 entry are diagnostic only and never implementable confirmation.",
+  "lookback_sessions": [
+    0,
+    1,
+    3,
+    5
+  ],
+  "output_dir": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit",
+  "outputs": {
+    "future_diagnostic_confirmation_summary.csv": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit\\future_diagnostic_confirmation_summary.csv",
+    "phase_35c_pre_registered_rules.json": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit\\phase_35c_pre_registered_rules.json",
+    "robustness_readme.txt": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit\\robustness_readme.txt",
+    "s2_confirmation_by_count_bucket_and_lookback.csv": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit\\s2_confirmation_by_count_bucket_and_lookback.csv",
+    "s2_confirmation_by_lookback.csv": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit\\s2_confirmation_by_lookback.csv",
+    "s2_confirmation_by_strategy_and_lookback.csv": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit\\s2_confirmation_by_strategy_and_lookback.csv",
+    "s2_confirmation_by_symbol_and_lookback.csv": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit\\s2_confirmation_by_symbol_and_lookback.csv",
+    "s2_confirmation_by_year_and_lookback.csv": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit\\s2_confirmation_by_year_and_lookback.csv",
+    "s2_trade_confirmation_detail.csv": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit\\s2_trade_confirmation_detail.csv",
+    "strategy_report_inventory.csv": "reports\\v2\\phase_35c_pre_registered_confirmation_robustness_audit\\strategy_report_inventory.csv"
+  },
+  "phase": "35C",
+  "pre_registered_candidates": {
+    "controls": [
+      "S2 confirmed by S1",
+      "S2 confirmed by S3",
+      "S2 confirmed by S5",
+      "S2 confirmed by any one of S1/S3/S4/S5",
+      "S2 confirmed by 2+ other strategies"
+    ],
+    "diagnostic_only": [
+      "3+ same-day signal consensus",
+      "future/after-entry nearby signals"
+    ],
+    "primary": "S2 confirmed by S4"
+  },
+  "sample_size_warning_rules": {
+    "tiny": "n < 20",
+    "usable_diagnostic_sample": "n >= 50",
+    "weak": "20 <= n < 50"
+  },
+  "session_calendar_source": "sorted union of available signal, trade entry, and equity dates in retained report CSVs",
+  "session_count": 1571,
+  "session_max_date": "2026-04-29",
+  "session_min_date": "2020-01-01"
+}

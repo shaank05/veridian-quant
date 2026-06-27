@@ -1,0 +1,327 @@
+{
+  "anchor_strategy": "S2",
+  "calendar_day_limitation": "Confirmation windows use calendar days; no session calendar is applied.",
+  "caveat": "This read-only audit is not an ensemble backtest, voting strategy, combined portfolio backtest, capital allocation model, or production approval.",
+  "counterfactual_schema_support": {
+    "S1": true,
+    "S2": true,
+    "S3": true,
+    "S4": true,
+    "S5": true
+  },
+  "detected_columns": {
+    "S1": {
+      "all_signal_opportunity_log.csv": {
+        "signal_date": "generated_on",
+        "symbol": "symbol"
+      },
+      "equity_curve.csv": {
+        "date": "date",
+        "equity": "equity",
+        "realized_pnl": "realized_pnl"
+      },
+      "signal_log.csv": {
+        "signal_date": "generated_on",
+        "symbol": "symbol"
+      },
+      "trade_log.csv": {
+        "entry_date": "entry_date",
+        "exit_date": "exit_date",
+        "exit_reason": "exit_reason",
+        "gross_pnl": null,
+        "net_pnl": null,
+        "symbol": "symbol",
+        "trade_id": "trade_id"
+      },
+      "trade_pnl_log.csv": {
+        "entry_date": "entry_date",
+        "exit_date": "exit_date",
+        "exit_reason": "exit_reason",
+        "gross_pnl": "gross_pnl",
+        "net_pnl": "net_pnl",
+        "symbol": "symbol",
+        "trade_id": "trade_id"
+      }
+    },
+    "S2": {
+      "all_signal_opportunity_log.csv": {
+        "signal_date": "generated_on",
+        "symbol": "symbol"
+      },
+      "equity_curve.csv": {
+        "date": "date",
+        "equity": "equity",
+        "realized_pnl": "realized_pnl"
+      },
+      "signal_log.csv": {
+        "signal_date": "generated_on",
+        "symbol": "symbol"
+      },
+      "trade_log.csv": {
+        "entry_date": "entry_date",
+        "exit_date": "exit_date",
+        "exit_reason": "exit_reason",
+        "gross_pnl": null,
+        "net_pnl": null,
+        "symbol": "symbol",
+        "trade_id": "trade_id"
+      },
+      "trade_pnl_log.csv": {
+        "entry_date": "entry_date",
+        "exit_date": "exit_date",
+        "exit_reason": "exit_reason",
+        "gross_pnl": "gross_pnl",
+        "net_pnl": "net_pnl",
+        "symbol": "symbol",
+        "trade_id": "trade_id"
+      }
+    },
+    "S3": {
+      "all_signal_opportunity_log.csv": {
+        "signal_date": "generated_on",
+        "symbol": "symbol"
+      },
+      "equity_curve.csv": {
+        "date": "date",
+        "equity": "equity",
+        "realized_pnl": "realized_pnl"
+      },
+      "signal_log.csv": {
+        "signal_date": "generated_on",
+        "symbol": "symbol"
+      },
+      "trade_log.csv": {
+        "entry_date": "entry_date",
+        "exit_date": "exit_date",
+        "exit_reason": "exit_reason",
+        "gross_pnl": null,
+        "net_pnl": null,
+        "symbol": "symbol",
+        "trade_id": "trade_id"
+      },
+      "trade_pnl_log.csv": {
+        "entry_date": "entry_date",
+        "exit_date": "exit_date",
+        "exit_reason": "exit_reason",
+        "gross_pnl": "gross_pnl",
+        "net_pnl": "net_pnl",
+        "symbol": "symbol",
+        "trade_id": "trade_id"
+      }
+    },
+    "S4": {
+      "all_signal_opportunity_log.csv": {
+        "signal_date": "generated_on",
+        "symbol": "symbol"
+      },
+      "equity_curve.csv": {
+        "date": "date",
+        "equity": "equity",
+        "realized_pnl": "realized_pnl"
+      },
+      "signal_log.csv": {
+        "signal_date": "generated_on",
+        "symbol": "symbol"
+      },
+      "trade_log.csv": {
+        "entry_date": "entry_date",
+        "exit_date": "exit_date",
+        "exit_reason": "exit_reason",
+        "gross_pnl": null,
+        "net_pnl": null,
+        "symbol": "symbol",
+        "trade_id": "trade_id"
+      },
+      "trade_pnl_log.csv": {
+        "entry_date": "entry_date",
+        "exit_date": "exit_date",
+        "exit_reason": "exit_reason",
+        "gross_pnl": "gross_pnl",
+        "net_pnl": "net_pnl",
+        "symbol": "symbol",
+        "trade_id": "trade_id"
+      }
+    },
+    "S5": {
+      "all_signal_opportunity_log.csv": {
+        "signal_date": "generated_on",
+        "symbol": "symbol"
+      },
+      "equity_curve.csv": {
+        "date": "date",
+        "equity": "equity",
+        "realized_pnl": "realized_pnl"
+      },
+      "signal_log.csv": {
+        "signal_date": "generated_on",
+        "symbol": "symbol"
+      },
+      "trade_log.csv": {
+        "entry_date": "entry_date",
+        "exit_date": "exit_date",
+        "exit_reason": "exit_reason",
+        "gross_pnl": null,
+        "net_pnl": null,
+        "symbol": "symbol",
+        "trade_id": "trade_id"
+      },
+      "trade_pnl_log.csv": {
+        "entry_date": "entry_date",
+        "exit_date": "exit_date",
+        "exit_reason": "exit_reason",
+        "gross_pnl": "gross_pnl",
+        "net_pnl": "net_pnl",
+        "symbol": "symbol",
+        "trade_id": "trade_id"
+      }
+    }
+  },
+  "diagnostic_window_days": 3,
+  "files": {
+    "S1": {
+      "found": [
+        "accepted_vs_rejected_signal_summary.csv",
+        "all_signal_opportunity_log.csv",
+        "counterfactual_by_symbol.csv",
+        "counterfactual_by_year.csv",
+        "counterfactual_rejected_trade_summary.csv",
+        "equity_curve.csv",
+        "signal_log.csv",
+        "trade_log.csv",
+        "trade_pnl_log.csv"
+      ],
+      "missing": []
+    },
+    "S2": {
+      "found": [
+        "accepted_vs_rejected_signal_summary.csv",
+        "all_signal_opportunity_log.csv",
+        "counterfactual_by_symbol.csv",
+        "counterfactual_by_year.csv",
+        "counterfactual_rejected_trade_summary.csv",
+        "equity_curve.csv",
+        "signal_log.csv",
+        "trade_log.csv",
+        "trade_pnl_log.csv"
+      ],
+      "missing": []
+    },
+    "S3": {
+      "found": [
+        "accepted_vs_rejected_signal_summary.csv",
+        "all_signal_opportunity_log.csv",
+        "counterfactual_by_symbol.csv",
+        "counterfactual_by_year.csv",
+        "counterfactual_rejected_trade_summary.csv",
+        "equity_curve.csv",
+        "signal_log.csv",
+        "trade_log.csv",
+        "trade_pnl_log.csv"
+      ],
+      "missing": []
+    },
+    "S4": {
+      "found": [
+        "accepted_vs_rejected_signal_summary.csv",
+        "all_signal_opportunity_log.csv",
+        "counterfactual_by_symbol.csv",
+        "counterfactual_by_year.csv",
+        "counterfactual_rejected_trade_summary.csv",
+        "equity_curve.csv",
+        "signal_log.csv",
+        "trade_log.csv",
+        "trade_pnl_log.csv"
+      ],
+      "missing": []
+    },
+    "S5": {
+      "found": [
+        "accepted_vs_rejected_signal_summary.csv",
+        "all_signal_opportunity_log.csv",
+        "counterfactual_by_symbol.csv",
+        "counterfactual_by_year.csv",
+        "counterfactual_rejected_trade_summary.csv",
+        "equity_curve.csv",
+        "signal_log.csv",
+        "trade_log.csv",
+        "trade_pnl_log.csv"
+      ],
+      "missing": []
+    }
+  },
+  "generated_at": "2026-06-27T09:45:12.566964+00:00",
+  "input_folders": {
+    "S1": "reports\\v2\\s1_2020_2026_research200_baseline_all_signal_diagnostics",
+    "S2": "reports\\v2\\s2_markov_2020_2026_research200_exclude_ret_down_full_diagnostics",
+    "S3": "reports\\v2\\s3_trend_pullback_2020_2026_research200_strong_trend_above_sma50_v1",
+    "S4": "reports\\v2\\s4\\raw_baselines\\research200_atr_compression_v1",
+    "S5": "reports\\v2\\s5_momentum\\research200_dual_momentum_63_126d_v1"
+  },
+  "limitations": {
+    "S1": [
+      "counterfactual files are summarized separately from realized PnL"
+    ],
+    "S2": [
+      "counterfactual files are summarized separately from realized PnL"
+    ],
+    "S3": [
+      "counterfactual files are summarized separately from realized PnL"
+    ],
+    "S4": [
+      "counterfactual files are summarized separately from realized PnL"
+    ],
+    "S5": [
+      "counterfactual files are summarized separately from realized PnL"
+    ]
+  },
+  "lookahead_warning": "Prior/on-entry confirmation uses generated_on <= anchor entry_date. Future nearby overlap is diagnostic only and is not implementable confirmation.",
+  "lookback_days": 3,
+  "optional_signal_counterfactual_files": {
+    "S1": {
+      "accepted_vs_rejected_signal_summary.csv": true,
+      "all_signal_opportunity_log.csv": true,
+      "counterfactual_by_symbol.csv": true,
+      "counterfactual_by_year.csv": true,
+      "counterfactual_rejected_trade_summary.csv": true
+    },
+    "S2": {
+      "accepted_vs_rejected_signal_summary.csv": true,
+      "all_signal_opportunity_log.csv": true,
+      "counterfactual_by_symbol.csv": true,
+      "counterfactual_by_year.csv": true,
+      "counterfactual_rejected_trade_summary.csv": true
+    },
+    "S3": {
+      "accepted_vs_rejected_signal_summary.csv": true,
+      "all_signal_opportunity_log.csv": true,
+      "counterfactual_by_symbol.csv": true,
+      "counterfactual_by_year.csv": true,
+      "counterfactual_rejected_trade_summary.csv": true
+    },
+    "S4": {
+      "accepted_vs_rejected_signal_summary.csv": true,
+      "all_signal_opportunity_log.csv": true,
+      "counterfactual_by_symbol.csv": true,
+      "counterfactual_by_year.csv": true,
+      "counterfactual_rejected_trade_summary.csv": true
+    },
+    "S5": {
+      "accepted_vs_rejected_signal_summary.csv": true,
+      "all_signal_opportunity_log.csv": true,
+      "counterfactual_by_symbol.csv": true,
+      "counterfactual_by_year.csv": true,
+      "counterfactual_rejected_trade_summary.csv": true
+    }
+  },
+  "output_dir": "reports\\v2\\phase_35b_cross_strategy_overlap_audit_signals",
+  "outputs": {
+    "overlap_readme.txt": "reports\\v2\\phase_35b_cross_strategy_overlap_audit_signals\\overlap_readme.txt",
+    "signal_consensus_by_symbol.csv": "reports\\v2\\phase_35b_cross_strategy_overlap_audit_signals\\signal_consensus_by_symbol.csv",
+    "signal_consensus_by_year.csv": "reports\\v2\\phase_35b_cross_strategy_overlap_audit_signals\\signal_consensus_by_year.csv",
+    "signal_overlap_same_day.csv": "reports\\v2\\phase_35b_cross_strategy_overlap_audit_signals\\signal_overlap_same_day.csv",
+    "signal_pair_overlap_summary.csv": "reports\\v2\\phase_35b_cross_strategy_overlap_audit_signals\\signal_pair_overlap_summary.csv",
+    "strategy_report_inventory.csv": "reports\\v2\\phase_35b_cross_strategy_overlap_audit_signals\\strategy_report_inventory.csv"
+  },
+  "overlap_scope": "signals",
+  "top_n": 20
+}

@@ -1,0 +1,34 @@
+{
+  "anchor_outcome": "S2 executed trades using realized net_pnl from retained reports",
+  "anchor_strategy": "S2",
+  "constraints": [
+    "read-only audit/reporting only",
+    "no voting ensemble implementation",
+    "no combined portfolio backtest",
+    "no production approval",
+    "no optimization by final PnL",
+    "no weights or capital allocation",
+    "future/after-entry signals are diagnostic only"
+  ],
+  "control_candidates": [
+    "S2 confirmed by S1",
+    "S2 confirmed by S3",
+    "S2 confirmed by S5",
+    "S2 confirmed by any one of S1/S3/S4/S5",
+    "S2 confirmed by 2+ other strategies"
+  ],
+  "diagnostic_candidates": [
+    "3+ same-day signal consensus",
+    "future/after-entry nearby signals"
+  ],
+  "future_diagnostic_sessions": 3,
+  "lookback_sessions": [
+    0,
+    1,
+    3,
+    5
+  ],
+  "lookback_type": "trading_sessions_derived_from_available_report_dates",
+  "phase": "35C",
+  "primary_candidate": "S2 confirmed by S4"
+}

@@ -1,0 +1,51 @@
+{
+  "caveat": "Read-only diagnostics only; no strategy, sizing, filter, backtest, allocation, or production change.",
+  "classification_csv": "config\\universes\\research\\nse_eq_research_200_static_classification.csv",
+  "generated_at": "2026-06-29T17:18:20.830843+00:00",
+  "include_vix": true,
+  "output_dir": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix",
+  "outputs": {
+    "atr_volatility_context_summary.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\atr_volatility_context_summary.csv",
+    "benchmark_regime_performance.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\benchmark_regime_performance.csv",
+    "capacity_pressure_by_year.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\capacity_pressure_by_year.csv",
+    "capacity_pressure_summary.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\capacity_pressure_summary.csv",
+    "drawdown_state_performance.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\drawdown_state_performance.csv",
+    "gap_exit_by_year.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\gap_exit_by_year.csv",
+    "gap_exit_stress_summary.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\gap_exit_stress_summary.csv",
+    "liquidity_bucket_by_year.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\liquidity_bucket_by_year.csv",
+    "liquidity_bucket_performance.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\liquidity_bucket_performance.csv",
+    "pre_entry_gap_context_summary.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\pre_entry_gap_context_summary.csv",
+    "risk_diagnostic_readme.txt": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\risk_diagnostic_readme.txt",
+    "risk_input_inventory.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\risk_input_inventory.csv",
+    "risk_join_coverage_by_strategy.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\risk_join_coverage_by_strategy.csv",
+    "rolling_r_expectancy_summary.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\rolling_r_expectancy_summary.csv",
+    "sector_diagnostic_coverage.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\sector_diagnostic_coverage.csv",
+    "symbol_concentration_summary.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\symbol_concentration_summary.csv",
+    "top_symbol_contributors.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\top_symbol_contributors.csv",
+    "vix_by_year.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\vix_by_year.csv",
+    "vix_change_performance.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\vix_change_performance.csv",
+    "vix_drawdown_interaction_summary.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\vix_drawdown_interaction_summary.csv",
+    "vix_gap_interaction_summary.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\vix_gap_interaction_summary.csv",
+    "vix_input_coverage.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\vix_input_coverage.csv",
+    "vix_regime_performance.csv": "reports\\v2\\phase_36c1_cross_strategy_risk_diagnostic_audit_with_vix\\vix_regime_performance.csv"
+  },
+  "strategy_dirs": {
+    "S1": "reports\\v2\\s1_2020_2026_research200_baseline_all_signal_diagnostics",
+    "S2": "reports\\v2\\s2_markov_2020_2026_research200_exclude_ret_down_full_diagnostics",
+    "S3": "reports\\v2\\s3_trend_pullback_2020_2026_research200_strong_trend_above_sma50_v1",
+    "S4": "reports\\v2\\s4\\raw_baselines\\research200_atr_compression_v1",
+    "S5": "reports\\v2\\s5_momentum\\research200_dual_momentum_63_126d_v1"
+  },
+  "universe_csv": "config\\universes\\research\\nse_eq_research_200_2018_2026.csv",
+  "vix_indicator_name": "INDIA_VIX",
+  "vix_interval": "day",
+  "vix_join_convention": "Use latest VIX session on or before signal_date when available; otherwise use latest VIX session strictly before entry_date.",
+  "vix_outputs_written": [
+    "vix_input_coverage.csv",
+    "vix_regime_performance.csv",
+    "vix_change_performance.csv",
+    "vix_by_year.csv",
+    "vix_gap_interaction_summary.csv",
+    "vix_drawdown_interaction_summary.csv"
+  ]
+}

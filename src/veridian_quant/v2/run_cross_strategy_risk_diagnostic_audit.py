@@ -29,6 +29,9 @@ def main(argv: Iterable[str] | None = None) -> int:
         universe_csv=args.universe_csv,
         classification_csv=args.classification_csv,
         output_dir=args.output_dir,
+        include_vix=args.include_vix,
+        vix_indicator_name=args.vix_indicator_name,
+        vix_interval=args.vix_interval,
     )
     print(
         json.dumps(
@@ -63,6 +66,13 @@ def _parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
         type=Path,
         default=DEFAULT_CLASSIFICATION_CSV,
     )
+    parser.add_argument(
+        "--include-vix",
+        action="store_true",
+        help="Query market_indicators and write India VIX diagnostic outputs.",
+    )
+    parser.add_argument("--vix-indicator-name", default="INDIA_VIX")
+    parser.add_argument("--vix-interval", default="day")
     return parser.parse_args(list(argv) if argv is not None else None)
 
 

@@ -8,13 +8,14 @@ position sizing.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 from typing import Iterable, Literal, Mapping
 
 import numpy as np
 import pandas as pd
+from sqlalchemy import text
 
 
 StrategyLabel = Literal["S1", "S2", "S3", "S4", "S5"]
@@ -254,7 +255,99 @@ OUTPUT_COLUMNS: dict[str, list[str]] = {
         "share_of_year_rejections_pct",
         "notes",
     ],
+    "vix_input_coverage.csv": [
+        "indicator_name",
+        "first_vix_date",
+        "last_vix_date",
+        "vix_rows",
+        "unique_vix_dates",
+        "null_close_count",
+        "nonpositive_close_count",
+        "duplicate_date_count",
+        "strategies_covered",
+        "total_trades",
+        "trades_with_vix",
+        "trade_vix_coverage_pct",
+        "notes",
+    ],
+    "vix_regime_performance.csv": [
+        "strategy",
+        "vix_percentile_bucket",
+        "trades",
+        "net_pnl",
+        "profit_factor",
+        "win_rate_pct",
+        "avg_net_pnl",
+        "median_net_pnl",
+        "avg_r_multiple",
+        "median_r_multiple",
+        "stop_gap_trades",
+        "stop_gap_net_pnl",
+        "notes",
+    ],
+    "vix_change_performance.csv": [
+        "strategy",
+        "vix_change_horizon",
+        "vix_change_bucket",
+        "trades",
+        "net_pnl",
+        "profit_factor",
+        "win_rate_pct",
+        "avg_net_pnl",
+        "median_net_pnl",
+        "avg_r_multiple",
+        "median_r_multiple",
+        "stop_gap_trades",
+        "stop_gap_net_pnl",
+        "notes",
+    ],
+    "vix_by_year.csv": [
+        "strategy",
+        "year",
+        "vix_percentile_bucket",
+        "trades",
+        "net_pnl",
+        "profit_factor",
+        "win_rate_pct",
+        "avg_net_pnl",
+        "median_net_pnl",
+        "avg_r_multiple",
+        "median_r_multiple",
+        "notes",
+    ],
+    "vix_gap_interaction_summary.csv": [
+        "strategy",
+        "vix_percentile_bucket",
+        "exit_reason",
+        "trades",
+        "net_pnl",
+        "avg_net_pnl",
+        "median_net_pnl",
+        "avg_r_multiple",
+        "median_r_multiple",
+        "share_of_strategy_bucket_trades_pct",
+        "notes",
+    ],
+    "vix_drawdown_interaction_summary.csv": [
+        "strategy",
+        "vix_percentile_bucket",
+        "drawdown_bucket_at_entry",
+        "trades",
+        "net_pnl",
+        "profit_factor",
+        "win_rate_pct",
+        "avg_net_pnl",
+        "median_net_pnl",
+        "avg_r_multiple",
+        "median_r_multiple",
+        "notes",
+    ],
 }
+
+VIX_JOIN_CONVENTION = (
+    "Use latest VIX session on or before signal_date when available; otherwise "
+    "use latest VIX session strictly before entry_date."
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -279,6 +372,10 @@ def run_cross_strategy_risk_diagnostic_audit(
     universe_csv: Path | str,
     classification_csv: Path | str,
     output_dir: Path | str,
+    include_vix: bool = False,
+    vix_indicator_name: str = "INDIA_VIX",
+    vix_interval: str = "day",
+    vix_data: pd.DataFrame | None = None,
 ) -> CrossStrategyRiskDiagnosticAuditResult:
     """Run the read-only Phase 36B risk input diagnostic audit."""
 
@@ -322,8 +419,38 @@ def run_cross_strategy_risk_diagnostic_audit(
     for name, builder in builders.items():
         outputs[name] = _write_csv(builder(), output_path / name, OUTPUT_COLUMNS[name])
 
+    vix_outputs_written: list[str] = []
+    if include_vix:
+        vix_frame = vix_data
+        if vix_frame is None:
+            first_trade_date, last_trade_date = _trade_date_range(reports)
+            vix_frame = load_vix_market_indicator(
+                indicator_name=vix_indicator_name,
+                interval=vix_interval,
+                start_date=first_trade_date - timedelta(days=45),
+                end_date=last_trade_date,
+            )
+        vix_features = build_vix_features(vix_frame)
+        vix_trades = build_vix_enriched_trades(reports, vix_features)
+        vix_builders = {
+            "vix_input_coverage.csv": lambda: build_vix_input_coverage(
+                reports,
+                vix_frame,
+                vix_trades,
+                indicator_name=vix_indicator_name,
+            ),
+            "vix_regime_performance.csv": lambda: build_vix_regime_performance(vix_trades),
+            "vix_change_performance.csv": lambda: build_vix_change_performance(vix_trades),
+            "vix_by_year.csv": lambda: build_vix_by_year(vix_trades),
+            "vix_gap_interaction_summary.csv": lambda: build_vix_gap_interaction_summary(vix_trades),
+            "vix_drawdown_interaction_summary.csv": lambda: build_vix_drawdown_interaction_summary(reports, vix_trades),
+        }
+        for name, builder in vix_builders.items():
+            outputs[name] = _write_csv(builder(), output_path / name, OUTPUT_COLUMNS[name])
+            vix_outputs_written.append(name)
+
     readme_path = output_path / "risk_diagnostic_readme.txt"
-    readme_path.write_text(_readme_text(), encoding="utf-8")
+    readme_path.write_text(_readme_text(include_vix=include_vix), encoding="utf-8")
     outputs["risk_diagnostic_readme.txt"] = readme_path
 
     metadata = {
@@ -333,6 +460,11 @@ def run_cross_strategy_risk_diagnostic_audit(
         "universe_csv": str(universe_csv),
         "classification_csv": str(classification_csv),
         "caveat": "Read-only diagnostics only; no strategy, sizing, filter, backtest, allocation, or production change.",
+        "include_vix": include_vix,
+        "vix_indicator_name": vix_indicator_name,
+        "vix_interval": vix_interval,
+        "vix_join_convention": VIX_JOIN_CONVENTION,
+        "vix_outputs_written": vix_outputs_written,
         "outputs": {name: str(path) for name, path in sorted(outputs.items())},
     }
     metadata_path = output_path / "risk_diagnostic_metadata.json"
@@ -769,11 +901,408 @@ def build_capacity_pressure_by_year(reports: Iterable[StrategyRiskReport]) -> pd
     return pd.DataFrame(rows)
 
 
+def load_vix_market_indicator(
+    *,
+    indicator_name: str,
+    interval: str,
+    start_date: datetime | pd.Timestamp | object,
+    end_date: datetime | pd.Timestamp | object,
+) -> pd.DataFrame:
+    """Load India VIX rows through the existing project DB client."""
+
+    try:
+        from veridian_quant.data.db_client import DatabaseClient
+
+        engine = DatabaseClient().get_engine()
+        query = text(
+            """
+            SELECT
+                timestamp::date AS date,
+                timestamp,
+                indicator_name,
+                open,
+                high,
+                low,
+                close,
+                value,
+                interval
+            FROM market_indicators
+            WHERE indicator_name = :indicator_name
+              AND interval = :interval
+              AND timestamp::date >= :start_date
+              AND timestamp::date <= :end_date
+            ORDER BY timestamp ASC
+            """
+        )
+        frame = pd.read_sql(
+            query,
+            engine,
+            params={
+                "indicator_name": indicator_name,
+                "interval": interval,
+                "start_date": _date_param(start_date),
+                "end_date": _date_param(end_date),
+            },
+        )
+    except Exception as error:  # pragma: no cover - message is validated by CLI usage.
+        raise RuntimeError(
+            "Unable to load India VIX from market_indicators. "
+            "Check DB connectivity, credentials, indicator name, and interval."
+        ) from error
+    if frame.empty:
+        raise ValueError(
+            f"No VIX rows found in market_indicators for {indicator_name!r} "
+            f"interval {interval!r}."
+        )
+    return frame
+
+
+def build_vix_features(vix_data: pd.DataFrame) -> pd.DataFrame:
+    """Return daily VIX features using only current and prior VIX rows."""
+
+    frame = _normalize_vix_frame(vix_data)
+    if frame.empty:
+        return _empty_vix_features()
+    frame["vix_change_1d_pct"] = ((frame["vix_close"] / frame["vix_close"].shift(1)) - 1.0) * 100.0
+    frame["vix_change_5d_pct"] = ((frame["vix_close"] / frame["vix_close"].shift(5)) - 1.0) * 100.0
+    frame["vix_rolling_20d_percentile"] = (
+        frame["vix_close"]
+        .rolling(window=20, min_periods=20)
+        .apply(lambda values: pd.Series(values).rank(method="average", pct=True).iloc[-1], raw=False)
+    )
+    frame["vix_percentile_bucket"] = [
+        _vix_percentile_bucket(value, idx)
+        for idx, value in enumerate(frame["vix_rolling_20d_percentile"])
+    ]
+    frame["vix_change_1d_bucket"] = [
+        _vix_change_bucket(value, idx, 1)
+        for idx, value in enumerate(frame["vix_change_1d_pct"])
+    ]
+    frame["vix_change_5d_bucket"] = [
+        _vix_change_bucket(value, idx, 5)
+        for idx, value in enumerate(frame["vix_change_5d_pct"])
+    ]
+    frame["vix_trend_5d"] = frame["vix_change_5d_bucket"]
+    return frame
+
+
+def build_vix_enriched_trades(
+    reports: Iterable[StrategyRiskReport],
+    vix_features: pd.DataFrame,
+) -> pd.DataFrame:
+    rows = []
+    features = vix_features.copy().sort_values("date", kind="mergesort").reset_index(drop=True)
+    for report in reports:
+        trades = _trades_with_signal_dates(report)
+        for _, trade in trades.iterrows():
+            joined = trade.to_dict()
+            vix_row, convention = _vix_row_for_trade(trade, features)
+            joined["vix_join_convention"] = convention
+            if vix_row is None:
+                joined.update(_missing_vix_values())
+            else:
+                for column in _vix_feature_columns():
+                    joined[column] = vix_row.get(column, np.nan)
+            rows.append(joined)
+    output = pd.DataFrame(rows)
+    if output.empty:
+        return output
+    output["vix_percentile_bucket"] = output["vix_percentile_bucket"].fillna("unknown")
+    output["vix_change_1d_bucket"] = output["vix_change_1d_bucket"].fillna("unknown")
+    output["vix_change_5d_bucket"] = output["vix_change_5d_bucket"].fillna("unknown")
+    output["vix_trend_5d"] = output["vix_trend_5d"].fillna("unknown")
+    return output
+
+
+def build_vix_input_coverage(
+    reports: Iterable[StrategyRiskReport],
+    vix_data: pd.DataFrame,
+    vix_trades: pd.DataFrame,
+    *,
+    indicator_name: str,
+) -> pd.DataFrame:
+    raw = _raw_vix_for_coverage(vix_data)
+    total_trades = sum(len(_trades(report)) for report in reports)
+    trades_with_vix = int(pd.to_numeric(vix_trades.get("vix_close"), errors="coerce").notna().sum())
+    duplicate_count = int(raw.duplicated(subset=["date"]).sum()) if "date" in raw.columns else 0
+    rows = [
+        {
+            "indicator_name": indicator_name,
+            "first_vix_date": raw["date"].min().date().isoformat() if not raw.empty else "",
+            "last_vix_date": raw["date"].max().date().isoformat() if not raw.empty else "",
+            "vix_rows": int(len(raw)),
+            "unique_vix_dates": int(raw["date"].nunique()) if "date" in raw.columns else 0,
+            "null_close_count": int(pd.to_numeric(raw.get("close"), errors="coerce").isna().sum()) if "close" in raw.columns else int(len(raw)),
+            "nonpositive_close_count": int((pd.to_numeric(raw.get("close"), errors="coerce") <= 0).sum()) if "close" in raw.columns else 0,
+            "duplicate_date_count": duplicate_count,
+            "strategies_covered": "|".join(sorted(vix_trades["strategy"].dropna().astype(str).unique())) if "strategy" in vix_trades.columns else "",
+            "total_trades": total_trades,
+            "trades_with_vix": trades_with_vix,
+            "trade_vix_coverage_pct": _pct(trades_with_vix, total_trades),
+            "notes": VIX_JOIN_CONVENTION,
+        }
+    ]
+    return pd.DataFrame(rows)
+
+
+def build_vix_regime_performance(vix_trades: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for (strategy, bucket), group in vix_trades.groupby(["strategy", "vix_percentile_bucket"], dropna=False, sort=True):
+        row = {"strategy": strategy, "vix_percentile_bucket": _text(bucket)}
+        row.update(_performance_metrics(group, include_gross=False))
+        row["stop_gap_trades"] = int((_exit_reason(group) == "stop_gap_hit").sum())
+        row["stop_gap_net_pnl"] = _sum(group.loc[_exit_reason(group) == "stop_gap_hit", "net_pnl"])
+        row["notes"] = "VIX rolling 20D percentile bucket; diagnostic only"
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def build_vix_change_performance(vix_trades: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for horizon, column in (("1d", "vix_change_1d_bucket"), ("5d", "vix_change_5d_bucket")):
+        for (strategy, bucket), group in vix_trades.groupby(["strategy", column], dropna=False, sort=True):
+            row = {
+                "strategy": strategy,
+                "vix_change_horizon": horizon,
+                "vix_change_bucket": _text(bucket),
+            }
+            row.update(_performance_metrics(group, include_gross=False))
+            row["stop_gap_trades"] = int((_exit_reason(group) == "stop_gap_hit").sum())
+            row["stop_gap_net_pnl"] = _sum(group.loc[_exit_reason(group) == "stop_gap_hit", "net_pnl"])
+            row["notes"] = "VIX change direction bucket; diagnostic only"
+            rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def build_vix_by_year(vix_trades: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    frame = vix_trades.copy()
+    frame["year"] = _year_from_trade(frame)
+    for (strategy, year, bucket), group in frame.groupby(["strategy", "year", "vix_percentile_bucket"], dropna=False, sort=True):
+        row = {
+            "strategy": strategy,
+            "year": _int_or_blank(year),
+            "vix_percentile_bucket": _text(bucket),
+        }
+        row.update(_performance_metrics(group, include_gross=False))
+        row["notes"] = "year from trade exit date when available, else entry date"
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def build_vix_gap_interaction_summary(vix_trades: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    frame = vix_trades.copy()
+    frame["exit_reason_norm"] = _exit_reason(frame)
+    for (strategy, bucket, reason), group in frame.groupby(["strategy", "vix_percentile_bucket", "exit_reason_norm"], dropna=False, sort=True):
+        bucket_total = len(frame[(frame["strategy"] == strategy) & (frame["vix_percentile_bucket"] == bucket)])
+        row = {
+            "strategy": strategy,
+            "vix_percentile_bucket": _text(bucket),
+            "exit_reason": _text(reason),
+        }
+        row.update(_performance_metrics(group, include_gross=False))
+        row["share_of_strategy_bucket_trades_pct"] = _pct(len(group), bucket_total)
+        row["notes"] = "exit reason clustering inside VIX percentile bucket; diagnostic only"
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def build_vix_drawdown_interaction_summary(
+    reports: Iterable[StrategyRiskReport],
+    vix_trades: pd.DataFrame,
+) -> pd.DataFrame:
+    rows = []
+    drawdown = _drawdown_by_trade(reports)
+    frame = vix_trades.merge(drawdown, on=["strategy", "trade_id"], how="left")
+    frame["drawdown_bucket_at_entry"] = frame["drawdown_bucket_at_entry"].fillna("unknown")
+    for (strategy, vix_bucket, drawdown_bucket), group in frame.groupby(
+        ["strategy", "vix_percentile_bucket", "drawdown_bucket_at_entry"],
+        dropna=False,
+        sort=True,
+    ):
+        row = {
+            "strategy": strategy,
+            "vix_percentile_bucket": _text(vix_bucket),
+            "drawdown_bucket_at_entry": _text(drawdown_bucket),
+        }
+        row.update(_performance_metrics(group, include_gross=False))
+        row["notes"] = "VIX percentile bucket crossed with strategy drawdown state; diagnostic only"
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
 def normalize_strategy_label(value: str) -> StrategyLabel:
     label = str(value).strip().upper()
     if label not in STRATEGY_LABELS:
         raise ValueError(f"strategy label must be one of {', '.join(STRATEGY_LABELS)}; got {value!r}")
     return label  # type: ignore[return-value]
+
+
+def _trade_date_range(reports: Iterable[StrategyRiskReport]) -> tuple[datetime, datetime]:
+    dates = []
+    for report in reports:
+        trades = _trades_with_signal_dates(report)
+        if "_signal_date" in trades.columns:
+            dates.append(trades["_signal_date"])
+        dates.append(trades["_entry_date"])
+    combined = pd.concat(dates, ignore_index=True).dropna()
+    if combined.empty:
+        raise ValueError("cannot determine VIX query range; no trade dates found")
+    return combined.min().to_pydatetime(), combined.max().to_pydatetime()
+
+
+def _normalize_vix_frame(vix_data: pd.DataFrame) -> pd.DataFrame:
+    if vix_data.empty:
+        return _empty_vix_features()
+    frame = vix_data.copy()
+    frame.columns = [str(column).lower() for column in frame.columns]
+    date_col = _first_existing(frame, ("date", "session_date", "timestamp"))
+    if date_col is None:
+        raise ValueError("VIX data requires date, session_date, or timestamp column")
+    close_col = _first_existing(frame, ("vix_close", "close", "value"))
+    if close_col is None:
+        raise ValueError("VIX data requires vix_close, close, or value column")
+    frame["date"] = pd.to_datetime(frame[date_col], errors="coerce").dt.normalize()
+    frame["vix_close"] = pd.to_numeric(frame[close_col], errors="coerce")
+    frame = frame.dropna(subset=["date"]).sort_values(["date"], kind="mergesort")
+    frame = frame.drop_duplicates(subset=["date"], keep="last").reset_index(drop=True)
+    return frame[["date", "vix_close"]]
+
+
+def _raw_vix_for_coverage(vix_data: pd.DataFrame) -> pd.DataFrame:
+    if vix_data.empty:
+        return pd.DataFrame(columns=["date", "close"])
+    frame = vix_data.copy()
+    frame.columns = [str(column).lower() for column in frame.columns]
+    date_col = _first_existing(frame, ("date", "session_date", "timestamp"))
+    close_col = _first_existing(frame, ("vix_close", "close", "value"))
+    if date_col is None:
+        frame["date"] = pd.NaT
+    else:
+        frame["date"] = pd.to_datetime(frame[date_col], errors="coerce").dt.normalize()
+    if close_col is None:
+        frame["close"] = np.nan
+    else:
+        frame["close"] = pd.to_numeric(frame[close_col], errors="coerce")
+    return frame
+
+
+def _empty_vix_features() -> pd.DataFrame:
+    return pd.DataFrame(columns=_vix_feature_columns())
+
+
+def _vix_feature_columns() -> list[str]:
+    return [
+        "date",
+        "vix_close",
+        "vix_change_1d_pct",
+        "vix_change_5d_pct",
+        "vix_rolling_20d_percentile",
+        "vix_percentile_bucket",
+        "vix_change_1d_bucket",
+        "vix_change_5d_bucket",
+        "vix_trend_5d",
+    ]
+
+
+def _missing_vix_values() -> dict[str, object]:
+    values = {column: np.nan for column in _vix_feature_columns()}
+    values["vix_percentile_bucket"] = "unknown"
+    values["vix_change_1d_bucket"] = "unknown"
+    values["vix_change_5d_bucket"] = "unknown"
+    values["vix_trend_5d"] = "unknown"
+    return values
+
+
+def _vix_percentile_bucket(value: object, position: int) -> str:
+    number = _float_or_nan(value)
+    if np.isnan(number):
+        return "insufficient_history" if position < 19 else "unknown"
+    if number <= 1 / 3:
+        return "low"
+    if number <= 2 / 3:
+        return "mid"
+    return "high"
+
+
+def _vix_change_bucket(value: object, position: int, horizon: int) -> str:
+    number = _float_or_nan(value)
+    if np.isnan(number):
+        return "insufficient_history" if position < horizon else "unknown"
+    if number > 0:
+        return "rising"
+    if number < 0:
+        return "falling"
+    return "flat"
+
+
+def _trades_with_signal_dates(report: StrategyRiskReport) -> pd.DataFrame:
+    trades = _trades(report)
+    trades["_signal_date"] = _parse_date_col(trades, "signal_date")
+    if trades["_signal_date"].notna().all():
+        return trades
+    context = _context_trades(report)
+    if context.empty or "trade_id" not in context.columns:
+        return trades
+    context_signal = context[["trade_id", "_entry_date"]].copy()
+    if "_signal_date" in context.columns:
+        context_signal["_context_signal_date"] = context["_signal_date"]
+    else:
+        context_signal["_context_signal_date"] = _parse_date_col(context, "signal_date")
+    context_signal = context_signal.drop_duplicates("trade_id", keep="first")
+    trades = trades.merge(
+        context_signal[["trade_id", "_context_signal_date"]],
+        on="trade_id",
+        how="left",
+    )
+    trades["_signal_date"] = trades["_signal_date"].fillna(trades["_context_signal_date"])
+    trades = trades.drop(columns=["_context_signal_date"])
+    return trades
+
+
+def _vix_row_for_trade(
+    trade: pd.Series,
+    vix_features: pd.DataFrame,
+) -> tuple[pd.Series | None, str]:
+    if vix_features.empty:
+        return None, "no_vix_data"
+    signal_date = pd.to_datetime(trade.get("_signal_date"), errors="coerce")
+    entry_date = pd.to_datetime(trade.get("_entry_date"), errors="coerce")
+    if pd.notna(signal_date):
+        available = vix_features.loc[vix_features["date"] <= signal_date]
+        convention = "signal_date_on_or_before"
+    elif pd.notna(entry_date):
+        available = vix_features.loc[vix_features["date"] < entry_date]
+        convention = "entry_date_strictly_before"
+    else:
+        return None, "missing_trade_date"
+    if available.empty:
+        return None, convention
+    return available.iloc[-1], convention
+
+
+def _drawdown_by_trade(reports: Iterable[StrategyRiskReport]) -> pd.DataFrame:
+    rows = []
+    for report in reports:
+        trades = _trades(report)
+        equity = _drawdown_frame(report.frames.get("equity_curve.csv", pd.DataFrame()))
+        if equity.empty:
+            trades["drawdown_bucket_at_entry"] = "unknown"
+        else:
+            trades = _merge_drawdown_at_entry(trades, equity)
+        rows.append(trades[["strategy", "trade_id", "drawdown_bucket_at_entry"]])
+    if not rows:
+        return pd.DataFrame(columns=["strategy", "trade_id", "drawdown_bucket_at_entry"])
+    return pd.concat(rows, ignore_index=True)
+
+
+def _date_param(value: object) -> object:
+    if isinstance(value, pd.Timestamp):
+        return value.date()
+    if isinstance(value, datetime):
+        return value.date()
+    return value
 
 
 def _normalize_trade_frame(frame: pd.DataFrame, strategy: str) -> pd.DataFrame:
@@ -1207,25 +1736,43 @@ def _write_csv(frame: pd.DataFrame, path: Path, columns: list[str]) -> Path:
     return path
 
 
-def _readme_text() -> str:
-    return "\n".join(
+def _readme_text(*, include_vix: bool = False) -> str:
+    lines = [
+        "Phase 36B/36C Cross-Strategy Risk Input Diagnostic Audit",
+        "",
+        "This is a read-only diagnostic audit.",
+        "It does not implement a risk model, dynamic sizing, filters, allocation, weights, or production rules.",
+        "",
+        "Outputs summarize liquidity, symbol concentration, gap exits, pre-entry gap context, ATR/volatility context, benchmark regime, sector diagnostics, drawdown state, rolling prior-trade R, rejection pressure, and optional India VIX diagnostics.",
+        "",
+        "India VIX diagnostics:",
+    ]
+    if include_vix:
+        lines.extend(
+            [
+                "- Source table: market_indicators.",
+                "- Identifier: INDIA_VIX by default; stored daily interval is day.",
+                "- Value used: close.",
+                "- Join convention: latest VIX session on or before signal_date when available; otherwise latest VIX session strictly before entry_date.",
+                "- No future or after-entry VIX data is used.",
+                "- VIX diagnostics are not trading rules and no thresholds have been approved.",
+                "- VIX is a broad-market implied-volatility/fear proxy, not stock-specific volatility.",
+            ]
+        )
+    else:
+        lines.append("- VIX outputs are not produced unless --include-vix is used.")
+    lines.extend(
         [
-            "Phase 36B Cross-Strategy Risk Input Diagnostic Audit",
-            "",
-            "This is a read-only diagnostic audit.",
-            "It does not implement a risk model, dynamic sizing, filters, allocation, weights, or production rules.",
-            "",
-            "Outputs summarize liquidity, symbol concentration, gap exits, pre-entry gap context, ATR/volatility context, benchmark regime, sector diagnostics, drawdown state, rolling prior-trade R, and rejection pressure.",
             "",
             "Caveats:",
             "- Liquidity buckets and liquidity metrics come from the static Research200 universe CSV.",
             "- Sector and classification fields are static/current diagnostics, not point-in-time historical truth.",
             "- Sector coverage is partial and must remain diagnostic-only.",
             "- Market-cap diagnostics are excluded because market_cap_bucket is currently unknown/unusable.",
-            "- India VIX is excluded because no ingestion was found.",
             "- Accepted/rejected opportunity logs are excluded from first Phase 36B cross-strategy diagnostics because retained folders are not consistently populated.",
             "- Counterfactual rejected-signal PnL is not realized portfolio PnL.",
             "- Rolling R uses previous trades only and must not be optimized into thresholds without a separate pre-registered phase.",
             "",
         ]
     )
+    return "\n".join(lines)

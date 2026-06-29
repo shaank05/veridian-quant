@@ -43,6 +43,11 @@ def test_cli_wires_defaultable_arguments(monkeypatch, tmp_path, capsys) -> None:
             "universe.csv",
             "--classification-csv",
             "classification.csv",
+            "--include-vix",
+            "--vix-indicator-name",
+            "CUSTOM_VIX",
+            "--vix-interval",
+            "day",
         ]
     )
 
@@ -53,4 +58,7 @@ def test_cli_wires_defaultable_arguments(monkeypatch, tmp_path, capsys) -> None:
     assert observed["output_dir"] == tmp_path / "out"
     assert observed["universe_csv"] == Path("universe.csv")
     assert observed["classification_csv"] == Path("classification.csv")
+    assert observed["include_vix"] is True
+    assert observed["vix_indicator_name"] == "CUSTOM_VIX"
+    assert observed["vix_interval"] == "day"
     assert payload["caveat"] == "Read-only diagnostics only"

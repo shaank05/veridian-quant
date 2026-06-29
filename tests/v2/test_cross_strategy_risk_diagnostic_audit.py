@@ -3,6 +3,8 @@ from __future__ import annotations
 import pandas as pd
 
 from veridian_quant.v2.analysis.cross_strategy_risk_diagnostic_audit import (
+    build_vix_enriched_trades,
+    build_vix_features,
     build_drawdown_state_performance,
     build_gap_exit_stress_summary,
     build_liquidity_bucket_performance,
@@ -146,6 +148,84 @@ def test_full_run_writes_required_outputs(tmp_path) -> None:
     assert "risk_diagnostic_readme.txt" in result.outputs
     assert result.outputs["risk_input_inventory.csv"].exists()
     assert result.outputs["capacity_pressure_by_year.csv"].exists()
+    assert "vix_input_coverage.csv" not in result.outputs
+
+
+def test_vix_feature_construction() -> None:
+    vix = _make_vix_data(periods=25)
+
+    features = build_vix_features(vix)
+
+    assert features.loc[1, "vix_change_1d_pct"] > 0
+    assert features.loc[5, "vix_change_5d_pct"] > 0
+    assert features.loc[18, "vix_percentile_bucket"] == "insufficient_history"
+    assert features.loc[19, "vix_percentile_bucket"] == "high"
+    assert features.loc[5, "vix_trend_5d"] == "rising"
+
+
+def test_vix_join_uses_signal_date_when_available(tmp_path) -> None:
+    dirs, _, _ = _make_audit_inputs(tmp_path)
+    report = load_strategy_risk_report("S1", dirs["S1"])
+    features = build_vix_features(_make_vix_data(periods=25))
+
+    joined = build_vix_enriched_trades([report], features)
+    first = joined.sort_values("trade_id").iloc[0]
+
+    assert first["vix_join_convention"] == "signal_date_on_or_before"
+    assert str(pd.to_datetime(first["date"]).date()) == "2024-01-02"
+
+
+def test_vix_join_falls_back_strictly_before_entry_date(tmp_path) -> None:
+    dirs, _, _ = _make_audit_inputs(tmp_path)
+    context_path = dirs["S1"] / "trade_signal_context.csv"
+    context = pd.read_csv(context_path).drop(columns=["signal_date"])
+    context.to_csv(context_path, index=False)
+    report = load_strategy_risk_report("S1", dirs["S1"])
+    vix = pd.DataFrame(
+        {
+            "date": ["2024-01-01", "2024-01-02"],
+            "close": [10.0, 99.0],
+        }
+    )
+    features = build_vix_features(vix)
+
+    joined = build_vix_enriched_trades([report], features)
+    first = joined.sort_values("trade_id").iloc[0]
+
+    assert first["vix_join_convention"] == "entry_date_strictly_before"
+    assert str(pd.to_datetime(first["date"]).date()) == "2024-01-01"
+    assert first["vix_close"] == 10.0
+
+
+def test_vix_outputs_written_with_synthetic_data(tmp_path) -> None:
+    dirs, universe_csv, classification_csv = _make_audit_inputs(tmp_path)
+
+    result = run_cross_strategy_risk_diagnostic_audit(
+        dirs,
+        universe_csv=universe_csv,
+        classification_csv=classification_csv,
+        output_dir=tmp_path / "out",
+        include_vix=True,
+        vix_data=_make_vix_data(periods=30),
+    )
+
+    assert result.outputs["vix_input_coverage.csv"].exists()
+    assert result.outputs["vix_regime_performance.csv"].exists()
+    assert result.outputs["vix_drawdown_interaction_summary.csv"].exists()
+    assert result.metadata["include_vix"] is True
+    coverage = pd.read_csv(result.outputs["vix_input_coverage.csv"]).iloc[0]
+    assert coverage["total_trades"] == 20
+    assert coverage["trades_with_vix"] == 20
+
+
+def test_missing_vix_values_do_not_crash(tmp_path) -> None:
+    dirs, _, _ = _make_audit_inputs(tmp_path)
+    report = load_strategy_risk_report("S1", dirs["S1"])
+    features = build_vix_features(pd.DataFrame({"date": ["2024-01-10"], "close": [20.0]}))
+
+    joined = build_vix_enriched_trades([report], features)
+
+    assert "unknown" in set(joined["vix_percentile_bucket"])
 
 
 def _make_audit_inputs(tmp_path, trade_count: int = 4):
@@ -181,6 +261,11 @@ def _make_audit_inputs(tmp_path, trade_count: int = 4):
         encoding="utf-8",
     )
     return dirs, universe_csv, classification_csv
+
+
+def _make_vix_data(periods: int = 25) -> pd.DataFrame:
+    dates = pd.date_range("2024-01-01", periods=periods, freq="D")
+    return pd.DataFrame({"date": dates, "close": [10.0 + idx for idx in range(periods)]})
 
 
 def _write_strategy_folder(label: str, path, trade_count: int) -> None:

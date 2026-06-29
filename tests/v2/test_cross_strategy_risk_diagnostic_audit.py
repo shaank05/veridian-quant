@@ -96,7 +96,9 @@ def test_rolling_r_uses_previous_trades_only(tmp_path) -> None:
 def test_missing_optional_columns_do_not_crash(tmp_path) -> None:
     dirs, universe_csv, classification_csv = _make_audit_inputs(tmp_path)
     s1_context = dirs["S1"] / "trade_signal_context.csv"
-    frame = pd.read_csv(s1_context).drop(columns=["stock_gap_from_prev_close_pct"])
+    frame = pd.read_csv(s1_context).drop(
+        columns=["stock_gap_from_prev_close_pct", "initial_risk_amount"]
+    )
     frame.to_csv(s1_context, index=False)
 
     result = run_cross_strategy_risk_diagnostic_audit(
@@ -108,6 +110,27 @@ def test_missing_optional_columns_do_not_crash(tmp_path) -> None:
     pre_gap = pd.read_csv(result.outputs["pre_entry_gap_context_summary.csv"])
 
     assert "unknown" in set(pre_gap["pre_entry_gap_bucket"])
+
+
+def test_trade_log_without_realized_pnl_does_not_crash(tmp_path) -> None:
+    dirs, universe_csv, classification_csv = _make_audit_inputs(tmp_path)
+
+    report = load_strategy_risk_report("S1", dirs["S1"])
+    assert "net_pnl" in report.frames["trade_log.csv"].columns
+    assert report.frames["trade_log.csv"]["net_pnl"].sum() == 0.0
+
+    result = run_cross_strategy_risk_diagnostic_audit(
+        dirs,
+        universe_csv=universe_csv,
+        classification_csv=classification_csv,
+        output_dir=tmp_path / "out",
+    )
+
+    inventory = pd.read_csv(result.outputs["risk_input_inventory.csv"])
+    s1_trade_log = inventory[
+        (inventory["strategy"] == "S1") & (inventory["artifact"] == "trade_log.csv")
+    ].iloc[0]
+    assert s1_trade_log["rows"] == 4
 
 
 def test_full_run_writes_required_outputs(tmp_path) -> None:
@@ -192,9 +215,41 @@ def _write_strategy_folder(label: str, path, trade_count: int) -> None:
         "per_share_risk,initial_risk_amount,planned_reward_amount,reward_risk_ratio,"
         "gross_pnl,gross_return_pct,total_cost,net_pnl,net_return_pct,exit_reason"
     )
-    trade_text = trade_header + "\n" + "\n".join(rows) + "\n"
-    (path / "trade_log.csv").write_text(trade_text, encoding="utf-8")
-    (path / "trade_pnl_log.csv").write_text(trade_text, encoding="utf-8")
+    trade_pnl_text = trade_header + "\n" + "\n".join(rows) + "\n"
+    trade_log_header = (
+        "trade_id,symbol,entry_date,entry_price,quantity,stop_loss,target_price,"
+        "per_share_risk,initial_risk_amount,planned_reward_amount,reward_risk_ratio,"
+        "exit_date,exit_price,exit_reason,strategy_name"
+    )
+    trade_log_rows = []
+    for row in rows:
+        parts = row.split(",")
+        trade_log_rows.append(
+            ",".join(
+                [
+                    parts[0],
+                    parts[1],
+                    parts[2],
+                    "100",
+                    parts[4],
+                    parts[5],
+                    parts[6],
+                    parts[7],
+                    parts[8],
+                    parts[9],
+                    parts[10],
+                    parts[3],
+                    "110",
+                    parts[16],
+                    label,
+                ]
+            )
+        )
+    (path / "trade_log.csv").write_text(
+        trade_log_header + "\n" + "\n".join(trade_log_rows) + "\n",
+        encoding="utf-8",
+    )
+    (path / "trade_pnl_log.csv").write_text(trade_pnl_text, encoding="utf-8")
     (path / "equity_curve.csv").write_text("\n".join(equity_rows) + "\n", encoding="utf-8")
     (path / "trade_signal_context.csv").write_text(
         (

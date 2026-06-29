@@ -1,0 +1,33 @@
+{
+  "caveat": "Read-only diagnostics only; no strategy, sizing, filter, backtest, allocation, or production change.",
+  "classification_csv": "config\\universes\\research\\nse_eq_research_200_static_classification.csv",
+  "generated_at": "2026-06-29T11:05:01.740562+00:00",
+  "output_dir": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit",
+  "outputs": {
+    "atr_volatility_context_summary.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\atr_volatility_context_summary.csv",
+    "benchmark_regime_performance.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\benchmark_regime_performance.csv",
+    "capacity_pressure_by_year.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\capacity_pressure_by_year.csv",
+    "capacity_pressure_summary.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\capacity_pressure_summary.csv",
+    "drawdown_state_performance.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\drawdown_state_performance.csv",
+    "gap_exit_by_year.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\gap_exit_by_year.csv",
+    "gap_exit_stress_summary.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\gap_exit_stress_summary.csv",
+    "liquidity_bucket_by_year.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\liquidity_bucket_by_year.csv",
+    "liquidity_bucket_performance.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\liquidity_bucket_performance.csv",
+    "pre_entry_gap_context_summary.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\pre_entry_gap_context_summary.csv",
+    "risk_diagnostic_readme.txt": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\risk_diagnostic_readme.txt",
+    "risk_input_inventory.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\risk_input_inventory.csv",
+    "risk_join_coverage_by_strategy.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\risk_join_coverage_by_strategy.csv",
+    "rolling_r_expectancy_summary.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\rolling_r_expectancy_summary.csv",
+    "sector_diagnostic_coverage.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\sector_diagnostic_coverage.csv",
+    "symbol_concentration_summary.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\symbol_concentration_summary.csv",
+    "top_symbol_contributors.csv": "reports\\v2\\phase_36b_cross_strategy_risk_diagnostic_audit\\top_symbol_contributors.csv"
+  },
+  "strategy_dirs": {
+    "S1": "reports\\v2\\s1_2020_2026_research200_baseline_all_signal_diagnostics",
+    "S2": "reports\\v2\\s2_markov_2020_2026_research200_exclude_ret_down_full_diagnostics",
+    "S3": "reports\\v2\\s3_trend_pullback_2020_2026_research200_strong_trend_above_sma50_v1",
+    "S4": "reports\\v2\\s4\\raw_baselines\\research200_atr_compression_v1",
+    "S5": "reports\\v2\\s5_momentum\\research200_dual_momentum_63_126d_v1"
+  },
+  "universe_csv": "config\\universes\\research\\nse_eq_research_200_2018_2026.csv"
+}

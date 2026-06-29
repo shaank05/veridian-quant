@@ -752,7 +752,7 @@ def build_capacity_pressure_by_year(reports: Iterable[StrategyRiskReport]) -> pd
         if rejected.empty or "reason" not in rejected.columns:
             continue
         rejected = rejected.copy()
-        rejected["year"] = pd.to_datetime(rejected.get("_signal_date"), errors="coerce").dt.year
+        rejected["year"] = _parse_date_col(rejected, "_signal_date").dt.year
         counts = rejected.groupby(["year", "reason"], dropna=False, sort=True).size().reset_index(name="rejected_count")
         year_totals = counts.groupby("year")["rejected_count"].transform("sum")
         for idx, row in counts.iterrows():
@@ -781,16 +781,11 @@ def _normalize_trade_frame(frame: pd.DataFrame, strategy: str) -> pd.DataFrame:
     output["strategy"] = strategy
     output["symbol"] = _normalize_symbol_series(output["symbol"])
     output["_entry_date"] = _parse_date_col(output, "entry_date")
-    output["_exit_date"] = _parse_date_col(output, "exit_date") if "exit_date" in output.columns else pd.NaT
-    output["net_pnl"] = pd.to_numeric(output.get("net_pnl"), errors="coerce").fillna(0.0)
-    if "gross_pnl" in output.columns:
-        output["gross_pnl"] = pd.to_numeric(output["gross_pnl"], errors="coerce")
-    if "initial_risk_amount" in output.columns:
-        output["initial_risk_amount"] = pd.to_numeric(output["initial_risk_amount"], errors="coerce")
-    if "exit_reason" in output.columns:
-        output["exit_reason"] = output["exit_reason"].astype(str)
-    else:
-        output["exit_reason"] = ""
+    output["_exit_date"] = _parse_date_col(output, "exit_date")
+    output["net_pnl"] = _numeric_series(output, "net_pnl", default=0.0)
+    output["gross_pnl"] = _numeric_series(output, "gross_pnl")
+    output["initial_risk_amount"] = _numeric_series(output, "initial_risk_amount")
+    output["exit_reason"] = _string_series(output, "exit_reason", default="")
     if "trade_id" not in output.columns:
         output["trade_id"] = [f"{strategy}_{idx}" for idx in range(len(output))]
     output["r_multiple"] = _r_multiple_series(output)
@@ -815,7 +810,7 @@ def _normalize_equity_frame(frame: pd.DataFrame, strategy: str) -> pd.DataFrame:
     output = frame.copy()
     output["strategy"] = strategy
     output["_date"] = _parse_date_col(output, "date")
-    output["equity"] = pd.to_numeric(output.get("equity"), errors="coerce")
+    output["equity"] = _numeric_series(output, "equity")
     return output.dropna(subset=["_date", "equity"]).sort_values("_date", kind="mergesort")
 
 
@@ -824,10 +819,9 @@ def _normalize_rejected_frame(frame: pd.DataFrame, strategy: str) -> pd.DataFram
     output["strategy"] = strategy
     if "symbol" in output.columns:
         output["symbol"] = _normalize_symbol_series(output["symbol"])
-    if "reason" not in output.columns:
-        output["reason"] = ""
+    output["reason"] = _string_series(output, "reason", default="")
     date_col = _first_existing(output, ("signal_date", "generated_on", "date"))
-    output["_signal_date"] = _parse_date_col(output, date_col) if date_col else pd.NaT
+    output["_signal_date"] = _parse_date_col(output, date_col)
     return output
 
 
@@ -877,7 +871,7 @@ def _symbol_metrics(trades: pd.DataFrame) -> pd.DataFrame:
 
 
 def _performance_metrics(frame: pd.DataFrame, *, include_gross: bool = True) -> dict[str, object]:
-    pnl = pd.to_numeric(frame.get("net_pnl", pd.Series(dtype=float)), errors="coerce").fillna(0.0)
+    pnl = _numeric_series(frame, "net_pnl", default=0.0)
     r = _r_multiple_series(frame)
     trades = int(len(frame))
     wins = int((pnl > 0).sum())
@@ -901,14 +895,14 @@ def _performance_metrics(frame: pd.DataFrame, *, include_gross: bool = True) -> 
 
 def _r_multiple_series(frame: pd.DataFrame) -> pd.Series:
     if "r_multiple" in frame.columns:
-        return pd.to_numeric(frame["r_multiple"], errors="coerce")
+        return _numeric_series(frame, "r_multiple")
     if {"net_pnl", "initial_risk_amount"}.issubset(frame.columns):
-        risk = pd.to_numeric(frame["initial_risk_amount"], errors="coerce")
-        pnl = pd.to_numeric(frame["net_pnl"], errors="coerce")
+        risk = _numeric_series(frame, "initial_risk_amount")
+        pnl = _numeric_series(frame, "net_pnl")
         return pnl / risk.replace(0, np.nan)
     if {"net_pnl", "per_share_risk", "quantity"}.issubset(frame.columns):
-        risk = pd.to_numeric(frame["per_share_risk"], errors="coerce") * pd.to_numeric(frame["quantity"], errors="coerce")
-        pnl = pd.to_numeric(frame["net_pnl"], errors="coerce")
+        risk = _numeric_series(frame, "per_share_risk") * _numeric_series(frame, "quantity")
+        pnl = _numeric_series(frame, "net_pnl")
         return pnl / risk.replace(0, np.nan)
     return pd.Series(np.nan, index=frame.index, dtype=float)
 
@@ -1107,6 +1101,28 @@ def _parse_date_col(frame: pd.DataFrame, column: str | None) -> pd.Series:
     return pd.to_datetime(frame[column], errors="coerce").dt.normalize()
 
 
+def _numeric_series(
+    frame: pd.DataFrame,
+    column: str,
+    *,
+    default: float | int | None = np.nan,
+) -> pd.Series:
+    if column not in frame.columns:
+        return pd.Series(default, index=frame.index, dtype="float64")
+    return pd.to_numeric(frame[column], errors="coerce").fillna(default)
+
+
+def _string_series(
+    frame: pd.DataFrame,
+    column: str,
+    *,
+    default: str = "",
+) -> pd.Series:
+    if column not in frame.columns:
+        return pd.Series(default, index=frame.index, dtype="object")
+    return frame[column].fillna(default).astype(str)
+
+
 def _first_existing(frame: pd.DataFrame, candidates: Iterable[str]) -> str | None:
     for candidate in candidates:
         if candidate in frame.columns:
@@ -1115,7 +1131,12 @@ def _first_existing(frame: pd.DataFrame, candidates: Iterable[str]) -> str | Non
 
 
 def _sum(values: object) -> float:
-    return float(pd.to_numeric(values, errors="coerce").fillna(0.0).sum())
+    if isinstance(values, pd.Series):
+        numeric = pd.to_numeric(values, errors="coerce").fillna(0.0)
+    else:
+        numeric = pd.Series([values], dtype="object")
+        numeric = pd.to_numeric(numeric, errors="coerce").fillna(0.0)
+    return float(numeric.sum())
 
 
 def _profit_factor(gross_profit: float, gross_loss: float) -> object:

@@ -80,6 +80,14 @@ Filter or resize trades based on market regime.
 * Sector trend
 * Advance-decline ratio
 
+## Phase 36B/36C Status Note
+
+India VIX is available and joined to 2,740 / 2,740 retained S1-S5 trades with
+100% coverage, but Phase 36C.1 retained it only as secondary market context.
+It is not approved as a standalone regime rule, VIX threshold, dynamic sizing
+input, or production filter. VIX x drawdown is a possible future
+pre-registration candidate only.
+
 ---
 
 # H3 — Volatility Normalization

@@ -74,6 +74,19 @@ Secondary benchmarks:
 - S4 ATR weak benchmark:
   `reports/v2/s4/raw_baselines/research200_atr_compression_v1`
 
+Phase 36B/36C risk diagnostic note:
+
+- Retained S5 trades were included in the cross-strategy risk diagnostic
+  branch.
+- Liquidity was useful for S2, S3, and S5, but no liquidity filter was
+  approved.
+- Moderate drawdown entries were weak across S2, S3, S4, and S5, but no
+  drawdown throttle was approved.
+- India VIX had 2,740 / 2,740 retained S1-S5 trade coverage, but remains a
+  secondary diagnostic only.
+- Detailed closeout:
+  `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`.
+
 Benchmark summary:
 
 | Benchmark | Net PnL | CAGR | Max DD | PF |

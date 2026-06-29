@@ -926,3 +926,65 @@ Consequence:
 Detailed audit:
 
 - `docs/02_audits/cross_strategy_overlap_audit.md`
+
+---
+
+## 2026-06-29 - Close Phase 36B/36C Cross-Strategy Risk Diagnostics
+
+Decision:
+
+Close the Phase 36B/36C risk diagnostic branch as research-only diagnostics.
+Do not implement a risk model, VIX rule, dynamic sizing, liquidity filter,
+drawdown throttle, rolling-R threshold, benchmark-regime filter, gap filter, or
+production behavior.
+
+Reason:
+
+Phase 36B found one or more promising risk diagnostics, but none were clean
+enough for immediate implementation. Liquidity was the strongest S2 diagnostic:
+S2 HIGH liquidity had 271 trades, about Rs 970,422 net PnL, about 1.42 PF,
+about 49.45% win rate, and about -Rs 948 median PnL. LOW liquidity had about
+-Rs 26,697 net PnL and about 0.96 PF, while MID liquidity had about Rs 27,990
+net PnL and about 1.01 PF.
+
+Benchmark regime remained strong diagnostic context for S2: strong-positive
+benchmark had 127 trades, about Rs 660,713 net PnL, about 1.78 PF;
+strong-negative had 42 trades, about Rs 268,996 net PnL, about 2.11 PF; and
+ordinary negative had 191 trades, about -Rs 94,265 net PnL, about 0.95 PF.
+
+Gap risk was important but mixed. S2 `STOP_GAP_HIT` had 35 trades and about
+-Rs 673,842 net PnL, while `TARGET_GAP_HIT` had 31 trades and about
++Rs 966,904 net PnL.
+
+Phase 36C.0 confirmed India VIX availability in `market_indicators` as
+`INDIA_VIX` using `close`. Phase 36C.1 joined VIX to 2,740 / 2,740 retained
+S1-S5 trades with 100% coverage and 0 missing/null/nonpositive joined values.
+VIX was useful as secondary context but not as a standalone rule. S2 low VIX
+had 210 trades, about Rs 654,183 net PnL, about 1.36 PF, and about 45.71% win
+rate; mid VIX had 123 trades, about Rs 12,216 net PnL and about 1.01 PF; high
+VIX had 236 trades, about Rs 358,383 net PnL and about 1.17 PF. S2 5D falling
+VIX had 262 trades, about Rs 762,307 net PnL and about 1.33 PF, while 5D rising
+VIX had 303 trades, about Rs 262,844 net PnL and about 1.10 PF.
+
+VIX x drawdown is the most promising VIX interaction, but requires
+pre-registration. S2 moderate drawdown + high VIX had 73 trades, about
+-Rs 80,885 net PnL and about 0.88 PF. S2 mild drawdown + mid VIX had 62 trades,
+about -Rs 135,157 net PnL and about 0.80 PF.
+
+Consequence:
+
+- Retain liquidity as the strongest S2 risk diagnostic.
+- Retain benchmark regime, drawdown state, gap risk, and rolling R as research
+  diagnostics.
+- Retain VIX as secondary diagnostic only.
+- Retain VIX x drawdown as a future pre-registration candidate.
+- Do not pivot directly into S2-only implementation.
+- Do not convert any diagnostic bucket into a rule without a new
+  pre-registered design phase.
+- Do not treat static liquidity, current/static sector, or current/static cap
+  fields as point-in-time historical truth.
+- Do not use entry-date VIX close for next-open entries.
+
+Detailed audit:
+
+- `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`

@@ -8,6 +8,47 @@ Rejected here means rejected as a benchmark or production candidate. It does not
 
 ---
 
+## Phase 36B/36C Risk Diagnostic Implementation Rejections
+
+The Phase 36B/36C risk diagnostic branch is closed as diagnostics only. Full
+audit: `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`.
+
+Rejected or not approved for implementation:
+
+- Risk model implementation now.
+- India VIX standalone rule.
+- VIX level rule.
+- VIX 5D change rule.
+- VIX x gap rule.
+- VIX x drawdown throttle without pre-registration.
+- Dynamic sizing optimized by net PnL.
+- Liquidity filter now.
+- Drawdown throttle now.
+- Rolling-R threshold now.
+- Benchmark-regime filter now.
+- Gap-risk filter now.
+- Sector caps.
+- Market-cap bucket rules.
+- Symbol include/exclude rules from contributor tables.
+
+Reason:
+
+The diagnostics are promising but not clean enough for direct implementation.
+Liquidity is the strongest S2 diagnostic, but static liquidity is not
+point-in-time historical truth. VIX joined 2,740 / 2,740 retained trades with
+100% coverage, but VIX effects were secondary and not universal across
+strategies. Gap risk is mixed because S2 `STOP_GAP_HIT` lost about
+-Rs 673,842 while `TARGET_GAP_HIT` gained about +Rs 966,904. Rolling R looked
+powerful but carries high overfit risk.
+
+Consequence:
+
+Future risk work must begin with design-only pre-registration. Do not optimize
+thresholds after seeing Phase 36 outputs, and do not use entry-date VIX close
+for next-open entries.
+
+---
+
 ## S1 Rejected / Parked Items
 
 - `S1_AVOID_MESSY_MIDDLE_V1`: rejected as a promoted filter because it failed to generalize on the broader research universe.

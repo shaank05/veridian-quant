@@ -79,6 +79,24 @@ Detailed audit: `docs/02_audits/cross_strategy_overlap_audit.md`.
 
 ---
 
+## Phase 36B/36C Risk Diagnostic Note
+
+Phase 36B/36C cross-strategy risk diagnostics included retained S4 ATR trades,
+but did not approve an S4 filter, VIX rule, risk model, drawdown throttle,
+dynamic sizing rule, or production use.
+
+Relevant cross-strategy findings:
+
+- Liquidity was not universal across S1/S4 even though it was useful for S2,
+  S3, and S5.
+- Moderate drawdown entries were weak across S2, S3, S4, and S5.
+- India VIX had 2,740 / 2,740 retained S1-S5 trade coverage, but remains a
+  secondary diagnostic only.
+
+Detailed closeout: `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`.
+
+---
+
 ## Raw Research200 Baseline Scope
 
 Backtest scope:

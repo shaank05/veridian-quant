@@ -674,6 +674,12 @@ Next direction:
 - Treat Phase 35B/35C as a closed ensemble branch. Broad voting and 2+
   consensus are dropped; S2/S4 is diagnostic-only and must not be cherry-picked
   from the 0-session or 1-session results.
+- Treat Phase 36B/36C as a closed risk diagnostic branch. Liquidity is the
+  strongest S2 risk diagnostic, benchmark regime/drawdown/gap/rolling-R remain
+  research diagnostics, and India VIX is retained only as secondary context.
+  No risk model, VIX rule, liquidity filter, drawdown throttle, rolling-R
+  threshold, benchmark-regime filter, gap filter, dynamic sizing change, or
+  production behavior is approved.
 - Close the simple S2 context-filter branch. Do not continue with threshold
   fishing, filter stacking, or another minor benchmark/relative/sector context
   tweak. Company fundamentals are now ingested and audited as research context,
@@ -707,6 +713,11 @@ The following are future research directions, not accepted production rules:
 - FFT strategy.
 - Wavelet strategy.
 - Cross-strategy risk-model input discovery.
+- Cross-strategy pre-registered risk experiment design after Phase 36B/36C.
+- S2 state x risk input diagnostic design, if separately scoped and
+  pre-registered.
+- Exact liquidity data-quality audit before any liquidity diagnostic is elevated
+  toward implementation.
 - Universe/regime segmentation research.
 - S2 risk model research.
 - Meta-ranking / capital allocation layer.

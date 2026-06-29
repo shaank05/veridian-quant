@@ -21,6 +21,24 @@ Final S3 decision:
 
 ---
 
+## Phase 36B/36C Risk Diagnostic Note
+
+Phase 36B/36C cross-strategy risk diagnostics included retained S3 trades, but
+did not approve an S3 filter, VIX rule, risk model, drawdown throttle, dynamic
+sizing rule, or production use.
+
+Relevant cross-strategy findings:
+
+- Liquidity was useful for S2, S3, and S5, but not universal across all
+  strategies.
+- Moderate drawdown entries were weak across S2, S3, S4, and S5.
+- India VIX had 2,740 / 2,740 retained S1-S5 trade coverage, but remains a
+  secondary diagnostic only.
+
+Detailed closeout: `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`.
+
+---
+
 ## 2. Strategy Thesis
 
 S3 tested trend pullback continuation.

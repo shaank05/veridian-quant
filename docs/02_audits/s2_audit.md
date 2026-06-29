@@ -50,6 +50,52 @@ Detailed audit: `docs/02_audits/cross_strategy_overlap_audit.md`.
 
 ---
 
+## Phase 36B/36C Risk Diagnostic Closeout
+
+Cross-strategy risk diagnostics did not approve an S2 risk model, filter,
+throttle, dynamic sizing rule, VIX rule, or production use.
+
+Detailed audit: `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`.
+
+Key S2 findings:
+
+- Liquidity is the strongest S2 risk diagnostic. HIGH liquidity had 271 trades,
+  about Rs 970,422 net PnL, about 1.42 PF, about 49.45% win rate, and about
+  -Rs 948 median PnL. LOW liquidity had about -Rs 26,697 net PnL and about
+  0.96 PF. MID liquidity had about Rs 27,990 net PnL and about 1.01 PF.
+- Benchmark regime remains a strong diagnostic. Strong-positive benchmark had
+  127 trades, about Rs 660,713 net PnL, about 1.78 PF. Strong-negative had
+  42 trades, about Rs 268,996 net PnL, about 2.11 PF. Ordinary negative had
+  191 trades, about -Rs 94,265 net PnL, about 0.95 PF.
+- Base gap risk is mixed. `STOP_GAP_HIT` had 35 trades and about -Rs 673,842
+  net PnL, while `TARGET_GAP_HIT` had 31 trades and about +Rs 966,904 net PnL.
+- India VIX joined to 2,740 / 2,740 retained S1-S5 trades with 100% coverage
+  and 0 missing/null/nonpositive joined values.
+- S2 low VIX had 210 trades, about Rs 654,183 net PnL, about 1.36 PF, and
+  about 45.71% win rate. Mid VIX had 123 trades, about Rs 12,216 net PnL and
+  about 1.01 PF. High VIX had 236 trades, about Rs 358,383 net PnL and about
+  1.17 PF.
+- S2 5D falling VIX had 262 trades, about Rs 762,307 net PnL, and about
+  1.33 PF. S2 5D rising VIX had 303 trades, about Rs 262,844 net PnL, and
+  about 1.10 PF.
+- S2 high-VIX `STOP_GAP_HIT` had 19 trades and about -Rs 355,336 net PnL,
+  while high-VIX `TARGET_GAP_HIT` had 17 trades and about +Rs 562,112 net PnL.
+- S2 moderate drawdown + high VIX had 73 trades, about -Rs 80,885 net PnL,
+  about 0.88 PF, about 45.21% win rate, and about -Rs 2,242 median PnL.
+  Mild drawdown + mid VIX had 62 trades, about -Rs 135,157 net PnL, about
+  0.80 PF, about 40.32% win rate, and about -Rs 9,998 median PnL.
+
+Decision:
+
+- Retain liquidity as the strongest S2 diagnostic.
+- Retain VIX only as secondary market context.
+- Retain VIX x drawdown only as a future pre-registration candidate.
+- Do not pivot directly into S2-only implementation.
+- Do not convert these diagnostics into rules without a new pre-registered
+  design phase.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.

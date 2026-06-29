@@ -107,6 +107,10 @@ Future context work:
 - Keep Phase 35B/35C cross-strategy overlap findings diagnostic only. Broad
   voting and generic 2+ consensus are dropped, and S2/S4 confirmation is parked
   as an observation rather than a feature, filter, or allocation rule.
+- Keep Phase 36B/36C risk diagnostics research-only. Liquidity is the strongest
+  S2 risk diagnostic, benchmark regime remains strong context, drawdown state
+  and gap risk remain important, and India VIX is retained only as secondary
+  market context.
 - Future S2 context work requires a genuinely new hypothesis, not minor
   benchmark/relative/sector threshold changes or renamed guard/state exclusions.
 - Add R-multiple availability to future trade PnL logs or provide reliable join
@@ -120,6 +124,55 @@ Future context work:
 
 All features using sector, cap, or index-membership classification must label
 whether the classification is point-in-time or current/static.
+
+---
+
+## Cross-Strategy Risk Diagnostic Candidates
+
+Phase 36B/36C closed the current risk diagnostic branch without approving
+implementation. Full audit:
+
+- `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`
+
+Retained research candidates:
+
+- Liquidity as strongest S2 diagnostic. S2 HIGH liquidity had 271 trades, about
+  Rs 970,422 net PnL, about 1.42 PF, about 49.45% win rate, and about
+  -Rs 948 median PnL.
+- Benchmark regime as strong diagnostic context. S2 strong-positive benchmark
+  had 127 trades, about Rs 660,713 net PnL and about 1.78 PF; strong-negative
+  had 42 trades, about Rs 268,996 net PnL and about 2.11 PF; ordinary negative
+  had 191 trades, about -Rs 94,265 net PnL and about 0.95 PF.
+- Drawdown state as a cross-strategy throttle diagnostic candidate.
+- Gap risk as important but mixed: S2 `STOP_GAP_HIT` had 35 trades and about
+  -Rs 673,842 net PnL, while `TARGET_GAP_HIT` had 31 trades and about
+  +Rs 966,904 net PnL.
+- India VIX as secondary market context. It joined to 2,740 / 2,740 retained
+  S1-S5 trades with 100% coverage and 0 missing/null/nonpositive joined values.
+- VIX x drawdown as a future pre-registration candidate. S2 moderate drawdown +
+  high VIX had 73 trades, about -Rs 80,885 net PnL, and about 0.88 PF.
+- Rolling prior-trade R as promising but high overfit risk.
+
+Anti-overfitting guardrails:
+
+- Do not convert diagnostic buckets into filters without pre-registration.
+- Do not optimize VIX thresholds after seeing outputs.
+- Do not treat static liquidity as point-in-time truth.
+- Do not use current/static sector or cap fields as historical controls.
+- Do not create symbol include/exclude rules from contributor tables.
+- Do not use rolling-R thresholds without strict pre-registration.
+- Do not ignore target-gap gains when studying stop-gap losses.
+- Do not use entry-date VIX close for next-open entries.
+
+Possible future branches:
+
+- Cross-strategy pre-registered risk experiment design.
+- S2 state x risk input diagnostic design.
+- Exact data-quality audit for liquidity if liquidity is elevated toward
+  implementation.
+
+No risk model, VIX rule, liquidity filter, drawdown throttle, dynamic sizing
+change, or production behavior is approved by these candidates.
 
 ---
 

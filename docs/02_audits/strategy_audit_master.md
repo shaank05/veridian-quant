@@ -16,6 +16,7 @@ No strategy is production-approved.
 - S4: `docs/02_audits/s4_audit.md`
 - S5: `docs/02_audits/s5_audit.md`
 - Cross-strategy overlap / confirmation: `docs/02_audits/cross_strategy_overlap_audit.md`
+- Cross-strategy risk diagnostics: `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`
 
 ---
 
@@ -38,6 +39,7 @@ No strategy is production-approved.
 | `S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` | First-pass audited / weak parked family | Yes | Yes | Simple RS rejected; Dual Momentum weak/parked; Vol-Adjusted rejected; does not challenge S2/S1/S3 |
 | Benchmark/sector/cap context layer | Phase 33F.3 context audit documented | Yes | Diagnostic audit only | Retained S1-S5 trade PnL logs audited; S2 remains strongest; no context filter or strategy promotion approved |
 | Cross-strategy voting / confirmation ensemble | Phase 35B/35C closed | No | Diagnostic audit only | Broad voting and generic 2+ consensus dropped; S2/S4 retained only as a parked diagnostic observation |
+| Cross-strategy risk diagnostics | Phase 36B/36C closed | No | Diagnostic audit only | Liquidity retained as strongest S2 diagnostic; VIX retained only as secondary context; no risk model, filter, throttle, sizing change, or production approval |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
@@ -113,6 +115,38 @@ First-pass variant decisions:
 ---
 
 ## Current Benchmark Evidence
+
+### Phase 36B/36C Risk Diagnostic Closeout
+
+Phase 36B/36C evaluated cross-strategy risk diagnostics across retained S1-S5,
+then added India VIX availability and VIX diagnostic outputs. Full closeout:
+`docs/02_audits/cross_strategy_risk_diagnostic_audit.md`.
+
+Decision:
+
+- No risk model implementation.
+- No VIX rule, liquidity filter, drawdown throttle, rolling-R threshold,
+  benchmark-regime filter, gap filter, dynamic sizing, or production approval.
+- Liquidity remains the strongest S2 risk diagnostic: S2 HIGH liquidity had
+  271 trades, about Rs 970,422 net PnL, about 1.42 PF, about 49.45% win rate,
+  and about -Rs 948 median PnL.
+- Benchmark regime remains a strong diagnostic: S2 strong-positive benchmark
+  had 127 trades, about Rs 660,713 net PnL, about 1.78 PF; strong-negative had
+  42 trades, about Rs 268,996 net PnL, about 2.11 PF; ordinary negative had
+  191 trades, about -Rs 94,265 net PnL, about 0.95 PF.
+- VIX is retained only as a secondary diagnostic. VIX joined to 2,740 / 2,740
+  retained trades with 100% coverage and 0 missing/null/nonpositive values.
+- VIX x drawdown is a possible pre-registration candidate, not an approved
+  throttle.
+
+Anti-overfitting rules:
+
+- Do not convert diagnostic buckets into filters without pre-registration.
+- Do not optimize VIX thresholds after seeing outputs.
+- Do not treat static liquidity, sector, or cap fields as point-in-time truth.
+- Do not create symbol include/exclude rules from contributor tables.
+- Do not use rolling-R thresholds without strict pre-registration.
+- Do not use entry-date VIX close for next-open entries.
 
 ### Phase 35B/35C Cross-Strategy Overlap Closeout
 

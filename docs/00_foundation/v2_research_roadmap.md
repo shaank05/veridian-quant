@@ -59,6 +59,11 @@ failure-audit code is currently needed. Phase 34B documents prior S2 guard,
 context, and state-exclusion variant lessons. The next S2 step must be a
 separate decision phase, not automatic implementation.
 
+Phase 35B/35C closed the cross-strategy overlap and confirmation branch.
+Broad voting and generic 2+ strategy consensus are dropped. Narrow S2/S4
+confirmation is retained only as a parked diagnostic observation. No ensemble,
+weights, allocation, or production approval resulted from this work.
+
 ---
 
 ## Completed Phases
@@ -523,12 +528,17 @@ Completed follow-up phases:
 - **Phase 34B:** prior S2 improvement variant lessons documented. 2025 guard,
   2025 context guard, and avoid shallow uptrend pullback remain rejected;
   `clean_state_v1` remains only a fragile higher-return benchmark.
+- **Phase 35B/35C:** cross-strategy overlap and confirmation closeout
+  documented in `docs/02_audits/cross_strategy_overlap_audit.md`. Broad voting
+  and generic 2+ consensus are dropped; S2/S4 is diagnostic-only.
 
 Remaining planned follow-up phases:
 
 - **Next branch:** decide separately. Do not continue with another simple S2
-  context-threshold tweak, guard tweak, state-label exclusion, or automatic
-  implementation phase.
+  context-threshold tweak, guard tweak, state-label exclusion, voting variant,
+  or automatic implementation phase. Preferred candidates are Cross-Strategy
+  Risk Model Input Discovery, Universe/Regime Segmentation Research, or S2 Risk
+  Model Research.
 - **Later:** broader strategy exposure/regime audit, historical index
   constituents, and point-in-time classification.
 
@@ -661,6 +671,9 @@ Next direction:
   materially redesigned momentum hypothesis.
 - Treat Phase 33E through 33G.2 as complete diagnostic/design/experiment
   context work, not as a strategy upgrade.
+- Treat Phase 35B/35C as a closed ensemble branch. Broad voting and 2+
+  consensus are dropped; S2/S4 is diagnostic-only and must not be cherry-picked
+  from the 0-session or 1-session results.
 - Close the simple S2 context-filter branch. Do not continue with threshold
   fishing, filter stacking, or another minor benchmark/relative/sector context
   tweak. Company fundamentals are now ingested and audited as research context,
@@ -693,7 +706,9 @@ The following are future research directions, not accepted production rules:
 - S1 candidate ranking v2.
 - FFT strategy.
 - Wavelet strategy.
-- Markov/S1 voting layer.
+- Cross-strategy risk-model input discovery.
+- Universe/regime segmentation research.
+- S2 risk model research.
 - Meta-ranking / capital allocation layer.
 - Walk-forward validation, regime splits, parameter sensitivity, and capacity
   stress testing after the Phase 31 Monte Carlo baseline.

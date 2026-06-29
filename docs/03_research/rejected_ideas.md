@@ -187,7 +187,39 @@ The following remain future research directions:
 
 - FFT strategy.
 - Wavelet strategy.
-- S1/S2 voting layer.
 - Meta-ranking / capital allocation layer.
 
 These are not accepted production rules.
+
+## Cross-Strategy Voting / Confirmation Ensemble
+
+Phase 35B/35C closes the current ensemble branch.
+
+Rejected for current branch:
+
+- Broad voting ensemble.
+- Generic 2+ strategy consensus.
+- Immediate continuation into another voting variant.
+
+Parked diagnostic only:
+
+- Narrow S2/S4 confirmation.
+
+Reason:
+
+- S2 confirmed trades were worse than S2 unconfirmed trades: 99 confirmed
+  trades had about 0.893 PF and about -Rs 1.07L net PnL, while 478 unconfirmed
+  trades had about 1.260 PF and about +Rs 10.79L net PnL.
+- Generic 2+ confirmation had only 16 trades, about 0.766 PF, and about
+  -Rs 38.5K net PnL.
+- Same-day executed overlap was sparse, with only 11 same-symbol/same-day rows
+  across all strategies.
+- Signal overlap was diagnostically useful but is not realized PnL.
+- S2/S4 survived the 5-session robustness check only weakly: 54 trades, about
+  1.23 PF, about +Rs 113.3K net PnL, about 42.6% win rate, and about -Rs 7.66K
+  median PnL.
+- Yearly stability and winner concentration remained fragile, and S3 was a
+  competitive 5-session control.
+
+Do not use this branch to approve an ensemble, weights, allocation, production
+behavior, future/after-entry confirmation, or post-hoc strategy combinations.

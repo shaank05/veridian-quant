@@ -104,6 +104,9 @@ Future context work:
 
 - Keep S1-S5 context audit findings diagnostic until controlled experiments are
   designed and reviewed.
+- Keep Phase 35B/35C cross-strategy overlap findings diagnostic only. Broad
+  voting and generic 2+ consensus are dropped, and S2/S4 confirmation is parked
+  as an observation rather than a feature, filter, or allocation rule.
 - Future S2 context work requires a genuinely new hypothesis, not minor
   benchmark/relative/sector threshold changes or renamed guard/state exclusions.
 - Add R-multiple availability to future trade PnL logs or provide reliable join
@@ -308,6 +311,16 @@ Candidate topology labels:
 - `regime_break`
 
 These features and labels are research/intelligence concepts only. They are not accepted strategy rules, filters, entries, exits, or ranking rules.
+
+Cross-strategy overlap note:
+
+- Phase 35B found 1,654 same-symbol/same-date signal overlap events across
+  S1-S5, dominated by 2-strategy consensus.
+- This can inform risk-model, universe, or regime input discovery.
+- It must not be treated as realized PnL or as approval for voting, weights, or
+  portfolio blending.
+- Future/after-entry confirmation is diagnostic only and not implementable as a
+  signal-time feature.
 
 Phase 30C diagnostic feature usage:
 

@@ -19,6 +19,37 @@ The current audit decision is to keep S2 available for benchmark comparison and 
 
 ---
 
+## Phase 35B/35C Confirmation Closeout
+
+Cross-strategy confirmation did not approve an S2 ensemble or S2 filter.
+
+Phase 35B found that S2 confirmed trades were worse than S2 unconfirmed trades:
+
+- S2 confirmed trades: 99 trades, about 0.893 PF, about -Rs 1.07L net PnL, and
+  about 40.4% win rate.
+- S2 unconfirmed trades: 478 trades, about 1.260 PF, about +Rs 10.79L net PnL,
+  and about 46.2% win rate.
+- Generic 2+ strategy confirmation was also weak: 16 trades, about 0.766 PF,
+  and about -Rs 38.5K net PnL.
+
+Phase 35C found that narrow S2/S4 confirmation stayed positive across tested
+trading-session lookbacks, but did not become clean enough for implementation.
+The 5-session result had 54 trades, about 1.23 PF, about +Rs 113.3K net PnL,
+about 42.6% win rate, and about -Rs 7.66K median PnL. Yearly stability remained
+weak, S2 fragile years were not fixed, and S3 became a competitive 5-session
+control.
+
+Decision:
+
+- Broad voting ensemble: dropped.
+- Generic 2+ consensus: dropped.
+- S2/S4 confirmation: retained only as a parked diagnostic observation.
+- No S2 ensemble, S2 allocation rule, S2 weight, or S2 production approval.
+
+Detailed audit: `docs/02_audits/cross_strategy_overlap_audit.md`.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.
@@ -280,8 +311,11 @@ Decision:
 - Retain `exclude_ret_down + ranking none` as the safer S2 benchmark.
 - Retain `exclude_ret_down + clean_state_v1` as the higher-return research candidate.
 - Reject guard/ranking variants as benchmarks.
+- Retain S2/S4 confirmation only as a diagnostic observation, not an S2
+  implementation path.
 - Do not continue immediate S2 tuning.
-- Move next research to a new independent strategy.
+- Move next research to risk-model, universe, or regime work rather than a
+  voting variant.
 
 Rationale:
 

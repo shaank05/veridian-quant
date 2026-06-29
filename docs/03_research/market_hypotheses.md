@@ -203,6 +203,14 @@ This supports future candidate ranking and voting systems, but does not prove th
 
 Standalone strategies should be tested independently before combining them as votes.
 
+Phase 35B/35C update:
+
+Broad cross-strategy voting and generic 2+ strategy consensus are dropped for
+the current branch. Executed-trade confirmation was weak, signal overlap was
+diagnostic rather than realized PnL, and narrow S2/S4 confirmation remains only
+a parked observation. H6 remains relevant for risk-model, universe/regime, and
+capacity-selection research, but not for immediate ensemble implementation.
+
 ## Candidate Features
 
 * Signal depth
@@ -536,6 +544,10 @@ and parked as a benchmark only. S5 is not a production strategy.
 The next research priority should not be more S2, S3, S4, or immediate S5
 threshold tuning. Future S5 work should require a materially redesigned momentum
 hypothesis rather than small parameter changes to the first-pass variants.
+
+The Phase 35 ensemble branch is closed for now. The next preferred work should
+be Cross-Strategy Risk Model Input Discovery, Universe/Regime Segmentation
+Research, or S2 Risk Model Research rather than another voting variant.
 
 Before major new strategy-family exploration, the project should prioritize the
 Phase 33 benchmark, sector, market-cap, regime, exposure, and

@@ -46,6 +46,36 @@ Final current decision:
 - Reject `S4_RANGE_COMPRESSION_BREAKOUT_V1` as an S4 raw baseline.
 - Do not promote `S4_ENTROPY_GATED_BREAKOUT_V1`.
 - Do not continue immediate S4 threshold tuning.
+- Retain Phase 35C S2/S4 confirmation only as a parked diagnostic observation,
+  not as S4 approval or ensemble approval.
+
+---
+
+## Phase 35B/35C Confirmation Closeout
+
+Phase 35B/35C tested whether S4 helped support cross-strategy confirmation or
+ensemble approval.
+
+The narrow S2/S4 result was the only interesting confirmer in Phase 35B, but
+the sample was small: 19 S2 trades, about 1.48 PF, about 52.6% win rate, and
+about +Rs 74K net PnL. S4 also diversified versus S2, with S2-S4 equity
+correlation about 0.275. However, S4 standalone drawdown remained weak at about
+-39.1%.
+
+Phase 35C retested S2/S4 with trading-session lookbacks. S2/S4 stayed positive
+from 0 through 5 sessions, but the most usable 5-session view was not clean:
+54 trades, about 1.23 PF, about +Rs 113.3K net PnL, about 42.6% win rate, and
+about -Rs 7.66K median PnL. Yearly stability was weak, winner concentration was
+moderately fragile, and S3 became competitive at the 5-session control.
+
+Decision:
+
+- S4 is not uniquely proven as a confirmer.
+- S2/S4 is retained only as `PROMISING_DIAGNOSTIC` / parked observation.
+- No S4 filter role, ensemble role, capital allocation, strategy weight, or
+  production approval is granted.
+
+Detailed audit: `docs/02_audits/cross_strategy_overlap_audit.md`.
 
 ---
 

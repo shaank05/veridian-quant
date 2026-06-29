@@ -15,6 +15,7 @@ No strategy is production-approved.
 - S3: `docs/02_audits/s3_audit.md`
 - S4: `docs/02_audits/s4_audit.md`
 - S5: `docs/02_audits/s5_audit.md`
+- Cross-strategy overlap / confirmation: `docs/02_audits/cross_strategy_overlap_audit.md`
 
 ---
 
@@ -36,10 +37,11 @@ No strategy is production-approved.
 | `S4_ENTROPY_GATED_BREAKOUT_V1` | Not promoted / parked | Yes | Yes | Near breakeven but negative and unstable; do not promote |
 | `S5_RELATIVE_STRENGTH_MOMENTUM_ROTATION` | First-pass audited / weak parked family | Yes | Yes | Simple RS rejected; Dual Momentum weak/parked; Vol-Adjusted rejected; does not challenge S2/S1/S3 |
 | Benchmark/sector/cap context layer | Phase 33F.3 context audit documented | Yes | Diagnostic audit only | Retained S1-S5 trade PnL logs audited; S2 remains strongest; no context filter or strategy promotion approved |
+| Cross-strategy voting / confirmation ensemble | Phase 35B/35C closed | No | Diagnostic audit only | Broad voting and generic 2+ consensus dropped; S2/S4 retained only as a parked diagnostic observation |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
-| S1/S2 voting layer | Future research | No | No | Deferred until strategy-family evidence improves |
+| S1/S2 voting layer | Dropped for current branch | No | Diagnostic audit only | Phase 35B/35C does not support broad voting or immediate ensemble research |
 | Meta-ranking / capital allocation layer | Future research | No | No | Deferred; not current behavior |
 
 ---
@@ -111,6 +113,47 @@ First-pass variant decisions:
 ---
 
 ## Current Benchmark Evidence
+
+### Phase 35B/35C Cross-Strategy Overlap Closeout
+
+Phase 35B/35C evaluated whether retained S1-S5 strategies supported a voting
+ensemble or confirmation-based ensemble. Full closeout:
+`docs/02_audits/cross_strategy_overlap_audit.md`.
+
+Decision:
+
+- Broad voting ensemble: dropped / not supported.
+- Generic 2+ strategy consensus: dropped / not supported.
+- Narrow S2/S4 confirmation: retained only as a parked diagnostic observation.
+- No ensemble implementation, strategy weights, capital allocation, or
+  production approval.
+- Do not continue immediate ensemble research or another voting variant.
+
+Evidence summary:
+
+- Executed-trade confirmation was weak: S2 confirmed trades had about 0.893 PF
+  and about -Rs 1.07L net PnL, while S2 unconfirmed trades had about 1.260 PF
+  and about +Rs 10.79L net PnL.
+- Generic 2+ confirmation had only 16 trades, about 0.766 PF, and about
+  -Rs 38.5K net PnL.
+- Executed same-symbol/same-day overlap was sparse, with only 11 overlap rows
+  across all strategies.
+- Signal overlap was larger and diagnostically useful, with 1,654 same-symbol/
+  same-date events, but signal overlap is not realized PnL.
+- S2/S4 remained positive across 0, 1, 3, and 5 trading-session lookbacks, but
+  the most usable 5-session result was only 54 trades, about 1.23 PF, about
+  +Rs 113.3K net PnL, and about -Rs 7.66K median PnL.
+- Yearly stability and winner concentration remained fragile, and S3 was a
+  competitive 5-session control, so S4 is not uniquely proven.
+
+Anti-overfitting rules:
+
+- Do not cherry-pick S2/S4 0-session or 1-session results.
+- Do not add new lookbacks after seeing Phase 35C results.
+- Do not use future/after-entry confirmation as implementable.
+- Do not optimize by net PnL alone.
+- Do not treat signal overlap as realized PnL.
+- Do not rescue weak strategies through post-hoc combinations.
 
 ### Phase 31D Robustness Ranking
 
@@ -385,6 +428,9 @@ Current decision:
   Dual Momentum only as a weak parked benchmark unless a later phase explicitly
   requests weak-benchmark Monte Carlo validation or a materially redesigned
   momentum hypothesis.
+- Close the Phase 35 ensemble branch. Next preferred work should be
+  cross-strategy risk-model input discovery, universe/regime segmentation
+  research, or S2 risk model research rather than another voting variant.
 - Prioritize the Phase 33 benchmark, sector, market-cap, regime, exposure, and
   capital-utilization context foundation before major new strategy-family
   exploration. Design reference:

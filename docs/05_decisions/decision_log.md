@@ -883,3 +883,46 @@ Consequence:
 - Do not continue threshold-tweaking the same S2 guard/context filters.
 - The next S2 step must be a separate decision phase, not automatic
   implementation.
+
+---
+
+## 2026-06-29 - Close Phase 35B/35C Cross-Strategy Overlap Research
+
+Decision:
+
+Drop broad voting ensemble research and generic 2+ strategy consensus for the
+current branch. Retain narrow S2/S4 confirmation only as a parked diagnostic
+observation.
+
+Reason:
+
+Phase 35B showed weak executed-trade confirmation. S2 confirmed trades were
+worse than S2 unconfirmed trades: 99 confirmed trades had about 0.893 PF and
+about -Rs 1.07L net PnL, while 478 unconfirmed trades had about 1.260 PF and
+about +Rs 10.79L net PnL. Generic 2+ confirmation had only 16 trades, about
+0.766 PF, and about -Rs 38.5K net PnL. Same-day executed overlap was sparse,
+with only 11 same-symbol/same-day rows across all strategies.
+
+Signal overlap was larger at 1,654 same-symbol/same-date events, but that is
+diagnostic evidence, not realized PnL.
+
+Phase 35C found that S2/S4 confirmation stayed positive across 0, 1, 3, and 5
+trading-session lookbacks, but the most usable 5-session result was not clean:
+54 trades, about 1.23 PF, about +Rs 113.3K net PnL, about 42.6% win rate, and
+about -Rs 7.66K median PnL. Yearly stability and winner concentration remained
+fragile, and S3 was a competitive 5-session control.
+
+Consequence:
+
+- No ensemble implementation.
+- No voting rule.
+- No strategy weights.
+- No capital allocation change.
+- No production approval.
+- Do not continue immediate ensemble research or another voting variant.
+- Next preferred work should be Cross-Strategy Risk Model Input Discovery,
+  Universe/Regime Segmentation Research, or S2 Risk Model Research.
+
+Detailed audit:
+
+- `docs/02_audits/cross_strategy_overlap_audit.md`

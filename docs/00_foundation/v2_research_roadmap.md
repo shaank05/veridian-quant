@@ -64,13 +64,15 @@ Broad voting and generic 2+ strategy consensus are dropped. Narrow S2/S4
 confirmation is retained only as a parked diagnostic observation. No ensemble,
 weights, allocation, or production approval resulted from this work.
 
-Phase 37A/37B opened a strictly docs-only external-model intelligence lane for
-Kronos. Phase 37A completed read-only repository discovery and classified
-Kronos as feasible only for offline diagnostic research. Phase 37B documents the
-future evaluation design in
-`docs/03_research/external_model_kronos_evaluation_design.md`. No Kronos
+Phase 37A through 37C opened a strictly docs-only external-model intelligence
+lane for Kronos. Phase 37A completed read-only repository discovery and
+classified Kronos as feasible only for offline diagnostic research. Phase 37B
+documents the future evaluation design in
+`docs/03_research/external_model_kronos_evaluation_design.md`. Phase 37C
+documents future sandbox and data-adapter boundaries in
+`docs/03_research/external_model_kronos_sandbox_adapter_design.md`. No Kronos
 installation, dependency merge, model download, inference, training, sandbox,
-strategy logic, backtest logic, or production use is approved.
+adapter, strategy logic, backtest logic, or production use is approved.
 
 ---
 
@@ -688,10 +690,11 @@ Next direction:
   No risk model, VIX rule, liquidity filter, drawdown throttle, rolling-R
   threshold, benchmark-regime filter, gap filter, dynamic sizing change, or
   production behavior is approved.
-- Treat Phase 37A/37B as an external-model design lane only. Kronos may be
+- Treat Phase 37A/37B/37C as an external-model design lane only. Kronos may be
   evaluated later as an offline diagnostic/ranking/context/confirmation layer,
-  but no model download, inference, direct strategy use, raw predicted-candle
-  execution, or dependency merge is approved.
+  but no sandbox implementation, adapter implementation, model download,
+  inference, direct strategy use, raw predicted-candle execution, or dependency
+  merge is approved.
 - Close the simple S2 context-filter branch. Do not continue with threshold
   fishing, filter stacking, or another minor benchmark/relative/sector context
   tweak. Company fundamentals are now ingested and audited as research context,
@@ -731,7 +734,8 @@ The following are future research directions, not accepted production rules:
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
 - Kronos offline diagnostic/ranking/context/confirmation evaluation, beginning
-  only with separately approved sandbox, license, or tiny-smoke-test phases.
+  only with separately approved license, sandbox, adapter, or tiny-smoke-test
+  phases.
 - Universe/regime segmentation research.
 - S2 risk model research.
 - Meta-ranking / capital allocation layer.

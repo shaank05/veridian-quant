@@ -9,6 +9,11 @@ not approved for direct predicted-candle execution. Phase 37B is design-only:
 no installation, model download, inference, training, sandbox creation, runner,
 adapter, strategy logic, backtest logic, or report artifact is approved.
 
+Phase 37C adds the future sandbox and data-adapter boundary design in
+`docs/03_research/external_model_kronos_sandbox_adapter_design.md`. That design
+also remains docs-only and does not approve sandbox creation, adapter
+implementation, installation, model download, or inference.
+
 ## 2. Why This Lane Exists
 
 S1-S5 are retained as benchmarks only. The Phase 35 ensemble and confirmation
@@ -185,12 +190,16 @@ optional Qlib, AkShare, and web UI components. Dependency isolation is required.
 
 Possible future phases, none approved by Phase 37B:
 
-- Phase 37C - Kronos data adapter / sandbox design.
-- Phase 37D - isolated tiny smoke test design or implementation, only if
-  approved.
-- Phase 37E - offline diagnostic report on a small sample.
-- Phase 37F - compare Kronos diagnostics against S1-S5 and risk inputs.
+- Phase 37C - Kronos sandbox / data adapter design.
+- Phase 37D - model-weight/license verification and tiny smoke-test plan.
+- Phase 37E - isolated tiny smoke test implementation, only if approved.
+- Phase 37F - offline diagnostic report on a small sample.
+- Phase 37G - compare Kronos diagnostics against S1-S5 and risk inputs.
 - Optional later fine-tuning lane only after leakage audit.
+
+Historical note: Phase 37C is now documented in
+`docs/03_research/external_model_kronos_sandbox_adapter_design.md`, but it does
+not approve execution.
 
 ## 14. Decision
 

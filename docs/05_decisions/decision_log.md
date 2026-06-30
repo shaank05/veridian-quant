@@ -1020,3 +1020,33 @@ Consequence:
 - Do not merge Kronos dependencies into Veridian core.
 - Future next actions must be separately approved: stop/park the lane, design a
   sandbox, verify model-weight/license terms, or prepare a tiny smoke-test plan.
+
+---
+
+## 2026-06-30 - Design Kronos Sandbox / Data Adapter Boundaries Only
+
+Decision:
+
+Proceed with Phase 37C as a docs-only sandbox and data-adapter design for
+possible future Kronos evaluation.
+
+Reason:
+
+Kronos has heavy external ML dependencies, including PyTorch and Hugging Face
+tooling, and the user's laptop constraints require any future execution to be
+small, isolated, optional, and separable from Veridian core. A future adapter
+must define data boundaries, leakage rules, output schemas, metadata, and join
+rules before any sandbox creation, installation, model download, or inference.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_sandbox_adapter_design.md`.
+- Do not create a sandbox.
+- Do not implement a data adapter.
+- Do not install Kronos dependencies.
+- Do not download model weights.
+- Do not run inference, notebooks, web UI, training, or fine-tuning.
+- Do not modify the Kronos repository.
+- Do not change strategy logic, backtest logic, runners, tests, or reports.
+- Do not merge Kronos dependencies into Veridian core.
+- Future next actions must be separately approved after review of the design.

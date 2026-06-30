@@ -52,7 +52,8 @@ for next-open entries.
 ## Phase 37B External-Model Misuse Rejections / Deferrals
 
 Kronos is allowed only as a future offline diagnostic/ranking/context/
-confirmation research candidate. Phase 37B does not approve any execution.
+confirmation research candidate. Phase 37B does not approve any execution, and
+Phase 37C does not approve sandbox or adapter implementation.
 
 Rejected or not approved:
 
@@ -64,6 +65,8 @@ Rejected or not approved:
 - Fine-tuning before train/validation/test split and leakage audit.
 - Merging Kronos dependencies into Veridian core.
 - Full Research200 inference before tiny smoke tests.
+- Creating a production dependency on Kronos from the Veridian core package.
+- Long-running GPU/cloud workflows without explicit approval.
 
 Reason:
 

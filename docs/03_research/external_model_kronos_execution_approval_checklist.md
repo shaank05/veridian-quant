@@ -18,6 +18,11 @@ Phase 37I reviewed the 37H output in
 not approve additional inference, full Research200 execution, production use,
 strategy integration, or raw predicted-candle trading.
 
+Phase 37J later designed a small offline diagnostic experiment in
+`docs/03_research/external_model_kronos_small_diagnostic_experiment_design.md`.
+Phase 37G covered only the tiny smoke-test approval; any Phase 37K small
+diagnostic execution requires a new explicit approval checklist.
+
 ## 2. Execution Cannot Start Until These Are Checked
 
 Phase 37H cannot start until every relevant item below is explicitly approved

@@ -59,6 +59,11 @@ Phase 37F does not approve smoke-test execution. Phase 37G creates the exact
 approval checklist only and does not approve install, download, inference, or
 smoke-test execution.
 
+Phase 37H executed one explicitly approved tiny smoke test, Phase 37I reviewed
+it, and Phase 37J designs a small diagnostic experiment only. These later phases
+do not approve additional inference, full Research200 execution, production use,
+raw forecast trading, threshold tuning, or strategy integration.
+
 Rejected or not approved:
 
 - Raw predicted-candle execution.
@@ -81,6 +86,10 @@ Rejected or not approved:
 - Treating smoke-test output as a trading signal.
 - Treating one Phase 37H smoke-test row as evidence that Kronos is good or bad
   as a model.
+- Treating a future small Phase 37K diagnostic sample as alpha proof or
+  production evidence.
+- Jumping from tiny/small Kronos diagnostics directly to a full Research200
+  sweep.
 
 Reason:
 

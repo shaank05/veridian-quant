@@ -187,6 +187,7 @@ Phase 37B design reference:
 - `docs/03_research/external_model_kronos_tiny_smoke_test_implementation_plan.md`
 - `docs/03_research/external_model_kronos_execution_approval_checklist.md`
 - `docs/03_research/external_model_kronos_smoke_test_review.md`
+- `docs/03_research/external_model_kronos_small_diagnostic_experiment_design.md`
 
 Current status:
 
@@ -203,14 +204,17 @@ Current status:
 - Phase 37H executed one approved tiny smoke test.
 - Phase 37I reviewed the smoke-test output: technical execution passed, but the
   single forecast row does not validate or reject Kronos model quality.
+- Phase 37J designs a small offline diagnostic experiment only: recommended
+  first diagnostic size is 5 HIGH-liquidity symbols x 6 dates = 30 forecasts.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
-- No installation, model download, Hugging Face download, inference, sandbox,
-  training, fine-tuning, adapter implementation, dependency merge, strategy
-  logic, or backtest logic is approved.
+- After the one approved Phase 37H tiny smoke test, no additional installation,
+  model download, Hugging Face download, inference, sandbox, training,
+  fine-tuning, adapter implementation, dependency merge, strategy logic, or
+  backtest logic is approved.
 
-Candidate diagnostic features if a future phase approves a tiny isolated smoke
-test:
+Candidate diagnostic features if a future phase approves a small isolated
+diagnostic execution:
 
 - Predicted close return over predeclared 5/10/20-session horizons.
 - Predicted direction.
@@ -220,6 +224,9 @@ test:
 - Forecast dispersion if repeated samples are later feasible.
 - Realized forecast error by regime.
 - Agreement/disagreement with retained S1-S5 trades.
+- Spearman rank IC between predicted 5-session return and realized 5-session
+  return.
+- Top-minus-bottom forecast-rank realized return spread.
 
 Safety rules:
 
@@ -229,8 +236,8 @@ Safety rules:
 - Do not choose symbols, horizons, thresholds, or overlays after seeing PnL.
 - Do not fine-tune before a leakage and split audit.
 - Do not merge Kronos dependencies into Veridian core.
-- Do not start with a full Research200 sweep; any future smoke test must be
-  small, isolated, and separately approved.
+- Do not start with a full Research200 sweep; any future diagnostic execution
+  must be small, isolated, and separately approved.
 - Do not download model/tokenizer weights before license/model-card review and
   explicit user approval.
 

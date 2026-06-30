@@ -485,6 +485,13 @@ Kronos is the first external model candidate in this lane, but Phase 37B is
 design-only. Kronos is not production-approved, not direct-strategy-approved,
 and not approved for raw predicted-candle execution.
 
+Phase 37J updates this lane with a small offline diagnostic design after the
+Phase 37H technical smoke test passed and Phase 37I reviewed it. The proposed
+first diagnostic remains pre-registered and small: 5 HIGH-liquidity Research200
+symbols x 6 dates = 30 forecasts, 400-session lookback, and 5-session horizon.
+This is not execution approval and does not support production or trading
+claims.
+
 ## Expected Research Value
 
 - Evaluate whether forecast-derived diagnostics have positive rank
@@ -513,6 +520,8 @@ and not approved for raw predicted-candle execution.
 - Predicted range or volatility proxy.
 - Forecast dispersion if repeated samples are feasible.
 - Agreement/disagreement with retained benchmark trades.
+- Spearman rank IC.
+- Top-minus-bottom forecast-rank realized return spread.
 
 ---
 
@@ -540,6 +549,10 @@ Kronos Phase 37B narrows one possible ML/model lane to offline diagnostics only:
 ranking, regime/context, confirmation/disagreement, and forecast-quality
 evaluation. It does not approve direct forecast execution, production use,
 dependency installation, model download, or fine-tuning.
+
+Phase 37J keeps this lane diagnostic-only. It does not approve a full
+Research200 run, alpha conclusion, threshold optimization, raw forecast trading,
+or small-diagnostic execution without separate 37K approval.
 
 ## FFT / Wavelet Entry
 

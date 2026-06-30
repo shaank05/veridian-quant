@@ -20,6 +20,10 @@ reviews the result in
 execution passed, but one poor forecast does not validate or reject model
 quality.
 
+Phase 37J later designs the first small offline diagnostic experiment in
+`docs/03_research/external_model_kronos_small_diagnostic_experiment_design.md`.
+That design does not approve additional inference.
+
 ## 2. Purpose of the Future Tiny Smoke Test
 
 The future tiny smoke test should answer only:

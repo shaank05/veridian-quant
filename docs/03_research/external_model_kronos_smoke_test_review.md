@@ -191,6 +191,11 @@ This decision is not based on forecast quality. The one observed forecast was
 directionally wrong and is not enough evidence to judge Kronos as good or bad.
 The next phase should be design-only. No new inference is approved yet.
 
+Phase 37J is now documented in
+`docs/03_research/external_model_kronos_small_diagnostic_experiment_design.md`.
+It designs a 5-symbol x 6-date small offline diagnostic only; it does not
+approve Phase 37K execution.
+
 ## 13. Requirements for 37J
 
 Phase 37J should design a small offline diagnostic experiment only. It should

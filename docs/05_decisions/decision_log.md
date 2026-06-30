@@ -1202,3 +1202,32 @@ Consequence:
 - Do not approve production use, strategy integration, raw forecast trading, or
   threshold tuning.
 - Do not interpret the Phase 37H row as evidence that Kronos is good or bad.
+
+---
+
+## 2026-06-30 - Design Kronos Small Offline Diagnostic Experiment Only
+
+Decision:
+
+Proceed with Phase 37J as a docs-only small offline diagnostic experiment
+design. Select `PROCEED_TO_37K_SMALL_DIAGNOSTIC_EXECUTION_APPROVAL`.
+
+Reason:
+
+Phase 37H/37I established technical feasibility and usable output schema, but
+forecast quality remains unproven. One HDFCBANK forecast row is insufficient
+evidence. The next useful step is a pre-registered diagnostic design that asks
+whether `Kronos-small` outputs have weak directional, ranking, or context value
+across a small sample, without treating forecasts as trades.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_small_diagnostic_experiment_design.md`.
+- Recommended future 37K default: 5 HIGH-liquidity Research200 symbols x 6
+  dates = 30 forecasts, 400-session lookback, 5-session horizon.
+- Do not approve Phase 37K execution yet.
+- Do not approve new inference, full Research200 inference, production use,
+  strategy integration, raw forecast trading, threshold tuning, training, or
+  fine-tuning.
+- Phase 37K must begin with explicit user approval for exact symbols, dates,
+  output folder, runtime limit, and no-production/no-trading boundaries.

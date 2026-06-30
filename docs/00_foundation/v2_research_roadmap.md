@@ -64,7 +64,7 @@ Broad voting and generic 2+ strategy consensus are dropped. Narrow S2/S4
 confirmation is retained only as a parked diagnostic observation. No ensemble,
 weights, allocation, or production approval resulted from this work.
 
-Phase 37A through 37I opened a strictly controlled external-model intelligence
+Phase 37A through 37J opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and
 classified Kronos as feasible only for offline diagnostic research. Phase 37B
 documents the future evaluation design in
@@ -85,7 +85,11 @@ Phase 37G documents the exact user approval and execution checklist in
 37I reviews that output in
 `docs/03_research/external_model_kronos_smoke_test_review.md`: the technical
 smoke test passed, but the single forecast was directionally wrong and does not
-validate model quality. No further Kronos inference, full Research200 run,
+validate model quality. Phase 37J designs the first small offline diagnostic
+experiment in
+`docs/03_research/external_model_kronos_small_diagnostic_experiment_design.md`;
+it recommends 5 HIGH-liquidity symbols x 6 dates = 30 forecasts for a possible
+future Phase 37K approval. No further Kronos inference, full Research200 run,
 strategy integration, raw predicted-candle trading, training, fine-tuning, or
 production use is approved.
 
@@ -705,7 +709,7 @@ Next direction:
   No risk model, VIX rule, liquidity filter, drawdown throttle, rolling-R
   threshold, benchmark-regime filter, gap filter, dynamic sizing change, or
   production behavior is approved.
-- Treat Phase 37A through 37I as a controlled external-model research lane.
+- Treat Phase 37A through 37J as a controlled external-model research lane.
   Kronos may be evaluated later as an offline diagnostic/ranking/context/
   confirmation layer, but after the one approved Phase 37H smoke test, no
   additional sandbox implementation, adapter implementation, model download,
@@ -750,8 +754,8 @@ The following are future research directions, not accepted production rules:
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
 - Kronos offline diagnostic/ranking/context/confirmation evaluation, beginning
-  only with Phase 37J small offline diagnostic design and later separate
-  execution approval.
+  only with separate Phase 37K execution approval for the pre-registered small
+  diagnostic design.
 - Universe/regime segmentation research.
 - S2 risk model research.
 - Meta-ranking / capital allocation layer.

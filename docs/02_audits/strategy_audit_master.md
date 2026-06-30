@@ -17,6 +17,7 @@ No strategy is production-approved.
 - S5: `docs/02_audits/s5_audit.md`
 - Cross-strategy overlap / confirmation: `docs/02_audits/cross_strategy_overlap_audit.md`
 - Cross-strategy risk diagnostics: `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`
+- Kronos external-model evaluation design: `docs/03_research/external_model_kronos_evaluation_design.md`
 
 ---
 
@@ -40,6 +41,7 @@ No strategy is production-approved.
 | Benchmark/sector/cap context layer | Phase 33F.3 context audit documented | Yes | Diagnostic audit only | Retained S1-S5 trade PnL logs audited; S2 remains strongest; no context filter or strategy promotion approved |
 | Cross-strategy voting / confirmation ensemble | Phase 35B/35C closed | No | Diagnostic audit only | Broad voting and generic 2+ consensus dropped; S2/S4 retained only as a parked diagnostic observation |
 | Cross-strategy risk diagnostics | Phase 36B/36C closed | No | Diagnostic audit only | Liquidity retained as strongest S2 diagnostic; VIX retained only as secondary context; no risk model, filter, throttle, sizing change, or production approval |
+| Kronos external-model lane | Phase 37B design only | No | No | Future offline diagnostic/ranking/context/confirmation evaluation only; no install, model download, inference, raw candle execution, strategy use, or dependency merge approved |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
@@ -115,6 +117,26 @@ First-pass variant decisions:
 ---
 
 ## Current Benchmark Evidence
+
+### Phase 37B Kronos External-Model Design Lane
+
+Phase 37B created a design note for possible future Kronos evaluation as an
+offline diagnostic/ranking/context/confirmation layer. This lane is separate
+from retained S1-S5 benchmarks and does not approve any strategy.
+
+Decision:
+
+- No Kronos installation.
+- No dependency merge into Veridian core.
+- No model download.
+- No inference, notebooks, web UI, training, or fine-tuning.
+- No raw predicted-candle execution.
+- No strategy logic, backtest logic, runner, adapter, report, or production
+  behavior change.
+
+The external-model lane may proceed only through separately approved future
+steps such as sandbox design, model-weight/license verification, or a tiny
+predeclared smoke-test plan.
 
 ### Phase 36B/36C Risk Diagnostic Closeout
 

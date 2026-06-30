@@ -473,6 +473,49 @@ Expected research value comes from:
 
 ---
 
+# H11 - External K-Line Representation Diagnostics
+
+## Hypothesis
+
+An external K-line foundation model may provide ranking, regime, context, or
+confirmation information not captured by S1-S5, RAWRS diagnostics, benchmark
+context, liquidity, drawdown state, gap risk, or VIX.
+
+Kronos is the first external model candidate in this lane, but Phase 37B is
+design-only. Kronos is not production-approved, not direct-strategy-approved,
+and not approved for raw predicted-candle execution.
+
+## Expected Research Value
+
+- Evaluate whether forecast-derived diagnostics have positive rank
+  relationships with future returns.
+- Test whether agreement/disagreement with S1-S5 separates trade quality.
+- Study whether any signal persists by year and regime rather than only in
+  strong bull periods.
+- Determine whether external forecasts add information beyond existing
+  liquidity, benchmark, drawdown, and VIX diagnostics.
+
+## When It May Fail
+
+- The model only repeats broad market, liquidity, or volatility effects.
+- Stochastic outputs are unstable.
+- Compute cost is too heavy for safe local research.
+- Lookahead, normalization leakage, or split leakage cannot be ruled out.
+- Model-weight terms block safe use.
+- Raw forecast PnL looks attractive while forecast/ranking diagnostics fail.
+
+## Candidate Features
+
+- Predicted close return over predeclared horizons.
+- Predicted direction.
+- Forecast strength score.
+- Cross-sectional forecast rank.
+- Predicted range or volatility proxy.
+- Forecast dispersion if repeated samples are feasible.
+- Agreement/disagreement with retained benchmark trades.
+
+---
+
 # Rejected or Deferred Hypotheses
 
 The following are not accepted production rules.
@@ -492,6 +535,11 @@ Deferred.
 Reason:
 
 Machine learning may be useful later, but only after clean baselines and audit framework are established.
+
+Kronos Phase 37B narrows one possible ML/model lane to offline diagnostics only:
+ranking, regime/context, confirmation/disagreement, and forecast-quality
+evaluation. It does not approve direct forecast execution, production use,
+dependency installation, model download, or fine-tuning.
 
 ## FFT / Wavelet Entry
 

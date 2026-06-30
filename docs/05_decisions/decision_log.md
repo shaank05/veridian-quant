@@ -988,3 +988,35 @@ Consequence:
 Detailed audit:
 
 - `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`
+
+---
+
+## 2026-06-30 - Design Kronos Offline Evaluation Framework Only
+
+Decision:
+
+Proceed with Phase 37B as a docs-only evaluation framework for Kronos as a
+future offline diagnostic, ranking, context, and confirmation layer.
+
+Reason:
+
+Phase 37A found Kronos feasible for offline diagnostic research, but not
+approved for production use, direct strategy use, or raw predicted-candle
+execution. S1-S5 are retained as benchmarks only, the Phase 35 ensemble branch
+is closed, Phase 36 risk diagnostics did not approve a risk model, and internal
+price-pattern/risk-filter research is showing diminishing returns. A future
+external-model lane needs explicit leakage, overfitting, compute, dependency,
+and license guardrails before any installation or inference.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_evaluation_design.md`.
+- Do not install Kronos dependencies.
+- Do not download model weights.
+- Do not run inference, notebooks, web UI, training, or fine-tuning.
+- Do not create a sandbox yet.
+- Do not change strategy logic, backtest logic, runners, adapters, tests, or
+  reports.
+- Do not merge Kronos dependencies into Veridian core.
+- Future next actions must be separately approved: stop/park the lane, design a
+  sandbox, verify model-weight/license terms, or prepare a tiny smoke-test plan.

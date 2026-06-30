@@ -49,6 +49,36 @@ for next-open entries.
 
 ---
 
+## Phase 37B External-Model Misuse Rejections / Deferrals
+
+Kronos is allowed only as a future offline diagnostic/ranking/context/
+confirmation research candidate. Phase 37B does not approve any execution.
+
+Rejected or not approved:
+
+- Raw predicted-candle execution.
+- Buy/sell rules directly from generated candles.
+- Stops or targets directly from predicted OHLC.
+- Treating generated candles as future truth.
+- Threshold, horizon, or symbol selection after seeing PnL.
+- Fine-tuning before train/validation/test split and leakage audit.
+- Merging Kronos dependencies into Veridian core.
+- Full Research200 inference before tiny smoke tests.
+
+Reason:
+
+Kronos is a forecasting model, not a trading agent. Raw forecast paths can look
+attractive while failing forecast/ranking diagnostics, and stochastic inference,
+normalization, data availability, model-weight terms, and compute cost all need
+separate controls before use.
+
+Consequence:
+
+Any future Kronos work must start from isolated, predeclared offline diagnostics
+and must not change S1-S5 strategy behavior.
+
+---
+
 ## S1 Rejected / Parked Items
 
 - `S1_AVOID_MESSY_MIDDLE_V1`: rejected as a promoted filter because it failed to generalize on the broader research universe.

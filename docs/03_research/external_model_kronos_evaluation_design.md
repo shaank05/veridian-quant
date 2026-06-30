@@ -31,6 +31,11 @@ Phase 37F documents the future tiny smoke-test implementation plan in
 No evaluation run exists yet; no install, download, inference, report, or
 strategy/backtest change is approved.
 
+Phase 37H later completed the first approved tiny smoke test, and Phase 37I
+reviews it in `docs/03_research/external_model_kronos_smoke_test_review.md`.
+The technical smoke test passed, but the first real evaluation has not started:
+one HDFCBANK forecast row is not evidence of model quality.
+
 ## 2. Why This Lane Exists
 
 S1-S5 are retained as benchmarks only. The Phase 35 ensemble and confirmation
@@ -218,7 +223,7 @@ Possible future phases, none approved by Phase 37B:
 - Phase 37G - user approval and exact execution checklist.
 - Phase 37H - tiny smoke-test execution, only if approved.
 - Phase 37I - smoke-test output review.
-- Phase 37J - small offline diagnostic experiment design.
+- Phase 37J - small offline diagnostic experiment design, not execution.
 - Phase 37K - small diagnostic execution, only if smoke test is acceptable.
 - Optional later fine-tuning lane only after leakage audit.
 

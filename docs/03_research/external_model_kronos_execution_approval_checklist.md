@@ -12,6 +12,12 @@ Phase 37G is docs/checklist only.
 - Kronos remains approved only for possible future offline diagnostic research.
 - No production use is approved.
 
+Later status update: Phase 37H was executed only after explicit user approval.
+Phase 37I reviewed the 37H output in
+`docs/03_research/external_model_kronos_smoke_test_review.md`. That review does
+not approve additional inference, full Research200 execution, production use,
+strategy integration, or raw predicted-candle trading.
+
 ## 2. Execution Cannot Start Until These Are Checked
 
 Phase 37H cannot start until every relevant item below is explicitly approved

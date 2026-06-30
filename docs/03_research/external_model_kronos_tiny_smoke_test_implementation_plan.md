@@ -14,6 +14,12 @@ Phase 37G adds the required user approval and exact execution checklist in
 `docs/03_research/external_model_kronos_execution_approval_checklist.md`.
 Phase 37H must not start until that approval block is filled and approved.
 
+Phase 37H later executed the approved 1-symbol / 1-date smoke test. Phase 37I
+reviews the result in
+`docs/03_research/external_model_kronos_smoke_test_review.md`: technical
+execution passed, but one poor forecast does not validate or reject model
+quality.
+
 ## 2. Purpose of the Future Tiny Smoke Test
 
 The future tiny smoke test should answer only:

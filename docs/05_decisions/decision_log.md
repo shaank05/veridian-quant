@@ -1173,3 +1173,32 @@ Consequence:
 - Do not approve production use, raw forecast trading, or full Research200
   inference.
 - Next action must be explicit user approval before any Phase 37H execution.
+
+---
+
+## 2026-06-30 - Review Kronos Tiny Smoke-Test Output Only
+
+Decision:
+
+Proceed with Phase 37I as a docs-only review of the Phase 37H tiny smoke-test
+output. Select `PROCEED_TO_37J_SMALL_OFFLINE_DIAGNOSTIC_DESIGN`.
+
+Reason:
+
+Phase 37H technically passed: the isolated Kronos environment remained outside
+Veridian core, `NeoQuasar/Kronos-Tokenizer-base` and `NeoQuasar/Kronos-small`
+were pinned, CPU inference completed on one HDFCBANK sample, and expected
+metadata, input, forecast, diagnostics, and runtime-note files were produced.
+The one forecast row was directionally wrong, with `pred_close_return` about
+`0.003514363982848989` versus realized forward return about
+`-0.14995235826584086`, but one row is not model-quality evidence.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_smoke_test_review.md`.
+- Permit Phase 37J design work only.
+- Do not approve new Kronos inference.
+- Do not approve full Research200 inference.
+- Do not approve production use, strategy integration, raw forecast trading, or
+  threshold tuning.
+- Do not interpret the Phase 37H row as evidence that Kronos is good or bad.

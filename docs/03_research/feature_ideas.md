@@ -186,6 +186,7 @@ Phase 37B design reference:
 - `docs/03_research/external_model_kronos_license_verification_result.md`
 - `docs/03_research/external_model_kronos_tiny_smoke_test_implementation_plan.md`
 - `docs/03_research/external_model_kronos_execution_approval_checklist.md`
+- `docs/03_research/external_model_kronos_smoke_test_review.md`
 
 Current status:
 
@@ -199,6 +200,9 @@ Current status:
   planning only.
 - Phase 37F is docs-only tiny smoke-test implementation planning.
 - Phase 37G is docs-only user approval and exact execution checklist creation.
+- Phase 37H executed one approved tiny smoke test.
+- Phase 37I reviewed the smoke-test output: technical execution passed, but the
+  single forecast row does not validate or reject Kronos model quality.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
 - No installation, model download, Hugging Face download, inference, sandbox,

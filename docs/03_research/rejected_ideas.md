@@ -79,6 +79,8 @@ Rejected or not approved:
 - Downloading models or tokenizers without pinned revisions.
 - Changing symbols or dates after seeing smoke-test output.
 - Treating smoke-test output as a trading signal.
+- Treating one Phase 37H smoke-test row as evidence that Kronos is good or bad
+  as a model.
 
 Reason:
 

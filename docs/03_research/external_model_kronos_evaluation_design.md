@@ -14,6 +14,12 @@ Phase 37C adds the future sandbox and data-adapter boundary design in
 also remains docs-only and does not approve sandbox creation, adapter
 implementation, installation, model download, or inference.
 
+Phase 37D adds the license/model-weight verification checklist and tiny
+smoke-test plan in
+`docs/03_research/external_model_kronos_license_smoke_test_plan.md`. That plan
+is also docs-only and does not approve installation, model download, Hugging
+Face download, or inference.
+
 ## 2. Why This Lane Exists
 
 S1-S5 are retained as benchmarks only. The Phase 35 ensemble and confirmation
@@ -192,14 +198,19 @@ Possible future phases, none approved by Phase 37B:
 
 - Phase 37C - Kronos sandbox / data adapter design.
 - Phase 37D - model-weight/license verification and tiny smoke-test plan.
-- Phase 37E - isolated tiny smoke test implementation, only if approved.
-- Phase 37F - offline diagnostic report on a small sample.
-- Phase 37G - compare Kronos diagnostics against S1-S5 and risk inputs.
+- Phase 37E - license/model-card manual verification result.
+- Phase 37F - tiny smoke-test implementation plan.
+- Phase 37G - tiny smoke-test execution, only if approved.
+- Phase 37H - smoke-test output review.
+- Phase 37I - small offline diagnostic experiment design.
 - Optional later fine-tuning lane only after leakage audit.
 
 Historical note: Phase 37C is now documented in
 `docs/03_research/external_model_kronos_sandbox_adapter_design.md`, but it does
 not approve execution.
+Phase 37D is now documented in
+`docs/03_research/external_model_kronos_license_smoke_test_plan.md`, but it also
+does not approve execution.
 
 ## 14. Decision
 

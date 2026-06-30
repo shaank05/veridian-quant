@@ -53,7 +53,8 @@ for next-open entries.
 
 Kronos is allowed only as a future offline diagnostic/ranking/context/
 confirmation research candidate. Phase 37B does not approve any execution, and
-Phase 37C does not approve sandbox or adapter implementation.
+Phase 37C does not approve sandbox or adapter implementation. Phase 37D does
+not approve installation, model download, Hugging Face download, or inference.
 
 Rejected or not approved:
 
@@ -65,6 +66,9 @@ Rejected or not approved:
 - Fine-tuning before train/validation/test split and leakage audit.
 - Merging Kronos dependencies into Veridian core.
 - Full Research200 inference before tiny smoke tests.
+- Model download without license/model-card verification.
+- Installing Kronos dependencies into the Veridian core environment.
+- Using smoke-test forecasts as strategy signals.
 - Creating a production dependency on Kronos from the Veridian core package.
 - Long-running GPU/cloud workflows without explicit approval.
 

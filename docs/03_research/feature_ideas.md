@@ -182,17 +182,20 @@ Phase 37B design reference:
 
 - `docs/03_research/external_model_kronos_evaluation_design.md`
 - `docs/03_research/external_model_kronos_sandbox_adapter_design.md`
+- `docs/03_research/external_model_kronos_license_smoke_test_plan.md`
 
 Current status:
 
 - Phase 37A repository discovery complete.
 - Phase 37B is docs-only evaluation design.
 - Phase 37C is docs-only sandbox / data adapter design.
+- Phase 37D is docs-only license/model-weight verification and tiny smoke-test
+  planning.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
-- No installation, model download, inference, sandbox, training, fine-tuning,
-  adapter implementation, dependency merge, strategy logic, or backtest logic
-  is approved.
+- No installation, model download, Hugging Face download, inference, sandbox,
+  training, fine-tuning, adapter implementation, dependency merge, strategy
+  logic, or backtest logic is approved.
 
 Candidate diagnostic features if a future phase approves a tiny isolated smoke
 test:
@@ -216,6 +219,8 @@ Safety rules:
 - Do not merge Kronos dependencies into Veridian core.
 - Do not start with a full Research200 sweep; any future smoke test must be
   small, isolated, and separately approved.
+- Do not download model/tokenizer weights before license/model-card review and
+  explicit user approval.
 
 ---
 

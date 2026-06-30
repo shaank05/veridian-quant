@@ -1050,3 +1050,33 @@ Consequence:
 - Do not change strategy logic, backtest logic, runners, tests, or reports.
 - Do not merge Kronos dependencies into Veridian core.
 - Future next actions must be separately approved after review of the design.
+
+---
+
+## 2026-06-30 - Create Kronos License and Tiny Smoke-Test Gate Plan Only
+
+Decision:
+
+Proceed with Phase 37D as a docs-only license/model-weight verification
+checklist and tiny smoke-test plan for possible future Kronos evaluation.
+
+Reason:
+
+Before any installation, Hugging Face download, model-weight use, or inference,
+Veridian needs explicit approval gates for model licenses, dependency isolation,
+reproducibility, user-laptop safety, tiny data scope, abort criteria, and
+diagnostic-only outputs.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_license_smoke_test_plan.md`.
+- Do not install Kronos dependencies.
+- Do not download model weights or tokenizer weights.
+- Do not open network connections from scripts.
+- Do not run inference, notebooks, web UI, training, or fine-tuning.
+- Do not create a sandbox or implement an adapter.
+- Do not modify the Kronos repository.
+- Do not change strategy logic, backtest logic, runners, tests, or reports.
+- Do not approve production use or direct strategy use.
+- Future execution requires separate user approval for install and model
+  download after the checklist is reviewed.

@@ -9,6 +9,11 @@ Kronos remains approved only for possible future offline diagnostic research. It
 is not production-approved, not direct-strategy-approved, and not approved for
 raw predicted-candle execution.
 
+Phase 37D defines the license/model-weight verification checklist and tiny
+smoke-test gates in
+`docs/03_research/external_model_kronos_license_smoke_test_plan.md`. Those gates
+must be reviewed before any future installation, model download, or inference.
+
 ## 2. Why a Separate Sandbox Is Required
 
 Kronos has heavy ML dependencies such as PyTorch, Hugging Face tooling, and
@@ -223,10 +228,16 @@ Production use cannot be considered unless a later phase establishes:
 Possible future phases, none approved by Phase 37C:
 
 - Phase 37D — model-weight/license verification and tiny smoke-test plan.
-- Phase 37E — isolated tiny smoke-test implementation only if approved.
-- Phase 37F — offline diagnostic report on tiny sample.
-- Phase 37G — compare Kronos diagnostics against S1-S5/risk inputs.
+- Phase 37E — license/model-card manual verification result.
+- Phase 37F — tiny smoke-test implementation plan.
+- Phase 37G — tiny smoke-test execution, only if approved.
+- Phase 37H — smoke-test output review.
+- Phase 37I — small offline diagnostic experiment design.
 - Fine-tuning lane remains deferred until leakage audit.
+
+Historical note: Phase 37D is now documented in
+`docs/03_research/external_model_kronos_license_smoke_test_plan.md`, but it does
+not approve installation, model download, or inference.
 
 ## 13. Decision
 

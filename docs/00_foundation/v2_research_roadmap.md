@@ -64,7 +64,7 @@ Broad voting and generic 2+ strategy consensus are dropped. Narrow S2/S4
 confirmation is retained only as a parked diagnostic observation. No ensemble,
 weights, allocation, or production approval resulted from this work.
 
-Phase 37A through 37D opened a strictly docs-only external-model intelligence
+Phase 37A through 37E opened a strictly docs-only external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and
 classified Kronos as feasible only for offline diagnostic research. Phase 37B
 documents the future evaluation design in
@@ -72,7 +72,11 @@ documents the future evaluation design in
 documents future sandbox and data-adapter boundaries in
 `docs/03_research/external_model_kronos_sandbox_adapter_design.md`. Phase 37D
 documents license/model-weight verification and tiny smoke-test gates in
-`docs/03_research/external_model_kronos_license_smoke_test_plan.md`. No Kronos
+`docs/03_research/external_model_kronos_license_smoke_test_plan.md`. Phase 37E
+records manual repo/model-card verification results in
+`docs/03_research/external_model_kronos_license_verification_result.md`: the
+repo code and selected Hugging Face cards appear clear for future internal
+offline diagnostic research planning, but not production-cleared. No Kronos
 installation, dependency merge, model download, Hugging Face download,
 inference, training, sandbox, adapter, strategy logic, backtest logic, or
 production use is approved.
@@ -693,12 +697,12 @@ Next direction:
   No risk model, VIX rule, liquidity filter, drawdown throttle, rolling-R
   threshold, benchmark-regime filter, gap filter, dynamic sizing change, or
   production behavior is approved.
-- Treat Phase 37A/37B/37C/37D as an external-model design/checklist lane only.
-  Kronos may be evaluated later as an offline
+- Treat Phase 37A through 37E as an external-model design/checklist/license
+  lane only. Kronos may be evaluated later as an offline
   diagnostic/ranking/context/confirmation layer, but no sandbox implementation,
   adapter implementation, model download, Hugging Face download, inference,
-  direct strategy use, raw predicted-candle execution, or dependency merge is
-  approved.
+  direct strategy use, raw predicted-candle execution, production use, or
+  dependency merge is approved.
 - Close the simple S2 context-filter branch. Do not continue with threshold
   fishing, filter stacking, or another minor benchmark/relative/sector context
   tweak. Company fundamentals are now ingested and audited as research context,

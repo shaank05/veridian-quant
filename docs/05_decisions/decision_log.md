@@ -1080,3 +1080,34 @@ Consequence:
 - Do not approve production use or direct strategy use.
 - Future execution requires separate user approval for install and model
   download after the checklist is reviewed.
+
+---
+
+## 2026-06-30 - Record Kronos License / Model-Card Verification Result
+
+Decision:
+
+Record Phase 37E manual license/model-card verification results and proceed only
+to tiny smoke-test implementation planning.
+
+Reason:
+
+The cloned Kronos repo contains an MIT license, and manual browser inspection of
+`NeoQuasar/Kronos-Tokenizer-base`, `NeoQuasar/Kronos-small`, and
+`NeoQuasar/Kronos-base` showed visible `mit` license fields on the selected
+Hugging Face model cards. No immutable model revisions were pinned in this
+phase, and this is not legal advice or production clearance.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_license_verification_result.md`.
+- Repo code and selected model/tokenizer cards are treated as
+  `CLEAR_FOR_INTERNAL_RESEARCH` for planning purposes only.
+- Decision option: `PROCEED_TO_37F_TINY_SMOKE_TEST_IMPLEMENTATION_PLAN`.
+- Do not install dependencies.
+- Do not download model or tokenizer weights.
+- Do not run inference, notebooks, web UI, training, or fine-tuning.
+- Do not create a sandbox or implement an adapter.
+- Do not modify the Kronos repository.
+- Do not approve production use, redistribution, hosted serving, or direct
+  strategy use.

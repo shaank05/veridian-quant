@@ -10,6 +10,12 @@ Kronos remains approved only for possible future offline diagnostic research.
 This phase creates gates and checklists for a future tiny smoke test, not the
 smoke test itself.
 
+Phase 37E records the manual license/model-card verification result in
+`docs/03_research/external_model_kronos_license_verification_result.md`. That
+result appears sufficient to proceed to tiny smoke-test implementation planning,
+but it does not approve installation, model download, inference, or production
+use.
+
 ## 2. Why This Phase Exists
 
 Phase 37A found Kronos feasible for offline diagnostic research. Phase 37B

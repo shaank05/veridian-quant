@@ -183,6 +183,7 @@ Phase 37B design reference:
 - `docs/03_research/external_model_kronos_evaluation_design.md`
 - `docs/03_research/external_model_kronos_sandbox_adapter_design.md`
 - `docs/03_research/external_model_kronos_license_smoke_test_plan.md`
+- `docs/03_research/external_model_kronos_license_verification_result.md`
 
 Current status:
 
@@ -191,6 +192,9 @@ Current status:
 - Phase 37C is docs-only sandbox / data adapter design.
 - Phase 37D is docs-only license/model-weight verification and tiny smoke-test
   planning.
+- Phase 37E records manual repo/model-card verification results; selected
+  components appear clear for future internal offline diagnostic research
+  planning only.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
 - No installation, model download, Hugging Face download, inference, sandbox,

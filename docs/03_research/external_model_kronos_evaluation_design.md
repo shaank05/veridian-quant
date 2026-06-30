@@ -20,6 +20,12 @@ smoke-test plan in
 is also docs-only and does not approve installation, model download, Hugging
 Face download, or inference.
 
+Phase 37E records manual repo/model-card verification results in
+`docs/03_research/external_model_kronos_license_verification_result.md`. Visible
+repo and selected model-card license fields appear clear enough for future
+internal offline diagnostic research planning, but Phase 37E does not approve
+production use, model download, installation, or inference.
+
 ## 2. Why This Lane Exists
 
 S1-S5 are retained as benchmarks only. The Phase 35 ensemble and confirmation
@@ -185,9 +191,13 @@ Laptop-safe plan:
 
 ## 12. Dependency / License Caveats
 
-Phase 37A found the Kronos repository code appears MIT licensed. Model-weight
-terms require Hugging Face verification before production use, redistribution,
-or any durable project dependency decision.
+Phase 37A found the Kronos repository code appears MIT licensed. Phase 37E
+manually verified that the selected Hugging Face cards for
+`NeoQuasar/Kronos-Tokenizer-base`, `NeoQuasar/Kronos-small`, and
+`NeoQuasar/Kronos-base` visibly show `mit` license fields. This supports future
+internal offline diagnostic research planning only. Production use,
+redistribution, hosted serving, bundled model-weight packaging, and any durable
+project dependency decision still require separate review.
 
 Kronos dependencies include PyTorch, Hugging Face tooling, safetensors, and
 optional Qlib, AkShare, and web UI components. Dependency isolation is required.
@@ -211,6 +221,9 @@ not approve execution.
 Phase 37D is now documented in
 `docs/03_research/external_model_kronos_license_smoke_test_plan.md`, but it also
 does not approve execution.
+Phase 37E is now documented in
+`docs/03_research/external_model_kronos_license_verification_result.md`, but it
+does not approve installation, model download, inference, or production use.
 
 ## 14. Decision
 

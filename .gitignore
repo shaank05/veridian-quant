@@ -18,6 +18,7 @@ ENV/
 # Strategy Outputs & Generated Datasets
 *.csv
 backtest_report_*.csv
+reports/v2/external_models/kronos/
 
 general_delete_afterwards.txt
 PHASE_25.txt

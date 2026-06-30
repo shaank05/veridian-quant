@@ -141,6 +141,11 @@ offline diagnostic research planning. Phase 37F may plan a tiny smoke-test
 implementation, but it still must not install dependencies, download model
 weights, or run inference unless a later phase explicitly approves those steps.
 
+Phase 37F is documented in
+`docs/03_research/external_model_kronos_tiny_smoke_test_implementation_plan.md`
+as the next planning step after `CLEAR_FOR_INTERNAL_RESEARCH`. It does not
+approve installation, model/tokenizer download, inference, or production use.
+
 ## 10. Anti-Misuse Guardrails
 
 - Do not download weights before approval.

@@ -16,6 +16,10 @@ result appears sufficient to proceed to tiny smoke-test implementation planning,
 but it does not approve installation, model download, inference, or production
 use.
 
+Phase 37F provides the concrete future smoke-test implementation plan in
+`docs/03_research/external_model_kronos_tiny_smoke_test_implementation_plan.md`.
+It remains planning-only and does not approve install/download/inference.
+
 ## 2. Why This Phase Exists
 
 Phase 37A found Kronos feasible for offline diagnostic research. Phase 37B
@@ -248,9 +252,11 @@ Possible future phases, none approved by Phase 37D:
 
 - Phase 37E — license/model-card manual verification result.
 - Phase 37F — tiny smoke-test implementation plan.
-- Phase 37G — tiny smoke-test execution, only if approved.
-- Phase 37H — smoke-test output review.
-- Phase 37I — small offline diagnostic experiment design.
+- Phase 37G — user approval and exact execution checklist.
+- Phase 37H — tiny smoke-test execution, only if approved.
+- Phase 37I — smoke-test output review.
+- Phase 37J — small offline diagnostic experiment design.
+- Phase 37K — small diagnostic execution, only if smoke test is acceptable.
 - Fine-tuning remains deferred until leakage audit.
 
 ## 15. Decision

@@ -14,6 +14,10 @@ smoke-test gates in
 `docs/03_research/external_model_kronos_license_smoke_test_plan.md`. Those gates
 must be reviewed before any future installation, model download, or inference.
 
+Phase 37F defines exact tiny smoke-test execution limits in
+`docs/03_research/external_model_kronos_tiny_smoke_test_implementation_plan.md`.
+It remains planning-only and does not implement the sandbox or adapter.
+
 ## 2. Why a Separate Sandbox Is Required
 
 Kronos has heavy ML dependencies such as PyTorch, Hugging Face tooling, and
@@ -230,9 +234,11 @@ Possible future phases, none approved by Phase 37C:
 - Phase 37D — model-weight/license verification and tiny smoke-test plan.
 - Phase 37E — license/model-card manual verification result.
 - Phase 37F — tiny smoke-test implementation plan.
-- Phase 37G — tiny smoke-test execution, only if approved.
-- Phase 37H — smoke-test output review.
-- Phase 37I — small offline diagnostic experiment design.
+- Phase 37G — user approval and exact execution checklist.
+- Phase 37H — tiny smoke-test execution, only if approved.
+- Phase 37I — smoke-test output review.
+- Phase 37J — small offline diagnostic experiment design.
+- Phase 37K — small diagnostic execution, only if smoke test is acceptable.
 - Fine-tuning lane remains deferred until leakage audit.
 
 Historical note: Phase 37D is now documented in

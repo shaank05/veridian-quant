@@ -26,6 +26,11 @@ repo and selected model-card license fields appear clear enough for future
 internal offline diagnostic research planning, but Phase 37E does not approve
 production use, model download, installation, or inference.
 
+Phase 37F documents the future tiny smoke-test implementation plan in
+`docs/03_research/external_model_kronos_tiny_smoke_test_implementation_plan.md`.
+No evaluation run exists yet; no install, download, inference, report, or
+strategy/backtest change is approved.
+
 ## 2. Why This Lane Exists
 
 S1-S5 are retained as benchmarks only. The Phase 35 ensemble and confirmation
@@ -210,9 +215,11 @@ Possible future phases, none approved by Phase 37B:
 - Phase 37D - model-weight/license verification and tiny smoke-test plan.
 - Phase 37E - license/model-card manual verification result.
 - Phase 37F - tiny smoke-test implementation plan.
-- Phase 37G - tiny smoke-test execution, only if approved.
-- Phase 37H - smoke-test output review.
-- Phase 37I - small offline diagnostic experiment design.
+- Phase 37G - user approval and exact execution checklist.
+- Phase 37H - tiny smoke-test execution, only if approved.
+- Phase 37I - smoke-test output review.
+- Phase 37J - small offline diagnostic experiment design.
+- Phase 37K - small diagnostic execution, only if smoke test is acceptable.
 - Optional later fine-tuning lane only after leakage audit.
 
 Historical note: Phase 37C is now documented in
@@ -224,6 +231,9 @@ does not approve execution.
 Phase 37E is now documented in
 `docs/03_research/external_model_kronos_license_verification_result.md`, but it
 does not approve installation, model download, inference, or production use.
+Phase 37F is now documented in
+`docs/03_research/external_model_kronos_tiny_smoke_test_implementation_plan.md`,
+but it does not approve execution.
 
 ## 14. Decision
 

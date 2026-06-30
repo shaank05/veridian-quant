@@ -1111,3 +1111,33 @@ Consequence:
 - Do not modify the Kronos repository.
 - Do not approve production use, redistribution, hosted serving, or direct
   strategy use.
+
+---
+
+## 2026-06-30 - Create Kronos Tiny Smoke-Test Implementation Plan Only
+
+Decision:
+
+Proceed with Phase 37F as a docs-only tiny smoke-test implementation plan.
+
+Reason:
+
+Phase 37E cleared the selected repo/model-card evidence for internal research
+planning only. Before any execution, Veridian needs exact future boundaries for
+environment isolation, model/tokenizer choice, tiny symbol/date scope, planned
+future commands, output schema, reproducibility, laptop abort criteria, leakage
+rules, and approval gates.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_tiny_smoke_test_implementation_plan.md`.
+- Do not install dependencies.
+- Do not download model or tokenizer weights.
+- Do not run inference, notebooks, web UI, Qlib, AkShare, training, or
+  fine-tuning.
+- Do not create a sandbox or implement an adapter.
+- Do not modify the Kronos repository.
+- Do not change strategy logic, backtest logic, runners, tests, or reports.
+- Do not approve production use, raw forecast trading, or full Research200
+  inference.
+- Next action should be a user approval checklist, not automatic execution.

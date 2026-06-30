@@ -55,7 +55,9 @@ Kronos is allowed only as a future offline diagnostic/ranking/context/
 confirmation research candidate. Phase 37B does not approve any execution, and
 Phase 37C does not approve sandbox or adapter implementation. Phase 37D does
 not approve installation, model download, Hugging Face download, or inference.
-Phase 37F does not approve smoke-test execution.
+Phase 37F does not approve smoke-test execution. Phase 37G creates the exact
+approval checklist only and does not approve install, download, inference, or
+smoke-test execution.
 
 Rejected or not approved:
 
@@ -73,6 +75,10 @@ Rejected or not approved:
 - Using smoke-test forecasts as strategy signals.
 - Creating a production dependency on Kronos from the Veridian core package.
 - Long-running GPU/cloud workflows without explicit approval.
+- Running Phase 37H without a filled user approval block.
+- Downloading models or tokenizers without pinned revisions.
+- Changing symbols or dates after seeing smoke-test output.
+- Treating smoke-test output as a trading signal.
 
 Reason:
 

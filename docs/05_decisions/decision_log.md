@@ -1141,3 +1141,35 @@ Consequence:
 - Do not approve production use, raw forecast trading, or full Research200
   inference.
 - Next action should be a user approval checklist, not automatic execution.
+
+---
+
+## 2026-06-30 - Create Kronos Exact Execution Approval Checklist Only
+
+Decision:
+
+Proceed with Phase 37G as a docs-only user approval and exact execution
+checklist for a possible Phase 37H tiny smoke-test execution.
+
+Reason:
+
+Phase 37F defined the future smoke-test implementation plan, but the user's
+laptop has tight comfort constraints and no install, download, or inference has
+been approved. Before any execution can be considered, Veridian needs an exact
+approval block covering environment path, model/tokenizer selection, revision
+pinning, symbol/date limits, output folder, abort limits, and not-approved
+boundaries.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_execution_approval_checklist.md`.
+- Do not install dependencies.
+- Do not download model or tokenizer weights.
+- Do not run inference, notebooks, web UI, Qlib, AkShare, training, or
+  fine-tuning.
+- Do not create a sandbox or implement an adapter.
+- Do not modify the Kronos repository.
+- Do not change strategy logic, backtest logic, runners, tests, or reports.
+- Do not approve production use, raw forecast trading, or full Research200
+  inference.
+- Next action must be explicit user approval before any Phase 37H execution.

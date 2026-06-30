@@ -146,6 +146,11 @@ Phase 37F is documented in
 as the next planning step after `CLEAR_FOR_INTERNAL_RESEARCH`. It does not
 approve installation, model/tokenizer download, inference, or production use.
 
+Phase 37G is documented in
+`docs/03_research/external_model_kronos_execution_approval_checklist.md` as the
+required exact approval gate before any Phase 37H execution. It also does not
+approve installation, model/tokenizer download, inference, or production use.
+
 ## 10. Anti-Misuse Guardrails
 
 - Do not download weights before approval.

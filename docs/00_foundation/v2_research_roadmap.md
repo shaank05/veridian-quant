@@ -64,7 +64,7 @@ Broad voting and generic 2+ strategy consensus are dropped. Narrow S2/S4
 confirmation is retained only as a parked diagnostic observation. No ensemble,
 weights, allocation, or production approval resulted from this work.
 
-Phase 37A through 37F opened a strictly docs-only external-model intelligence
+Phase 37A through 37G opened a strictly docs-only external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and
 classified Kronos as feasible only for offline diagnostic research. Phase 37B
 documents the future evaluation design in
@@ -79,8 +79,9 @@ repo code and selected Hugging Face cards appear clear for future internal
 offline diagnostic research planning, but not production-cleared. Phase 37F
 documents the future tiny smoke-test implementation plan in
 `docs/03_research/external_model_kronos_tiny_smoke_test_implementation_plan.md`.
-No Kronos
-installation, dependency merge, model download, Hugging Face download,
+Phase 37G documents the exact user approval and execution checklist in
+`docs/03_research/external_model_kronos_execution_approval_checklist.md`. No
+Kronos installation, dependency merge, model download, Hugging Face download,
 inference, training, sandbox, adapter, strategy logic, backtest logic, or
 production use is approved.
 
@@ -700,7 +701,7 @@ Next direction:
   No risk model, VIX rule, liquidity filter, drawdown throttle, rolling-R
   threshold, benchmark-regime filter, gap filter, dynamic sizing change, or
   production behavior is approved.
-- Treat Phase 37A through 37F as an external-model
+- Treat Phase 37A through 37G as an external-model
   design/checklist/license/planning lane only. Kronos may be evaluated later as an offline
   diagnostic/ranking/context/confirmation layer, but no sandbox implementation,
   adapter implementation, model download, Hugging Face download, inference,
@@ -745,8 +746,8 @@ The following are future research directions, not accepted production rules:
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
 - Kronos offline diagnostic/ranking/context/confirmation evaluation, beginning
-  only with separately approved license-result, sandbox, adapter, or
-  tiny-smoke-test execution phases.
+  only with a filled Phase 37G approval block and separately approved
+  tiny-smoke-test execution phase.
 - Universe/regime segmentation research.
 - S2 risk model research.
 - Meta-ranking / capital allocation layer.

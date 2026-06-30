@@ -10,6 +10,10 @@ Kronos remains approved only for possible future offline diagnostic research.
 This plan prepares a future tiny smoke test only if the user explicitly
 approves execution later.
 
+Phase 37G adds the required user approval and exact execution checklist in
+`docs/03_research/external_model_kronos_execution_approval_checklist.md`.
+Phase 37H must not start until that approval block is filled and approved.
+
 ## 2. Purpose of the Future Tiny Smoke Test
 
 The future tiny smoke test should answer only:
@@ -302,6 +306,7 @@ Technical-only success:
 - User approves install.
 - User approves model/tokenizer download.
 - User approves exact model/tokenizer.
+- User approves exact model/tokenizer revisions.
 - User approves exact environment path.
 - User approves exact symbols/dates.
 - User approves abort limits.
@@ -309,6 +314,7 @@ Technical-only success:
 - User confirms no full Research200 run.
 - User confirms no production use.
 - User confirms no raw forecast trading.
+- User fills the Phase 37G approval block before any Phase 37H execution.
 
 ## 16. Phase Roadmap After 37F
 

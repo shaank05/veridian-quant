@@ -108,10 +108,13 @@ the sample is too small to approve scaling. Phase 37P selects
 `PROCEED_TO_37Q_OUTPUT_VALIDITY_POLICY_DESIGN`. Phase 37Q defines the
 output-validity policy in
 `docs/03_research/external_model_kronos_output_validity_policy.md` and selects
-`PROCEED_TO_37R_OUTPUT_VALIDITY_POLICY_IMPLEMENTATION`. No small diagnostic
-retry, further Kronos inference, full Research200 run, strategy integration,
-raw predicted-candle trading, training, fine-tuning, or production use is
-approved.
+`PROCEED_TO_37R_OUTPUT_VALIDITY_POLICY_IMPLEMENTATION`. Phase 37R implements
+reusable tracked policy helpers in
+`src/veridian_quant/v2/external_models/kronos/output_validity.py` with
+synthetic-data tests in `tests/v2/test_kronos_output_validity.py` and selects
+`PROCEED_TO_37S_POLICY_COMPLIANT_RETRY_DESIGN`. No small diagnostic retry,
+further Kronos inference, full Research200 run, strategy integration, raw
+predicted-candle trading, training, fine-tuning, or production use is approved.
 
 ---
 
@@ -594,6 +597,12 @@ Completed follow-up phases:
   diagnostics must exclude invalid forecast runs from signal metrics by
   default and implement explicit eval/decoding/validity audit requirements
   before any retry.
+- **Phase 37R:** Kronos output-validity policy helpers implemented in
+  `src/veridian_quant/v2/external_models/kronos/output_validity.py` and tested
+  with synthetic data in `tests/v2/test_kronos_output_validity.py`. No Kronos
+  inference, model loading, report generation, backtest, strategy logic change,
+  or cloned-repo modification is approved. Next selected gate:
+  `PROCEED_TO_37S_POLICY_COMPLIANT_RETRY_DESIGN`.
 
 Remaining planned follow-up phases:
 

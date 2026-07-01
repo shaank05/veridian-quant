@@ -235,6 +235,12 @@ Current status:
   forecast runs are excluded from signal-quality metrics, repair is
   visualization-only unless separately approved, and close-only mode requires a
   separate label/approval.
+- Phase 37R implements reusable Kronos output-validity helpers and
+  synthetic-data tests only. The helpers validate OHLC rows, summarize run and
+  aggregate validity, filter signal-metric-eligible diagnostics to valid runs,
+  and provide visualization-only OHLC repair while preserving raw outputs.
+  Phase 37R selects `PROCEED_TO_37S_POLICY_COMPLIANT_RETRY_DESIGN`; it does not
+  approve Kronos inference or diagnostic retry.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
 - After the approved Phase 37K small diagnostic, Phase 37N validity diagnostic,

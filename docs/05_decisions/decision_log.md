@@ -1365,3 +1365,30 @@ Consequence:
   production use, strategy integration, raw forecast trading, threshold tuning,
   best-seed/decoding cherry-picking, training, fine-tuning, model download,
   install, or Kronos repo modification.
+
+## 2026-07-01 - Implement Kronos Output Validity Policy Helpers Only
+
+Decision:
+
+Proceed with Phase 37R as implementation-only reusable output-validity policy
+helpers. Select `PROCEED_TO_37S_POLICY_COMPLIANT_RETRY_DESIGN`.
+
+Reason:
+
+Phase 37Q defined the policy, but it existed only in documentation. Future
+Kronos diagnostics need tracked helper behavior for OHLC validity, invalid-run
+exclusion, aggregate fail/warn/pass thresholds, and visualization-only repair
+before any retry can be designed.
+
+Consequence:
+
+- Add `src/veridian_quant/v2/external_models/kronos/output_validity.py`.
+- Add `tests/v2/test_kronos_output_validity.py`.
+- Validate forecast-path OHLC rows without mutating caller data.
+- Mark any forecast run with invalid OHLC as `INVALID_OUTPUT`.
+- Exclude invalid runs from signal-metric-eligible diagnostics by default.
+- Provide visualization-only repair fields while preserving raw forecast
+  columns.
+- Keep 37R policy/helper only: no Kronos inference, model loading, report
+  generation, backtest, strategy logic change, dependency installation,
+  cloned-repo modification, production use, or direct predicted-candle trading.

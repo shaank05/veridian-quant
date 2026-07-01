@@ -20,6 +20,18 @@ Reason: the policy below needs reusable implementation in the future Kronos
 helper/adapter layer before any small diagnostic retry. Phase 37Q does not
 approve that implementation or any inference.
 
+Phase 37R implementation update:
+
+- Reusable policy helpers were added in
+  `src/veridian_quant/v2/external_models/kronos/output_validity.py`.
+- Synthetic-data tests were added in
+  `tests/v2/test_kronos_output_validity.py`.
+- The implementation is policy/helper only. It does not run Kronos inference,
+  load models, modify the cloned Kronos repository, generate reports, run
+  backtests, or change strategy logic.
+- The next selected gated step is
+  `PROCEED_TO_37S_POLICY_COMPLIANT_RETRY_DESIGN`, not diagnostic execution.
+
 ## 2. Why 37Q Exists
 
 The Kronos lane is technically runnable, but output validity has repeatedly
@@ -318,6 +330,10 @@ Reason:
 Do not choose immediate execution. Do not proceed to a small diagnostic retry
 until the policy is implemented or a future phase explicitly approves a
 policy-compliant generated helper.
+
+Phase 37R implemented the reusable validity helpers and synthetic tests. The
+policy remains a gate: any future retry still requires a separate
+policy-compliant retry design and approval.
 
 ## 17. Anti-Misuse Guardrails
 

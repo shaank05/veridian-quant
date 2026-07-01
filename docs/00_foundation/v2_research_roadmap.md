@@ -100,10 +100,14 @@ Phase 37N executed that bounded diagnostic and confirmed invalid OHLC rows
 remained high: 16 / 90 rows = 17.78%, affecting 8 / 18 forecast runs. Phase
 37O documents the read-only adapter/output-validation debug design in
 `docs/03_research/external_model_kronos_adapter_output_validation_debug.md` and
-selects `PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION` as the next gated step. No
-small diagnostic retry, further Kronos inference, full Research200 run,
-strategy integration, raw predicted-candle trading, training, fine-tuning, or
-production use is approved.
+selects `PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION` as the next gated step. Phase
+37P executed the approved tiny adapter debug on HDFCBANK / `2024-01-15` only.
+It found invalid OHLC rows fell from 3 / 15 in the 37N-like baseline to 1 / 15
+with explicit eval mode and 0 / 15 with eval plus `top_k=1`, `top_p=1.0`, but
+the sample is too small to approve scaling. Phase 37P selects
+`PROCEED_TO_37Q_OUTPUT_VALIDITY_POLICY_DESIGN`. No small diagnostic retry,
+further Kronos inference, full Research200 run, strategy integration, raw
+predicted-candle trading, training, fine-tuning, or production use is approved.
 
 ---
 
@@ -576,6 +580,11 @@ Completed follow-up phases:
   `docs/03_research/external_model_kronos_adapter_output_validation_debug.md`.
   The lane remains blocked by invalid OHLC output validity; next gated decision
   is adapter debug execution, not diagnostic scaling.
+- **Phase 37P:** Approved tiny Kronos adapter debug execution completed in
+  `docs/03_research/external_model_kronos_adapter_debug_result.md`. Eval mode
+  and low-randomness decoding improved validity in the tiny sample, but
+  caller-side output-validity policy is still required before any diagnostic
+  retry.
 
 Remaining planned follow-up phases:
 

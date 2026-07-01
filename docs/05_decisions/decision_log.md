@@ -1302,3 +1302,33 @@ Consequence:
   allowed, exact files/scripts that may be edited, whether any new inference or
   output-validation-only rerun is allowed, symbols/dates/seeds/settings,
   runtime cap, and no-production/no-trading boundaries.
+
+---
+
+## 2026-07-01 - Execute Kronos Adapter Debug Only
+
+Decision:
+
+Record Phase 37P as the approved bounded adapter/output-validation debug
+execution. Select `PROCEED_TO_37Q_OUTPUT_VALIDITY_POLICY_DESIGN`.
+
+Reason:
+
+Phase 37P ran only the approved HDFCBANK / `2024-01-15` sample with 400-session
+lookback, 5-session horizon, three seeds, and three predeclared configurations.
+The 37N-like baseline produced 3 / 15 invalid OHLC rows = 20.000000%.
+Explicit eval mode reduced invalid rows to 1 / 15 = 6.666667%.
+Eval plus deterministic-ish `top_k=1`, `top_p=1.0` produced 0 / 15 invalid
+rows in this tiny sample. This shows API/decoding settings matter, but it does
+not prove output validity is solved across symbols/dates/seeds.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_adapter_debug_result.md`.
+- Keep generated outputs ignored under
+  `reports/v2/external_models/kronos/adapter_debug_20260701/`.
+- Proceed to output-validity policy design before any diagnostic retry.
+- Do not approve full Research200 inference, small diagnostic retry, production
+  use, strategy integration, raw forecast trading, threshold tuning,
+  best-seed/decoding cherry-picking, training, fine-tuning, model download,
+  install, or Kronos repo modification.

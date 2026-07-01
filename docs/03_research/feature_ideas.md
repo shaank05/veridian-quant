@@ -192,6 +192,7 @@ Phase 37B design reference:
 - `docs/03_research/external_model_kronos_reproducibility_validity_design.md`
 - `docs/03_research/external_model_kronos_reproducibility_validity_result.md`
 - `docs/03_research/external_model_kronos_adapter_output_validation_debug.md`
+- `docs/03_research/external_model_kronos_adapter_debug_result.md`
 
 Current status:
 
@@ -224,6 +225,10 @@ Current status:
   simple output-column swap, but identified missing explicit eval-mode usage in
   the Veridian helper scripts versus Kronos regression tests and found no
   built-in Kronos candle-validity guarantee or repair step.
+- Phase 37P executed the approved tiny adapter debug on HDFCBANK /
+  `2024-01-15`: baseline 37N-like output had 3 / 15 invalid rows, explicit
+  eval had 1 / 15, and eval plus `top_k=1`, `top_p=1.0` had 0 / 15. This is an
+  output-validity/API finding only and does not approve signal-quality retry.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
 - After the approved Phase 37K small diagnostic, Phase 37N validity diagnostic,
@@ -263,6 +268,8 @@ Safety rules:
   unexplained.
 - Do not run another signal-quality diagnostic until adapter/API usage and the
   output-validity policy are explicitly debugged.
+- Do not treat the 37P deterministic tiny-sample zero-invalid result as enough
+  evidence for Research200 or small diagnostic retry.
 - Do not cherry-pick the best seed or decoding setting after results.
 - Do not download model/tokenizer weights before license/model-card review and
   explicit user approval.

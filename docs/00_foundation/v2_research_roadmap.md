@@ -118,7 +118,13 @@ policy-compliant small diagnostic retry design in
 selects `PROCEED_TO_37T_POLICY_COMPLIANT_RETRY_APPROVAL`. No small diagnostic
 retry, further Kronos inference, full Research200 run, strategy integration,
 raw predicted-candle trading, training, fine-tuning, or production use is
-approved.
+approved. Phase 37T later executed the approved policy-compliant retry and
+records the result in
+`docs/03_research/external_model_kronos_policy_compliant_retry_result.md`: 30 /
+30 runs completed, but output validity failed with 3 / 30 invalid forecast runs
+and 4 / 150 invalid path rows. Validity-gated signal metrics remained
+weak/negative, and the selected next step is
+`PROCEED_TO_37U_POLICY_RETRY_RESULT_SCRUTINY`.
 
 ---
 
@@ -614,6 +620,13 @@ Completed follow-up phases:
   decoding, and the 37R output-validity helpers; invalid forecast runs remain
   excluded from signal metrics. Next selected gate:
   `PROCEED_TO_37T_POLICY_COMPLIANT_RETRY_APPROVAL`.
+- **Phase 37T:** Approved policy-compliant `Kronos-small` retry executed and
+  documented in
+  `docs/03_research/external_model_kronos_policy_compliant_retry_result.md`.
+  The run completed 30 / 30 forecasts, but 3 / 30 forecast runs were invalid
+  and output validity failed under the 37Q run-rate threshold. Validity-gated
+  metrics on 27 valid runs remained weak/negative. Next selected gate:
+  `PROCEED_TO_37U_POLICY_RETRY_RESULT_SCRUTINY`.
 
 Remaining planned follow-up phases:
 

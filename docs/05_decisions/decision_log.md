@@ -1427,3 +1427,40 @@ Consequence:
   strategy integration, raw predicted-candle trading, threshold tuning,
   best-seed/decoding cherry-picking, training, fine-tuning, generated report
   commits, or cloned Kronos repo modification.
+
+---
+
+## 2026-07-01 - Execute Kronos Policy-Compliant Retry Only
+
+Decision:
+
+Record Phase 37T as the approved bounded policy-compliant `Kronos-small` retry
+execution. Select `PROCEED_TO_37U_POLICY_RETRY_RESULT_SCRUTINY`.
+
+Reason:
+
+The approved 37T retry completed 30 / 30 forecasts using explicit eval,
+deterministic-ish decoding (`top_k=1`, `top_p=1.0`), seed `42`, and the 37R
+output-validity helper. Output validity failed under the 37Q policy: 3 / 30
+forecast runs were invalid = 10.00%, and 4 / 150 path rows were invalid =
+2.666667%. The invalid forecast-run rate exceeded the 5% failure threshold.
+Validity-gated signal metrics on 27 valid runs remained weak/negative:
+directional accuracy was 11 / 27 = 40.740741%, Spearman rank IC was
+-0.199634, top1-minus-bottom1 spread was -0.039897, and top2-minus-bottom2
+spread was -0.013160.
+
+Consequence:
+
+- Add
+  `docs/03_research/external_model_kronos_policy_compliant_retry_result.md`.
+- Keep generated outputs ignored under
+  `reports/v2/external_models/kronos/policy_retry_20260701/`.
+- Preserve invalid forecast runs in validity summaries and exclude them from
+  signal metrics.
+- Do not claim direct improvement versus 37K without caveating the changed
+  eval/decoding policy.
+- Do not proceed to a larger diagnostic before 37U scrutiny.
+- Do not approve full Research200, `Kronos-base`, production use, strategy
+  integration, raw predicted-candle trading, threshold tuning, best-seed or
+  best-decoding selection, training, fine-tuning, generated report commits, or
+  cloned Kronos repo modification.

@@ -16,6 +16,12 @@ Reason: invalid OHLC rows remained high and unexplained: 16 / 90 forecast path
 rows = 17.777778%, affecting 8 / 18 forecast runs and appearing across both
 symbols, all three dates, and all three seeds.
 
+Phase 37O follow-up:
+`docs/03_research/external_model_kronos_adapter_output_validation_debug.md`
+inspects the Veridian helper scripts, local generated schemas, and Kronos
+source/examples. It keeps the lane blocked and selects
+`PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION`, not a small diagnostic retry.
+
 ## Output Folder
 
 - `reports/v2/external_models/kronos/repro_validity_20260701/`
@@ -230,6 +236,13 @@ inspect the output construction and validation boundary: Kronos predicted
 candle ordering, de-normalization behavior, OHLC repair/rejection policy,
 whether invalid generated rows should invalidate a forecast run, and how to
 record invalid-row handling before any further signal-quality experiment.
+
+Phase 37O completed that read-only inspection. It found no simple column-order
+swap and no Veridian-side de-normalization step, but did find a concrete
+adapter/API concern: the 37K/37N helper scripts did not explicitly call
+`tokenizer.eval()` or `model.eval()`, while Kronos' regression tests do. It also
+found no built-in Kronos OHLC repair or candle-validity guarantee. The next
+step remains adapter/output-validation debug only.
 
 No full Research200 run, production use, strategy integration, raw forecast
 trading, threshold tuning, best-seed selection, decoding cherry-picking, or

@@ -14,6 +14,13 @@ Phase 37M is design-only.
 
 Phase 37M designs a future reproducibility/output-validity diagnostic only.
 
+Phase 37N later executed that diagnostic and confirmed invalid OHLC rows
+remained high. Phase 37O therefore performs read-only adapter/output-validation
+inspection in
+`docs/03_research/external_model_kronos_adapter_output_validation_debug.md`.
+No diagnostic retry is approved until the adapter/API usage and output-validity
+policy are debugged.
+
 ## 2. Why This Phase Exists
 
 Phase 37K completed 30 / 30 approved `Kronos-small` forecast points on CPU.
@@ -297,6 +304,11 @@ Future execution review should choose one:
 
 Do not proceed to a larger diagnostic until output validity and reproducibility
 are acceptable.
+
+37N chose `FIX_ADAPTER_OR_OUTPUT_VALIDATION`. 37O follows up with a debug
+design and selects `PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION` because the cause is
+not fully proven and because explicit eval-mode/API usage plus caller-side
+validity policy need to be tested before any signal-quality retry.
 
 ## 18. Approval Requirements Before Future Execution
 

@@ -498,8 +498,12 @@ scrutinized the result: 30 / 30 forecasts completed, directional accuracy was
 -0.043511, top2-minus-bottom2 spread was -0.010859, and 17 / 150 forecast path
 rows had invalid OHLC relationships. Phase 37M therefore adds a design-only
 stochastic reproducibility/output-validity gate before any broader diagnostic.
-The hypothesis is still not accepted or rejected permanently; invalid output
-rows, seed stability, and rank stability must be understood first.
+Phase 37N executed that gate and still found 16 / 90 invalid OHLC rows =
+17.78%, affecting 8 / 18 forecast runs. Phase 37O documents adapter/output
+validation debug design and selects a gated adapter debug execution as the next
+step. The hypothesis is still not accepted or rejected permanently; invalid
+output rows, seed stability, rank stability, API usage, and caller-side
+validity policy must be understood first.
 
 ## Expected Research Value
 
@@ -573,6 +577,11 @@ Phase 37M adds a further gate after the weak/negative Phase 37K/37L result and
 best-seed selection, decoding cherry-picking, production use, or strategy use
 is appropriate until output validity and stochastic reproducibility are
 acceptable under a separately approved tiny follow-up.
+
+Phase 37O updates that gate after 37N: invalid OHLC remained high, so no
+signal-quality retry is appropriate until adapter/API usage and output
+validation policy are debugged. In particular, "repair candles and continue" is
+not an approved trading or alpha-evaluation path.
 
 ## FFT / Wavelet Entry
 

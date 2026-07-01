@@ -48,6 +48,12 @@ adds a stochastic reproducibility/output-validity diagnostic design in
 This adds an explicit validity/reproducibility gate before any larger
 diagnostic, Research200 expansion, or strategy-adjacent use.
 
+Phase 37N later confirmed invalid OHLC rows remained high. Phase 37O documents
+read-only adapter/output-validation inspection in
+`docs/03_research/external_model_kronos_adapter_output_validation_debug.md` and
+keeps signal-quality diagnostics blocked pending adapter/API debug and a
+predeclared output-validity policy.
+
 ## 2. Why This Lane Exists
 
 S1-S5 are retained as benchmarks only. The Phase 35 ensemble and confirmation
@@ -184,6 +190,8 @@ Evidence that could justify moving past design:
   regime.
 - Valid forecast paths with low or explainable invalid OHLC rates.
 - Stable enough repeated-seed direction/rank/return outputs for diagnostic use.
+- Explicit inference-mode/API usage checks and caller-side output-validity
+  handling before signal diagnostics.
 - Manageable compute cost on a small smoke test.
 - Deterministic and reproducible enough under fixed seed/settings.
 

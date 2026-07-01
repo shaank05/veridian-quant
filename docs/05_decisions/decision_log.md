@@ -1266,3 +1266,39 @@ Consequence:
 - Phase 37N must begin with explicit user approval for exact symbols, dates,
   seed list, decoding settings, output folder, runtime limit, and no-production
   / no-trading boundaries.
+
+---
+
+## 2026-07-01 - Design Kronos Adapter / Output Validation Debug Only
+
+Decision:
+
+Proceed with Phase 37O as read-only adapter/output-validation inspection and
+debug design. Select `PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION`.
+
+Reason:
+
+Phase 37N confirmed that invalid OHLC rows remained high and unexplained:
+16 / 90 forecast path rows = 17.777778%, affecting 8 / 18 forecast runs and
+appearing across both symbols, all three dates, and all three seeds. Phase 37O
+inspected the generated Veridian helper scripts, generated forecast schemas,
+and local Kronos source/examples/tests without running inference. The inspection
+found no simple output-column swap and no Veridian-side de-normalization step,
+but it did identify a concrete adapter/API concern: the 37K/37N helper scripts
+did not explicitly call `tokenizer.eval()` or `model.eval()`, while Kronos'
+regression tests do. Kronos also returns decoded OHLC directly and no built-in
+OHLC repair or candle-validity guarantee was found.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_adapter_output_validation_debug.md`.
+- Keep Kronos blocked by output validity.
+- Do not approve a small diagnostic retry.
+- Do not approve full Research200 inference.
+- Do not approve production use, strategy integration, raw forecast trading,
+  threshold tuning, best-seed selection, decoding cherry-picking, training,
+  fine-tuning, model download, install, or Kronos repo modification.
+- A future Phase 37P must receive explicit approval for whether execution is
+  allowed, exact files/scripts that may be edited, whether any new inference or
+  output-validation-only rerun is allowed, symbols/dates/seeds/settings,
+  runtime cap, and no-production/no-trading boundaries.

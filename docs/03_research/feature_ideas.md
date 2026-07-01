@@ -190,6 +190,8 @@ Phase 37B design reference:
 - `docs/03_research/external_model_kronos_small_diagnostic_experiment_design.md`
 - `docs/03_research/external_model_kronos_small_diagnostic_result.md`
 - `docs/03_research/external_model_kronos_reproducibility_validity_design.md`
+- `docs/03_research/external_model_kronos_reproducibility_validity_result.md`
+- `docs/03_research/external_model_kronos_adapter_output_validation_debug.md`
 
 Current status:
 
@@ -216,9 +218,16 @@ Current status:
 - Phase 37M is docs-only reproducibility/output-validity design. It pauses
   broader diagnostics until invalid OHLC rows and seed/rank stability are
   tested in a separately approved small run.
+- Phase 37N executed that bounded run and confirmed invalid OHLC rows remained
+  high: 16 / 90 = 17.78%, affecting 8 / 18 forecast runs.
+- Phase 37O is read-only adapter/output-validation debug design. It found no
+  simple output-column swap, but identified missing explicit eval-mode usage in
+  the Veridian helper scripts versus Kronos regression tests and found no
+  built-in Kronos candle-validity guarantee or repair step.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
-- After the approved Phase 37K small diagnostic and Phase 37L scrutiny, no
+- After the approved Phase 37K small diagnostic, Phase 37N validity diagnostic,
+  and Phase 37O debug design, no
   additional installation, model download, Hugging Face download, inference,
   sandbox, training, fine-tuning, adapter implementation, dependency merge,
   strategy logic, or backtest logic is approved.
@@ -252,6 +261,8 @@ Safety rules:
   must be small, isolated, and separately approved.
 - Do not scale beyond the small diagnostic while invalid OHLC rows remain
   unexplained.
+- Do not run another signal-quality diagnostic until adapter/API usage and the
+  output-validity policy are explicitly debugged.
 - Do not cherry-pick the best seed or decoding setting after results.
 - Do not download model/tokenizer weights before license/model-card review and
   explicit user approval.

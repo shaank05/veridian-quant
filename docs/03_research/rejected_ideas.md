@@ -71,6 +71,12 @@ later phases still do not approve broader inference, full Research200
 execution, production use, raw forecast trading, threshold tuning, strategy
 integration, or best-seed/decoding cherry-picking.
 
+Phase 37N executed the bounded reproducibility/output-validity diagnostic and
+confirmed invalid OHLC rows remained high. Phase 37O then inspected Veridian
+helper scripts, local generated output schemas, and Kronos source/examples in
+read-only mode. It keeps the lane blocked and selects adapter/output-validation
+debug as the next gated step.
+
 Rejected or not approved:
 
 - Raw predicted-candle execution.
@@ -103,6 +109,11 @@ Rejected or not approved:
   PnL, rank IC, or invalid-row rates.
 - Filtering out invalid forecast rows and then treating the remaining rows as
   strategy evidence without a predeclared validity policy.
+- Scaling, retrying signal diagnostics, or running Research200 while invalid
+  OHLC output validity remains unresolved.
+- Repairing generated OHLC rows and then trading or evaluating alpha from the
+  repaired candles without a separately approved, non-leaky policy.
+- Treating visualization-only repaired candles as canonical model output.
 
 Reason:
 

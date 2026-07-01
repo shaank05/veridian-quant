@@ -6,6 +6,9 @@ Phase 37K executed the approved small offline Kronos diagnostic on July 1, 2026.
 Phase 37L later scrutinized the output and selected `REDESIGN_SMALL_DIAGNOSTIC`.
 Phase 37M now designs a stochastic reproducibility/output-validity diagnostic
 before any broader Kronos inference.
+Phase 37N executed that bounded follow-up and found invalid OHLC rows remained
+high; Phase 37O records the adapter/output-validation debug design in
+`docs/03_research/external_model_kronos_adapter_output_validation_debug.md`.
 
 This was not a trading backtest. It did not create strategy rules, tune
 thresholds, or approve production use. Generated outputs remain ignored under
@@ -214,8 +217,11 @@ Phase 37L review decision: `REDESIGN_SMALL_DIAGNOSTIC`.
 Phase 37M next-design decision:
 `PROCEED_TO_37N_REPRO_VALIDITY_EXECUTION_APPROVAL`.
 
+Phase 37N result decision: `FIX_ADAPTER_OR_OUTPUT_VALIDATION`.
+Phase 37O debug-design decision: `PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION`.
+
 This does not approve execution. It only records that the next useful Kronos
-step should be a small, separately approved stochastic reproducibility and
-output-validity diagnostic. No full Research200 run, strategy integration,
-production use, raw forecast trading, threshold tuning, or best-seed/decoding
-cherry-picking is approved.
+step should be an adapter/output-validation debug phase, not a small diagnostic
+retry. No full Research200 run, strategy integration, production use, raw
+forecast trading, threshold tuning, or best-seed/decoding cherry-picking is
+approved.

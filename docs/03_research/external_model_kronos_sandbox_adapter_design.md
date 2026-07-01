@@ -18,6 +18,13 @@ Phase 37F defines exact tiny smoke-test execution limits in
 `docs/03_research/external_model_kronos_tiny_smoke_test_implementation_plan.md`.
 It remains planning-only and does not implement the sandbox or adapter.
 
+Later update: 37K/37N execution exposed persistent invalid OHLC forecast rows.
+Phase 37O adds the adapter/output-validation debug design in
+`docs/03_research/external_model_kronos_adapter_output_validation_debug.md`.
+Any future sandbox/helper script must include an explicit output-validity gate,
+record model/tokenizer eval-mode state, and avoid writing repaired candles as
+canonical signal evidence.
+
 ## 2. Why a Separate Sandbox Is Required
 
 Kronos has heavy ML dependencies such as PyTorch, Hugging Face tooling, and
@@ -168,6 +175,11 @@ Recommended metadata:
 
 Future Kronos outputs should join back to Veridian by `symbol` and
 `inference_date`.
+
+Before any join is used for signal-quality diagnostics, forecast paths must
+pass or explicitly fail an output-validity gate. Invalid rows, invalid reasons,
+and the chosen reject/flag/repair-for-visualization policy must be recorded
+before any downstream rank, direction, context, or trade-overlay interpretation.
 
 Evaluation rules:
 

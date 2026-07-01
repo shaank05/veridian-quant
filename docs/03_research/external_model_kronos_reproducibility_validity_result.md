@@ -259,3 +259,8 @@ step remains adapter/output-validation debug only.
 No full Research200 run, production use, strategy integration, raw forecast
 trading, threshold tuning, best-seed selection, decoding cherry-picking, or
 fine-tuning is approved.
+
+Phase 37W final closeout: the Kronos lane is closed for now with
+`DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`. Review upstream repo/issues/model
+cards every two months for maturity, fixes, output-validity/reproducibility
+improvements, and prediction-quality evidence before any reopening.

@@ -1464,3 +1464,46 @@ Consequence:
   integration, raw predicted-candle trading, threshold tuning, best-seed or
   best-decoding selection, training, fine-tuning, generated report commits, or
   cloned Kronos repo modification.
+
+---
+
+## 2026-07-01 - Close Out Kronos Lane With Bi-Monthly Upstream Review
+
+Decision:
+
+Close the Kronos external-model lane for now with
+`DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`.
+
+Reason:
+
+Internal diagnostics failed both output-validity and signal-quality gates.
+Phase 37K had 17 / 150 invalid OHLC rows = 11.33%. Phase 37N had 16 / 90
+invalid OHLC rows = 17.78%, affecting 8 / 18 forecast runs. Phase 37T still
+failed the 37Q policy under eval plus deterministic-ish decoding: 3 / 30
+forecast runs were invalid = 10.00%, 4 / 150 path rows were invalid =
+2.666667%, and output validity status was `OUTPUT_VALIDITY_FAILED`.
+Validity-gated signal metrics remained weak/negative: 11 / 27 directional
+accuracy = 40.740741%, rank IC = -0.199634, top1 spread = -0.039897, and top2
+spread = -0.013160.
+
+Phase 37V public evidence review found no direct public invalid-OHLC issue, no
+maintainer-confirmed fix, no official OHLC guarantee, no official repair
+guidance, and no confirmed workaround. Broader public generation-quality /
+reproducibility concerns exist, including #229 implausible generated data, #319
+A-share MAPE/quality concern, #156 long-horizon concern, and #184 CPU/GPU
+output mismatch.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_closeout.md`.
+- Close the lane for now; do not continue local inference.
+- Do not patch local Kronos now.
+- Do not use Kronos in strategy logic.
+- Do not scale to Research200.
+- Do not use raw predicted candles.
+- Review upstream Kronos repo/issues/model cards every two months for maturity,
+  fixes, output-validity/reproducibility improvement, CPU/GPU mismatch
+  clarification, model/tokenizer revisions, and prediction-quality evidence.
+- Reopen only after concrete upstream improvement or explicit user approval for
+  a new design such as upstream fix validation, close-only diagnostic,
+  patched-Kronos experiment, or new model revision smoke test.

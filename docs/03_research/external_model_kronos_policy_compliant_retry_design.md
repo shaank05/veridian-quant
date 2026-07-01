@@ -18,6 +18,12 @@ Recommended next phase:
 Phase 37T is an approval gate first. Execution may happen only after explicit
 user approval. Phase 37S does not start immediate inference.
 
+Later closeout update: Phase 37T executed the approved retry, Phase 37U/37V
+supported closeout, and Phase 37W records
+`DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW` in
+`docs/03_research/external_model_kronos_closeout.md`. This design remains
+historical; no further local Kronos inference is approved.
+
 ## 2. Why 37S Exists
 
 Prior Kronos diagnostics found weak/negative signal evidence and repeated
@@ -269,3 +275,7 @@ approval. No immediate inference follows from 37S.
 - No generated report/model-weight commits.
 - No fine-tuning/training.
 - No direct comparison versus 37K without caveating the decoding-policy change.
+
+Phase 37W closeout keeps these guardrails active and adds: no local patch now,
+no Research200 scaling, and only bi-monthly upstream maturity review unless a
+separate reopening condition is met.

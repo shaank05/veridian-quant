@@ -195,6 +195,8 @@ Phase 37B design reference:
 - `docs/03_research/external_model_kronos_adapter_debug_result.md`
 - `docs/03_research/external_model_kronos_output_validity_policy.md`
 - `docs/03_research/external_model_kronos_policy_compliant_retry_design.md`
+- `docs/03_research/external_model_kronos_policy_compliant_retry_result.md`
+- `docs/03_research/external_model_kronos_closeout.md`
 
 Current status:
 
@@ -247,6 +249,14 @@ Current status:
   explicit eval when supported, deterministic-ish decoding, and 37R
   output-validity gating. It selects
   `PROCEED_TO_37T_POLICY_COMPLIANT_RETRY_APPROVAL`; no inference is approved.
+- Phase 37T executed the approved policy-compliant retry. It completed 30 / 30
+  forecasts, but output validity failed: 3 / 30 invalid forecast runs =
+  10.00%, and validity-gated metrics on 27 valid runs stayed weak/negative.
+- Phase 37W closes the lane for now with
+  `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`. Keep only a bi-monthly upstream
+  repo/issues/model-card maturity review. No local patch, further local
+  inference, Research200 scaling, strategy integration, production use, or raw
+  predicted-candle trading is approved.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
 - After the approved Phase 37K small diagnostic, Phase 37N validity diagnostic,
@@ -288,9 +298,10 @@ Safety rules:
   output-validity policy are explicitly debugged.
 - Do not treat the 37P deterministic tiny-sample zero-invalid result as enough
   evidence for Research200 or small diagnostic retry.
-- Do not run a policy-compliant retry without explicit 37T approval for sample,
-  decoding, seed, output folder, runtime cap, and no-production/no-trading
-  boundaries.
+- Do not reopen Kronos merely because time passed; require concrete upstream
+  improvement or explicit user approval for a new design.
+- Do not patch local Kronos now; any patched-Kronos experiment would need a
+  separate branch, separate approval, and separate evidence bucket.
 - Do not filter invalid outputs to create apparent alpha; invalid-run
   exclusion is an output-validity rule, not a return-improvement rule.
 - Do not cherry-pick the best seed or decoding setting after results.

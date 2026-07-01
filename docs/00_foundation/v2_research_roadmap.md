@@ -124,7 +124,13 @@ records the result in
 30 runs completed, but output validity failed with 3 / 30 invalid forecast runs
 and 4 / 150 invalid path rows. Validity-gated signal metrics remained
 weak/negative, and the selected next step is
-`PROCEED_TO_37U_POLICY_RETRY_RESULT_SCRUTINY`.
+`PROCEED_TO_37U_POLICY_RETRY_RESULT_SCRUTINY`. Phase 37U scrutiny and Phase
+37V public evidence review supported closeout: no direct public invalid-OHLC
+fix, no official OHLC guarantee, no official repair guidance, and broader
+generation-quality/reproducibility concerns, including CPU/GPU output mismatch.
+Phase 37W closes the lane in
+`docs/03_research/external_model_kronos_closeout.md` with
+`DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`.
 
 ---
 
@@ -627,6 +633,13 @@ Completed follow-up phases:
   and output validity failed under the 37Q run-rate threshold. Validity-gated
   metrics on 27 valid runs remained weak/negative. Next selected gate:
   `PROCEED_TO_37U_POLICY_RETRY_RESULT_SCRUTINY`.
+- **Phase 37W:** Kronos lane closeout completed in
+  `docs/03_research/external_model_kronos_closeout.md`. Final verdict:
+  `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`. No further Kronos inference,
+  local patch, Research200 scaling, strategy integration, production use, or
+  raw predicted-candle trading is approved. Review upstream repo/issues/model
+  cards every two months for maturity, fixes, prediction-quality evidence, and
+  output-validity/reproducibility improvements before any reopening.
 
 Remaining planned follow-up phases:
 
@@ -776,15 +789,15 @@ Next direction:
   No risk model, VIX rule, liquidity filter, drawdown throttle, rolling-R
   threshold, benchmark-regime filter, gap filter, dynamic sizing change, or
   production behavior is approved.
-- Treat Phase 37A through 37M as a controlled external-model research lane.
-  Kronos may be evaluated later as an offline diagnostic/ranking/context/
-  confirmation layer, but after the approved Phase 37K small diagnostic and
-  Phase 37L scrutiny, broader diagnostics are paused until output validity and
-  stochastic reproducibility are tested through a separately approved 37N-style
-  reproducibility/validity run. No additional sandbox implementation, adapter
-  implementation, model download, Hugging Face download, inference, direct
-  strategy use, raw predicted-candle execution, production use, or dependency
-  merge is approved.
+- Treat Phase 37A through 37W as a closed external-model research lane for
+  Kronos. Final verdict:
+  `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`. No further local Kronos
+  inference, local patch, Research200 scaling, strategy integration,
+  production use, raw predicted-candle execution, or dependency merge is
+  approved. Review upstream repo/issues/model cards every two months and reopen
+  only after concrete upstream maturity, output-validity/reproducibility
+  improvement, prediction-quality evidence, or explicit user approval for a
+  new design.
 - Close the simple S2 context-filter branch. Do not continue with threshold
   fishing, filter stacking, or another minor benchmark/relative/sector context
   tweak. Company fundamentals are now ingested and audited as research context,
@@ -823,10 +836,9 @@ The following are future research directions, not accepted production rules:
   pre-registered.
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
-- Kronos offline diagnostic/ranking/context/confirmation evaluation, paused
-  after Phase 37K/37L until a separately approved Phase 37N-style stochastic
-  reproducibility/output-validity diagnostic addresses invalid OHLC rows and
-  ranking stability.
+- Kronos offline diagnostic/ranking/context/confirmation evaluation is closed
+  for now after Phase 37W. Maintain only a bi-monthly upstream review note;
+  reopen only under the documented 37W revisit conditions.
 - Universe/regime segmentation research.
 - S2 risk model research.
 - Meta-ranking / capital allocation layer.

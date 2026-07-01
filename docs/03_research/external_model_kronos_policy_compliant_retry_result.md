@@ -19,6 +19,13 @@ raw predicted-candle trading, threshold tuning, training, fine-tuning, or a
 larger diagnostic. Do not claim direct improvement versus 37K without caveating
 the eval/decoding-policy change.
 
+Later closeout update: Phase 37U scrutiny supported closeout, and Phase 37V
+public evidence review found no direct invalid-OHLC issue/fix, no official OHLC
+guarantee, no official repair guidance, and broader generation-quality /
+reproducibility concerns including CPU/GPU output mismatch. Phase 37W closes the
+lane with `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`; no further local Kronos
+inference or local patch is approved.
+
 ## Output Folder
 
 Generated output folder:
@@ -276,3 +283,8 @@ Do not proceed to a larger diagnostic before 37U scrutiny. The immediate next
 step should review output validity failure, invalid-run concentration, metric
 eligibility, and weak/negative validity-gated signal metrics before deciding
 whether to revise policy/debug, park Kronos, or design any further diagnostic.
+
+Phase 37W final update: `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`. Review
+upstream repo/issues/model cards every two months; do not continue local
+inference, patch local Kronos, scale to Research200, or use Kronos in strategy
+logic.

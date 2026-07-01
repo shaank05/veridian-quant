@@ -508,7 +508,11 @@ rank stability, API usage, and caller-side validity policy must be understood
 and implemented first. Phase 37R implemented reusable output-validity helpers,
 and Phase 37S designs a policy-compliant 30-run retry only; future execution
 requires explicit 37T approval and direct comparison with 37K must be caveated
-because decoding policy changes.
+because decoding policy changes. Phase 37T completed that retry but failed
+output validity and retained weak/negative validity-gated metrics. Phase 37W
+closes the lane for now with `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`; review
+upstream every two months for maturity, fixes, CPU/GPU reproducibility
+clarification, output-validity improvements, and prediction-quality evidence.
 
 ## Expected Research Value
 
@@ -593,7 +597,9 @@ signal-quality metrics by default, repair is visualization-only unless
 separately approved, and close-only diagnostics require a separate labeled mode.
 Phase 37S allows only a future approval-gated, policy-compliant retry design;
 it does not approve inference, Research200, strategy integration, or raw
-predicted-candle trading.
+predicted-candle trading. Phase 37W closes Kronos for now; no local patch,
+further local inference, Research200 scaling, strategy integration, production
+use, or raw predicted-candle trading is approved.
 
 ## FFT / Wavelet Entry
 

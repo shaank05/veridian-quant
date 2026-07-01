@@ -242,3 +242,9 @@ output-validity gating. No immediate retry is approved from this result.
 No full Research200 run, production use, strategy integration, raw forecast
 trading, threshold tuning, best-seed selection, decoding cherry-picking,
 fine-tuning, or training is approved.
+
+Phase 37W final closeout: the Kronos lane is closed for now with
+`DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`. The 37P eval/decoding finding remains
+historical and did not mature into a reliable fix. No local patch, further
+local inference, Research200 scaling, strategy integration, production use, or
+raw predicted-candle trading is approved.

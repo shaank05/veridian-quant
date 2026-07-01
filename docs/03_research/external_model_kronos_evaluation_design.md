@@ -290,6 +290,11 @@ but it does not approve execution.
 Phase 37S is now documented in
 `docs/03_research/external_model_kronos_policy_compliant_retry_design.md`, but
 it does not approve execution.
+Phase 37W is now documented in
+`docs/03_research/external_model_kronos_closeout.md`. It closes the Kronos lane
+for now with `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW` and permits only
+bi-monthly upstream maturity review unless a separate reopening condition is
+met.
 
 ## 14. Decision
 
@@ -302,7 +307,10 @@ Next approved action after these docs can be one of:
 - Perform model-weight/license verification.
 - Prepare a tiny smoke-test plan.
 
-No execution is approved by this document.
+No execution is approved by this document. After Phase 37W, the Kronos lane is
+closed for now; no further local Kronos inference, local patch, Research200
+scaling, strategy integration, production use, or raw predicted-candle trading
+is approved.
 
 ## 15. Anti-Overfitting Guardrails
 

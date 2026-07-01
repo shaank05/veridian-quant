@@ -237,3 +237,9 @@ Later update: any future retry must be policy-compliant, must use explicit eval
 when supported and deterministic-ish decoding, and must exclude invalid forecast
 runs from signal metrics using the 37R output-validity helpers. Direct
 comparison against 37K must be caveated because the decoding policy changes.
+
+Phase 37W final closeout: after the policy-compliant retry and public evidence
+review, the Kronos lane is closed for now with
+`DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`. No further local inference, local
+patch, Research200 scaling, strategy integration, production use, or raw
+predicted-candle trading is approved.

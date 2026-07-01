@@ -17,7 +17,7 @@ No strategy is production-approved.
 - S5: `docs/02_audits/s5_audit.md`
 - Cross-strategy overlap / confirmation: `docs/02_audits/cross_strategy_overlap_audit.md`
 - Cross-strategy risk diagnostics: `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`
-- Kronos external-model evaluation design: `docs/03_research/external_model_kronos_evaluation_design.md`
+- Kronos external-model closeout: `docs/03_research/external_model_kronos_closeout.md`
 
 ---
 
@@ -41,7 +41,7 @@ No strategy is production-approved.
 | Benchmark/sector/cap context layer | Phase 33F.3 context audit documented | Yes | Diagnostic audit only | Retained S1-S5 trade PnL logs audited; S2 remains strongest; no context filter or strategy promotion approved |
 | Cross-strategy voting / confirmation ensemble | Phase 35B/35C closed | No | Diagnostic audit only | Broad voting and generic 2+ consensus dropped; S2/S4 retained only as a parked diagnostic observation |
 | Cross-strategy risk diagnostics | Phase 36B/36C closed | No | Diagnostic audit only | Liquidity retained as strongest S2 diagnostic; VIX retained only as secondary context; no risk model, filter, throttle, sizing change, or production approval |
-| Kronos external-model lane | Phase 37B design only | No | No | Future offline diagnostic/ranking/context/confirmation evaluation only; no install, model download, inference, raw candle execution, strategy use, or dependency merge approved |
+| Kronos external-model lane | Closed after Phase 37W | No | Diagnostic only | `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`; no further local inference, local patch, Research200 scaling, raw candle execution, strategy use, production use, or dependency merge approved |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
 | S1 ranking v2 | Future research / parked | No | No | Deferred until stronger evidence exists |
@@ -118,25 +118,35 @@ First-pass variant decisions:
 
 ## Current Benchmark Evidence
 
-### Phase 37B Kronos External-Model Design Lane
+### Phase 37W Kronos External-Model Closeout
 
-Phase 37B created a design note for possible future Kronos evaluation as an
-offline diagnostic/ranking/context/confirmation layer. This lane is separate
-from retained S1-S5 benchmarks and does not approve any strategy.
+Phase 37A through 37W evaluated Kronos only as an offline
+diagnostic/ranking/context candidate. The lane is separate from retained S1-S5
+benchmarks and does not approve any strategy.
 
 Decision:
 
-- No Kronos installation.
-- No dependency merge into Veridian core.
-- No model download.
-- No inference, notebooks, web UI, training, or fine-tuning.
+- Final verdict: `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`.
+- No further local Kronos inference.
+- No local Kronos patch now.
+- No Research200 scaling.
 - No raw predicted-candle execution.
-- No strategy logic, backtest logic, runner, adapter, report, or production
-  behavior change.
+- No strategy logic, backtest logic, runner, adapter, or production behavior
+  change.
+- No dependency merge into Veridian core.
 
-The external-model lane may proceed only through separately approved future
-steps such as sandbox design, model-weight/license verification, or a tiny
-predeclared smoke-test plan.
+Reason:
+
+- 37K had 17 / 150 invalid OHLC rows = 11.33%.
+- 37N had 16 / 90 invalid OHLC rows = 17.78%.
+- 37T still failed output validity with 3 / 30 invalid forecast runs = 10.00%.
+- 37T validity-gated rank IC and top/bottom spreads remained negative.
+- Public evidence review found no direct invalid-OHLC fix, no official OHLC
+  guarantee, no official repair guidance, and broader generation-quality /
+  reproducibility concerns including CPU/GPU output mismatch.
+
+Continue only a bi-monthly upstream repo/issues/model-card maturity review
+unless a new approved design reopens the lane.
 
 ### Phase 36B/36C Risk Diagnostic Closeout
 

@@ -86,6 +86,13 @@ Phase 37R implements reusable output-validity helpers, and Phase 37S designs a
 policy-compliant retry only. They do not approve inference. Phase 37T approval
 is required before any retry execution.
 
+Phase 37T executed the approved policy-compliant retry, but output validity
+failed and validity-gated metrics remained weak/negative. Phase 37V found no
+direct public invalid-OHLC fix, no official OHLC guarantee, no official repair
+guidance, and broader generation-quality/reproducibility concerns including a
+CPU/GPU output mismatch issue. Phase 37W closes the lane for now with
+`DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`.
+
 Rejected or not approved:
 
 - Raw predicted-candle execution.
@@ -119,6 +126,11 @@ Rejected or not approved:
   enforce output-validity policy.
 - Claiming a direct 37K-versus-retry improvement without caveating the changed
   eval/decoding policy.
+- Local Kronos patching now.
+- Repair-and-trade.
+- Research200 scaling without concrete upstream maturity/output-validity
+  improvement and separate approval.
+- Reopening Kronos merely because time passed.
 - Choosing the best seed or decoding setting after seeing forecast quality,
   PnL, rank IC, or invalid-row rates.
 - Filtering out invalid forecast rows and then treating the remaining rows as
@@ -142,8 +154,10 @@ model-weight terms, and compute cost all need separate controls before use.
 
 Consequence:
 
-Any future Kronos work must start from isolated, predeclared offline diagnostics
-and must not change S1-S5 strategy behavior.
+Any future Kronos work must start from a new approved design and must not
+change S1-S5 strategy behavior. The only ongoing Kronos action after 37W is a
+bi-monthly upstream review of repo/issues/model-card maturity, fixes,
+prediction-quality evidence, and output-validity/reproducibility improvements.
 
 ---
 

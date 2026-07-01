@@ -41,6 +41,16 @@ Phase 37S retry-design update:
 - It selects `PROCEED_TO_37T_POLICY_COMPLIANT_RETRY_APPROVAL`; this remains an
   approval gate, not execution approval.
 
+Phase 37W closeout update:
+
+- The output-validity policy remains available as a reusable control, but the
+  Kronos lane is closed for now with
+  `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`.
+- No further local inference, local patch, strategy integration, Research200
+  scaling, or raw predicted-candle trading is approved.
+- Reopening requires concrete upstream maturity/output-validity evidence or a
+  separately approved new design.
+
 ## 2. Why 37Q Exists
 
 The Kronos lane is technically runnable, but output validity has repeatedly

@@ -193,6 +193,7 @@ Phase 37B design reference:
 - `docs/03_research/external_model_kronos_reproducibility_validity_result.md`
 - `docs/03_research/external_model_kronos_adapter_output_validation_debug.md`
 - `docs/03_research/external_model_kronos_adapter_debug_result.md`
+- `docs/03_research/external_model_kronos_output_validity_policy.md`
 
 Current status:
 
@@ -229,6 +230,11 @@ Current status:
   `2024-01-15`: baseline 37N-like output had 3 / 15 invalid rows, explicit
   eval had 1 / 15, and eval plus `top_k=1`, `top_p=1.0` had 0 / 15. This is an
   output-validity/API finding only and does not approve signal-quality retry.
+- Phase 37Q defines the output-validity policy: explicit eval is required when
+  supported, deterministic-ish decoding is the default candidate, invalid
+  forecast runs are excluded from signal-quality metrics, repair is
+  visualization-only unless separately approved, and close-only mode requires a
+  separate label/approval.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
 - After the approved Phase 37K small diagnostic, Phase 37N validity diagnostic,
@@ -270,6 +276,8 @@ Safety rules:
   output-validity policy are explicitly debugged.
 - Do not treat the 37P deterministic tiny-sample zero-invalid result as enough
   evidence for Research200 or small diagnostic retry.
+- Do not filter invalid outputs to create apparent alpha; invalid-run
+  exclusion is an output-validity rule, not a return-improvement rule.
 - Do not cherry-pick the best seed or decoding setting after results.
 - Do not download model/tokenizer weights before license/model-card review and
   explicit user approval.

@@ -105,9 +105,13 @@ selects `PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION` as the next gated step. Phase
 It found invalid OHLC rows fell from 3 / 15 in the 37N-like baseline to 1 / 15
 with explicit eval mode and 0 / 15 with eval plus `top_k=1`, `top_p=1.0`, but
 the sample is too small to approve scaling. Phase 37P selects
-`PROCEED_TO_37Q_OUTPUT_VALIDITY_POLICY_DESIGN`. No small diagnostic retry,
-further Kronos inference, full Research200 run, strategy integration, raw
-predicted-candle trading, training, fine-tuning, or production use is approved.
+`PROCEED_TO_37Q_OUTPUT_VALIDITY_POLICY_DESIGN`. Phase 37Q defines the
+output-validity policy in
+`docs/03_research/external_model_kronos_output_validity_policy.md` and selects
+`PROCEED_TO_37R_OUTPUT_VALIDITY_POLICY_IMPLEMENTATION`. No small diagnostic
+retry, further Kronos inference, full Research200 run, strategy integration,
+raw predicted-candle trading, training, fine-tuning, or production use is
+approved.
 
 ---
 
@@ -585,6 +589,11 @@ Completed follow-up phases:
   and low-randomness decoding improved validity in the tiny sample, but
   caller-side output-validity policy is still required before any diagnostic
   retry.
+- **Phase 37Q:** Kronos output-validity policy design completed in
+  `docs/03_research/external_model_kronos_output_validity_policy.md`. Future
+  diagnostics must exclude invalid forecast runs from signal metrics by
+  default and implement explicit eval/decoding/validity audit requirements
+  before any retry.
 
 Remaining planned follow-up phases:
 

@@ -21,6 +21,12 @@ returns decoded OHLC columns directly and does not enforce candle constraints.
 Recommended next phase:
 `PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION`.
 
+Later update: Phase 37P executed the approved tiny adapter debug and selected
+`PROCEED_TO_37Q_OUTPUT_VALIDITY_POLICY_DESIGN`. Phase 37Q now documents the
+policy in `docs/03_research/external_model_kronos_output_validity_policy.md`.
+No further diagnostic retry is approved until the policy is implemented or a
+future policy-compliant helper is explicitly approved.
+
 ## 2. Why 37O Exists
 
 Phase 37K and 37N showed that signal-quality metrics are secondary until output
@@ -258,6 +264,11 @@ sample needed to compare:
 - deterministic/near-deterministic settings if approved,
 - raw output validity,
 - no repair versus flagged/rejected policy.
+
+37P later found eval mode reduced invalid output but did not eliminate it, and
+deterministic-ish decoding produced zero invalid rows only on one tiny sample.
+37Q therefore defines a conservative validity policy rather than allowing a
+small diagnostic retry.
 
 ## 10. Approval Needed Before Any Execution
 

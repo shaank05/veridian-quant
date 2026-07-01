@@ -310,6 +310,12 @@ design and selects `PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION` because the cause is
 not fully proven and because explicit eval-mode/API usage plus caller-side
 validity policy need to be tested before any signal-quality retry.
 
+37P tested that boundary on a tiny approved sample. 37Q then defines the
+output-validity policy in
+`docs/03_research/external_model_kronos_output_validity_policy.md`. Any future
+reproducibility or signal-quality diagnostic must implement the policy before
+execution.
+
 ## 18. Approval Requirements Before Future Execution
 
 Before execution, the user must approve:

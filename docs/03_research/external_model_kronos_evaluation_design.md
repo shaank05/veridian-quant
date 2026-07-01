@@ -54,6 +54,11 @@ read-only adapter/output-validation inspection in
 keeps signal-quality diagnostics blocked pending adapter/API debug and a
 predeclared output-validity policy.
 
+Phase 37Q now defines that policy in
+`docs/03_research/external_model_kronos_output_validity_policy.md`. Future
+Kronos signal-quality metrics are eligible only on valid forecast runs unless a
+later close-only mode is explicitly approved.
+
 ## 2. Why This Lane Exists
 
 S1-S5 are retained as benchmarks only. The Phase 35 ensemble and confirmation
@@ -192,6 +197,8 @@ Evidence that could justify moving past design:
 - Stable enough repeated-seed direction/rank/return outputs for diagnostic use.
 - Explicit inference-mode/API usage checks and caller-side output-validity
   handling before signal diagnostics.
+- Metric eligibility gated on valid forecast runs, with invalid/excluded run
+  counts reported beside any directional, rank, or spread metric.
 - Manageable compute cost on a small smoke test.
 - Deterministic and reproducible enough under fixed seed/settings.
 

@@ -77,6 +77,11 @@ helper scripts, local generated output schemas, and Kronos source/examples in
 read-only mode. It keeps the lane blocked and selects adapter/output-validation
 debug as the next gated step.
 
+Phase 37P executed the approved tiny adapter debug and Phase 37Q defines the
+output-validity policy. The policy does not approve scaling; it requires
+invalid forecast runs to be excluded from signal metrics and repair to remain
+visualization-only unless separately approved.
+
 Rejected or not approved:
 
 - Raw predicted-candle execution.
@@ -114,6 +119,10 @@ Rejected or not approved:
 - Repairing generated OHLC rows and then trading or evaluating alpha from the
   repaired candles without a separately approved, non-leaky policy.
 - Treating visualization-only repaired candles as canonical model output.
+- Comparing valid-only filtered metrics against prior unfiltered metrics as if
+  the filter improved alpha.
+- Choosing deterministic decoding because it improves returns rather than
+  because it improves structural validity/reproducibility.
 
 Reason:
 

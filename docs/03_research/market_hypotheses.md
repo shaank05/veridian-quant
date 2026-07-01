@@ -501,9 +501,11 @@ stochastic reproducibility/output-validity gate before any broader diagnostic.
 Phase 37N executed that gate and still found 16 / 90 invalid OHLC rows =
 17.78%, affecting 8 / 18 forecast runs. Phase 37O documents adapter/output
 validation debug design and selects a gated adapter debug execution as the next
-step. The hypothesis is still not accepted or rejected permanently; invalid
-output rows, seed stability, rank stability, API usage, and caller-side
-validity policy must be understood first.
+step. Phase 37P showed eval/decoding settings affect validity, and Phase 37Q
+defines the output-validity policy required before any retry. The hypothesis is
+still not accepted or rejected permanently; invalid output rows, seed stability,
+rank stability, API usage, and caller-side validity policy must be understood
+and implemented first.
 
 ## Expected Research Value
 
@@ -582,6 +584,10 @@ Phase 37O updates that gate after 37N: invalid OHLC remained high, so no
 signal-quality retry is appropriate until adapter/API usage and output
 validation policy are debugged. In particular, "repair candles and continue" is
 not an approved trading or alpha-evaluation path.
+
+Phase 37Q makes that policy explicit: invalid forecast runs are excluded from
+signal-quality metrics by default, repair is visualization-only unless
+separately approved, and close-only diagnostics require a separate labeled mode.
 
 ## FFT / Wavelet Entry
 

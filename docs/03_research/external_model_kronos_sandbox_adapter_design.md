@@ -25,6 +25,10 @@ Any future sandbox/helper script must include an explicit output-validity gate,
 record model/tokenizer eval-mode state, and avoid writing repaired candles as
 canonical signal evidence.
 
+Phase 37Q further defines the required output-validity policy in
+`docs/03_research/external_model_kronos_output_validity_policy.md`. Future
+adapter/helper work must implement that policy before any diagnostic retry.
+
 ## 2. Why a Separate Sandbox Is Required
 
 Kronos has heavy ML dependencies such as PyTorch, Hugging Face tooling, and
@@ -180,6 +184,8 @@ Before any join is used for signal-quality diagnostics, forecast paths must
 pass or explicitly fail an output-validity gate. Invalid rows, invalid reasons,
 and the chosen reject/flag/repair-for-visualization policy must be recorded
 before any downstream rank, direction, context, or trade-overlay interpretation.
+Runs marked `INVALID_OUTPUT` must be excluded from signal-quality metrics by
+default.
 
 Evaluation rules:
 

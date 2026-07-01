@@ -1332,3 +1332,36 @@ Consequence:
   use, strategy integration, raw forecast trading, threshold tuning,
   best-seed/decoding cherry-picking, training, fine-tuning, model download,
   install, or Kronos repo modification.
+
+---
+
+## 2026-07-01 - Design Kronos Output Validity Policy Only
+
+Decision:
+
+Proceed with Phase 37Q as docs-only output-validity policy design. Select
+`PROCEED_TO_37R_OUTPUT_VALIDITY_POLICY_IMPLEMENTATION`.
+
+Reason:
+
+Phase 37K, 37N, and 37P showed invalid OHLC output is a structural gate before
+any further Kronos diagnostics. Phase 37P improved invalid rows from 3 / 15 in
+the 37N-like baseline to 1 / 15 with explicit eval and 0 / 15 with eval plus
+`top_k=1`, `top_p=1.0`, but the sample was only HDFCBANK on `2024-01-15`.
+Policy must be pre-registered before retry so decoding, invalid-run exclusion,
+repair/coercion, close-only mode, and failure thresholds cannot be chosen after
+seeing signal metrics.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_output_validity_policy.md`.
+- Require future helpers to call `.eval()` when supported, record eval status,
+  and use deterministic-ish decoding as the default candidate unless a later
+  design changes it.
+- Mark any forecast run with invalid OHLC as `INVALID_OUTPUT` and exclude it
+  from signal-quality metrics by default.
+- Keep repair visualization-only unless separately approved.
+- Do not approve new inference, small diagnostic retry, full Research200,
+  production use, strategy integration, raw forecast trading, threshold tuning,
+  best-seed/decoding cherry-picking, training, fine-tuning, model download,
+  install, or Kronos repo modification.

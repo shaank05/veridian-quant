@@ -12,6 +12,10 @@ Spearman rank IC was -0.268521, top-minus-bottom spread was -0.043511, and
 diagnostics are paused pending the Phase 37M/37N stochastic reproducibility and
 output-validity gate.
 
+Later Phase 37Q policy update: future small diagnostics must apply explicit
+eval mode, predeclared decoding, run-level invalid-output exclusion, and
+required validity exports before any signal-quality metrics are reported.
+
 - No new inference is approved.
 - No full Research200 run is approved.
 - No strategy integration is approved.

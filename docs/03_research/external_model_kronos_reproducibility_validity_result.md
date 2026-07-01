@@ -22,6 +22,12 @@ inspects the Veridian helper scripts, local generated schemas, and Kronos
 source/examples. It keeps the lane blocked and selects
 `PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION`, not a small diagnostic retry.
 
+Phase 37P then confirmed decoding/API settings materially affect validity.
+Phase 37Q documents the required output-validity policy in
+`docs/03_research/external_model_kronos_output_validity_policy.md`; invalid
+forecast runs must be excluded from signal-quality metrics until a future phase
+implements the policy.
+
 ## Output Folder
 
 - `reports/v2/external_models/kronos/repro_validity_20260701/`

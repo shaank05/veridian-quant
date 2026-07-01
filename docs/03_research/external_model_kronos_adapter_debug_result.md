@@ -225,6 +225,14 @@ predeclared policy for invalid forecast rows/runs, canonical raw output,
 optional visualization-only repair, allowed decoding/API settings, and criteria
 for when Kronos should be parked versus rerun.
 
+Phase 37Q completed that docs-only policy design in
+`docs/03_research/external_model_kronos_output_validity_policy.md`. It requires
+future Kronos diagnostics to apply explicit eval mode, use deterministic-ish
+decoding as the default candidate, mark any run with invalid OHLC as
+`INVALID_OUTPUT`, exclude invalid runs from signal-quality metrics, and preserve
+repair only as optional visualization unless separately approved. The next
+selected step is `PROCEED_TO_37R_OUTPUT_VALIDITY_POLICY_IMPLEMENTATION`.
+
 No full Research200 run, production use, strategy integration, raw forecast
 trading, threshold tuning, best-seed selection, decoding cherry-picking,
 fine-tuning, or training is approved.

@@ -219,9 +219,13 @@ Phase 37M next-design decision:
 
 Phase 37N result decision: `FIX_ADAPTER_OR_OUTPUT_VALIDATION`.
 Phase 37O debug-design decision: `PROCEED_TO_37P_ADAPTER_DEBUG_EXECUTION`.
+Phase 37P adapter-debug decision:
+`PROCEED_TO_37Q_OUTPUT_VALIDITY_POLICY_DESIGN`.
+Phase 37Q policy-design decision:
+`PROCEED_TO_37R_OUTPUT_VALIDITY_POLICY_IMPLEMENTATION`.
 
 This does not approve execution. It only records that the next useful Kronos
-step should be an adapter/output-validation debug phase, not a small diagnostic
+step should be output-validity policy implementation, not a small diagnostic
 retry. No full Research200 run, strategy integration, production use, raw
 forecast trading, threshold tuning, or best-seed/decoding cherry-picking is
 approved.

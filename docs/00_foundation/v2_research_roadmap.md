@@ -112,9 +112,13 @@ output-validity policy in
 reusable tracked policy helpers in
 `src/veridian_quant/v2/external_models/kronos/output_validity.py` with
 synthetic-data tests in `tests/v2/test_kronos_output_validity.py` and selects
-`PROCEED_TO_37S_POLICY_COMPLIANT_RETRY_DESIGN`. No small diagnostic retry,
-further Kronos inference, full Research200 run, strategy integration, raw
-predicted-candle trading, training, fine-tuning, or production use is approved.
+`PROCEED_TO_37S_POLICY_COMPLIANT_RETRY_DESIGN`. Phase 37S documents the
+policy-compliant small diagnostic retry design in
+`docs/03_research/external_model_kronos_policy_compliant_retry_design.md` and
+selects `PROCEED_TO_37T_POLICY_COMPLIANT_RETRY_APPROVAL`. No small diagnostic
+retry, further Kronos inference, full Research200 run, strategy integration,
+raw predicted-candle trading, training, fine-tuning, or production use is
+approved.
 
 ---
 
@@ -603,6 +607,13 @@ Completed follow-up phases:
   inference, model loading, report generation, backtest, strategy logic change,
   or cloned-repo modification is approved. Next selected gate:
   `PROCEED_TO_37S_POLICY_COMPLIANT_RETRY_DESIGN`.
+- **Phase 37S:** Kronos policy-compliant small diagnostic retry design
+  completed in
+  `docs/03_research/external_model_kronos_policy_compliant_retry_design.md`.
+  Any future retry must use explicit eval when supported, deterministic-ish
+  decoding, and the 37R output-validity helpers; invalid forecast runs remain
+  excluded from signal metrics. Next selected gate:
+  `PROCEED_TO_37T_POLICY_COMPLIANT_RETRY_APPROVAL`.
 
 Remaining planned follow-up phases:
 

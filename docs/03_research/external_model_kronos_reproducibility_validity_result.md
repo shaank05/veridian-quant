@@ -28,6 +28,12 @@ Phase 37Q documents the required output-validity policy in
 forecast runs must be excluded from signal-quality metrics until a future phase
 implements the policy.
 
+Phase 37R later implemented reusable output-validity helpers, and Phase 37S
+documents the policy-compliant retry design in
+`docs/03_research/external_model_kronos_policy_compliant_retry_design.md`.
+Future signal metrics are eligible only on valid forecast runs under that
+policy; invalid-run filtering must not be used to improve apparent alpha.
+
 ## Output Folder
 
 - `reports/v2/external_models/kronos/repro_validity_20260701/`

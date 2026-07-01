@@ -1392,3 +1392,38 @@ Consequence:
 - Keep 37R policy/helper only: no Kronos inference, model loading, report
   generation, backtest, strategy logic change, dependency installation,
   cloned-repo modification, production use, or direct predicted-candle trading.
+
+---
+
+## 2026-07-01 - Design Kronos Policy-Compliant Retry Only
+
+Decision:
+
+Proceed with Phase 37S as docs-only policy-compliant small diagnostic retry
+design. Select `PROCEED_TO_37T_POLICY_COMPLIANT_RETRY_APPROVAL`.
+
+Reason:
+
+Phase 37K had 17 / 150 invalid OHLC rows = 11.33%. Phase 37N had 16 / 90
+invalid OHLC rows = 17.78%, affecting 8 / 18 forecast runs = 44.44%. Phase
+37P showed that explicit eval and deterministic-ish `top_k=1`, `top_p=1.0`
+decoding eliminated invalid rows only in a tiny HDFCBANK / `2024-01-15`
+sample. Phase 37R then implemented reusable output-validity helpers with 22
+focused tests passing. A retry can be designed only if it uses explicit eval,
+deterministic-ish decoding, and 37R validity gating.
+
+Consequence:
+
+- Add
+  `docs/03_research/external_model_kronos_policy_compliant_retry_design.md`.
+- Recommended future retry: same 37K structure, 5 symbols x 6 dates = 30
+  forecast runs, horizon 5, lookback 400, using the same symbols/dates unless
+  preflight fails.
+- Future retry metrics are computed only on valid forecast runs; invalid runs
+  remain preserved in output-validity summaries.
+- Direct comparison to 37K must be caveated because decoding policy changes.
+- Phase 37T must be an explicit approval gate before execution.
+- Do not approve inference, full Research200, `Kronos-base`, production use,
+  strategy integration, raw predicted-candle trading, threshold tuning,
+  best-seed/decoding cherry-picking, training, fine-tuning, generated report
+  commits, or cloned Kronos repo modification.

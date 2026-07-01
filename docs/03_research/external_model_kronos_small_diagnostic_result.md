@@ -9,6 +9,9 @@ before any broader Kronos inference.
 Phase 37N executed that bounded follow-up and found invalid OHLC rows remained
 high; Phase 37O records the adapter/output-validation debug design in
 `docs/03_research/external_model_kronos_adapter_output_validation_debug.md`.
+Phase 37R later implemented reusable output-validity helpers, and Phase 37S
+documents a policy-compliant retry design in
+`docs/03_research/external_model_kronos_policy_compliant_retry_design.md`.
 
 This was not a trading backtest. It did not create strategy rules, tune
 thresholds, or approve production use. Generated outputs remain ignored under
@@ -229,3 +232,8 @@ step should be output-validity policy implementation, not a small diagnostic
 retry. No full Research200 run, strategy integration, production use, raw
 forecast trading, threshold tuning, or best-seed/decoding cherry-picking is
 approved.
+
+Later update: any future retry must be policy-compliant, must use explicit eval
+when supported and deterministic-ish decoding, and must exclude invalid forecast
+runs from signal metrics using the 37R output-validity helpers. Direct
+comparison against 37K must be caveated because the decoding policy changes.

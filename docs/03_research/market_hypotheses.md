@@ -505,7 +505,10 @@ step. Phase 37P showed eval/decoding settings affect validity, and Phase 37Q
 defines the output-validity policy required before any retry. The hypothesis is
 still not accepted or rejected permanently; invalid output rows, seed stability,
 rank stability, API usage, and caller-side validity policy must be understood
-and implemented first.
+and implemented first. Phase 37R implemented reusable output-validity helpers,
+and Phase 37S designs a policy-compliant 30-run retry only; future execution
+requires explicit 37T approval and direct comparison with 37K must be caveated
+because decoding policy changes.
 
 ## Expected Research Value
 
@@ -588,6 +591,9 @@ not an approved trading or alpha-evaluation path.
 Phase 37Q makes that policy explicit: invalid forecast runs are excluded from
 signal-quality metrics by default, repair is visualization-only unless
 separately approved, and close-only diagnostics require a separate labeled mode.
+Phase 37S allows only a future approval-gated, policy-compliant retry design;
+it does not approve inference, Research200, strategy integration, or raw
+predicted-candle trading.
 
 ## FFT / Wavelet Entry
 

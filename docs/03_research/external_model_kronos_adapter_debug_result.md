@@ -233,6 +233,12 @@ decoding as the default candidate, mark any run with invalid OHLC as
 repair only as optional visualization unless separately approved. The next
 selected step is `PROCEED_TO_37R_OUTPUT_VALIDITY_POLICY_IMPLEMENTATION`.
 
+Phase 37R implemented reusable output-validity helpers, and Phase 37S documents
+the policy-compliant retry design in
+`docs/03_research/external_model_kronos_policy_compliant_retry_design.md`. Any
+future retry remains approval-gated and must use 37R helper-based
+output-validity gating. No immediate retry is approved from this result.
+
 No full Research200 run, production use, strategy integration, raw forecast
 trading, threshold tuning, best-seed selection, decoding cherry-picking,
 fine-tuning, or training is approved.

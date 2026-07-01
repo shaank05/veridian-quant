@@ -194,6 +194,7 @@ Phase 37B design reference:
 - `docs/03_research/external_model_kronos_adapter_output_validation_debug.md`
 - `docs/03_research/external_model_kronos_adapter_debug_result.md`
 - `docs/03_research/external_model_kronos_output_validity_policy.md`
+- `docs/03_research/external_model_kronos_policy_compliant_retry_design.md`
 
 Current status:
 
@@ -241,6 +242,11 @@ Current status:
   and provide visualization-only OHLC repair while preserving raw outputs.
   Phase 37R selects `PROCEED_TO_37S_POLICY_COMPLIANT_RETRY_DESIGN`; it does not
   approve Kronos inference or diagnostic retry.
+- Phase 37S designs a policy-compliant small diagnostic retry only. It
+  recommends the same 37K structure, 5 symbols x 6 dates = 30 forecasts, with
+  explicit eval when supported, deterministic-ish decoding, and 37R
+  output-validity gating. It selects
+  `PROCEED_TO_37T_POLICY_COMPLIANT_RETRY_APPROVAL`; no inference is approved.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
 - After the approved Phase 37K small diagnostic, Phase 37N validity diagnostic,
@@ -282,6 +288,9 @@ Safety rules:
   output-validity policy are explicitly debugged.
 - Do not treat the 37P deterministic tiny-sample zero-invalid result as enough
   evidence for Research200 or small diagnostic retry.
+- Do not run a policy-compliant retry without explicit 37T approval for sample,
+  decoding, seed, output folder, runtime cap, and no-production/no-trading
+  boundaries.
 - Do not filter invalid outputs to create apparent alpha; invalid-run
   exclusion is an output-validity rule, not a return-improvement rule.
 - Do not cherry-pick the best seed or decoding setting after results.

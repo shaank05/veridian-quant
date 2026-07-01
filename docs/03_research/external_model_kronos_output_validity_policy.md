@@ -32,6 +32,15 @@ Phase 37R implementation update:
 - The next selected gated step is
   `PROCEED_TO_37S_POLICY_COMPLIANT_RETRY_DESIGN`, not diagnostic execution.
 
+Phase 37S retry-design update:
+
+- The policy-compliant retry design is documented in
+  `docs/03_research/external_model_kronos_policy_compliant_retry_design.md`.
+- It requires explicit eval when supported, deterministic-ish decoding, and
+  37R helper-based output-validity gating before any future retry.
+- It selects `PROCEED_TO_37T_POLICY_COMPLIANT_RETRY_APPROVAL`; this remains an
+  approval gate, not execution approval.
+
 ## 2. Why 37Q Exists
 
 The Kronos lane is technically runnable, but output validity has repeatedly

@@ -16,6 +16,12 @@ Later Phase 37Q policy update: future small diagnostics must apply explicit
 eval mode, predeclared decoding, run-level invalid-output exclusion, and
 required validity exports before any signal-quality metrics are reported.
 
+Later Phase 37S retry-design update: any future retry of this small diagnostic
+must follow
+`docs/03_research/external_model_kronos_policy_compliant_retry_design.md`, use
+37R helper-based output-validity gating, and report signal metrics only on
+valid forecast runs while preserving invalid-output summaries.
+
 - No new inference is approved.
 - No full Research200 run is approved.
 - No strategy integration is approved.
@@ -32,6 +38,8 @@ After 37K/37L, this document should be treated as historical design context, not
 as approval to repeat or expand the small diagnostic. Any retry must first pass
 the reproducibility/output-validity design in
 `docs/03_research/external_model_kronos_reproducibility_validity_design.md`.
+After 37R/37S, any retry must also pass the implemented output-validity policy
+and a separate 37T approval gate.
 
 ## 2. Why This Experiment Exists
 

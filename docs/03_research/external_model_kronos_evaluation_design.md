@@ -59,6 +59,12 @@ Phase 37Q now defines that policy in
 Kronos signal-quality metrics are eligible only on valid forecast runs unless a
 later close-only mode is explicitly approved.
 
+Phase 37R implements reusable output-validity helpers, and Phase 37S documents
+the policy-compliant retry design in
+`docs/03_research/external_model_kronos_policy_compliant_retry_design.md`.
+Future metric eligibility is validity-gated and any retry remains subject to a
+separate 37T approval gate.
+
 ## 2. Why This Lane Exists
 
 S1-S5 are retained as benchmarks only. The Phase 35 ensemble and confirmation
@@ -281,6 +287,9 @@ but it does not approve execution.
 Phase 37M is now documented in
 `docs/03_research/external_model_kronos_reproducibility_validity_design.md`,
 but it does not approve execution.
+Phase 37S is now documented in
+`docs/03_research/external_model_kronos_policy_compliant_retry_design.md`, but
+it does not approve execution.
 
 ## 14. Decision
 

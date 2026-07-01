@@ -82,6 +82,10 @@ output-validity policy. The policy does not approve scaling; it requires
 invalid forecast runs to be excluded from signal metrics and repair to remain
 visualization-only unless separately approved.
 
+Phase 37R implements reusable output-validity helpers, and Phase 37S designs a
+policy-compliant retry only. They do not approve inference. Phase 37T approval
+is required before any retry execution.
+
 Rejected or not approved:
 
 - Raw predicted-candle execution.
@@ -110,6 +114,11 @@ Rejected or not approved:
   sweep.
 - Scaling Kronos diagnostics after invalid OHLC rows before output validity and
   reproducibility are understood.
+- Running a policy-bypassing Kronos retry.
+- Filtering invalid forecast runs to improve apparent alpha rather than to
+  enforce output-validity policy.
+- Claiming a direct 37K-versus-retry improvement without caveating the changed
+  eval/decoding policy.
 - Choosing the best seed or decoding setting after seeing forecast quality,
   PnL, rank IC, or invalid-row rates.
 - Filtering out invalid forecast rows and then treating the remaining rows as

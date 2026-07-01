@@ -4,6 +4,14 @@
 
 Phase 37J is design-only.
 
+Later status update: Phase 37K executed the approved 5-symbol x 6-date small
+diagnostic. Phase 37L scrutinized the result and selected
+`REDESIGN_SMALL_DIAGNOSTIC`: directional accuracy was 13 / 30 = 43.33%,
+Spearman rank IC was -0.268521, top-minus-bottom spread was -0.043511, and
+17 / 150 forecast path rows had invalid OHLC relationships. Broader Kronos
+diagnostics are paused pending the Phase 37M/37N stochastic reproducibility and
+output-validity gate.
+
 - No new inference is approved.
 - No full Research200 run is approved.
 - No strategy integration is approved.
@@ -15,6 +23,11 @@ Phase 37J is design-only.
 
 Phase 37J designs a small diagnostic experiment for possible future Phase 37K
 execution only.
+
+After 37K/37L, this document should be treated as historical design context, not
+as approval to repeat or expand the small diagnostic. Any retry must first pass
+the reproducibility/output-validity design in
+`docs/03_research/external_model_kronos_reproducibility_validity_design.md`.
 
 ## 2. Why This Experiment Exists
 

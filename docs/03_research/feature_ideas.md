@@ -188,6 +188,8 @@ Phase 37B design reference:
 - `docs/03_research/external_model_kronos_execution_approval_checklist.md`
 - `docs/03_research/external_model_kronos_smoke_test_review.md`
 - `docs/03_research/external_model_kronos_small_diagnostic_experiment_design.md`
+- `docs/03_research/external_model_kronos_small_diagnostic_result.md`
+- `docs/03_research/external_model_kronos_reproducibility_validity_design.md`
 
 Current status:
 
@@ -206,12 +208,20 @@ Current status:
   single forecast row does not validate or reject Kronos model quality.
 - Phase 37J designs a small offline diagnostic experiment only: recommended
   first diagnostic size is 5 HIGH-liquidity symbols x 6 dates = 30 forecasts.
+- Phase 37K executed that approved small diagnostic.
+- Phase 37L scrutinized the result and selected `REDESIGN_SMALL_DIAGNOSTIC`:
+  directional accuracy was 13 / 30 = 43.33%, Spearman rank IC was -0.268521,
+  top-minus-bottom spread was -0.043511, and 17 / 150 forecast path rows had
+  invalid OHLC relationships.
+- Phase 37M is docs-only reproducibility/output-validity design. It pauses
+  broader diagnostics until invalid OHLC rows and seed/rank stability are
+  tested in a separately approved small run.
 - Kronos is not production-approved, not direct-strategy-approved, and not
   approved for raw predicted-candle execution.
-- After the one approved Phase 37H tiny smoke test, no additional installation,
-  model download, Hugging Face download, inference, sandbox, training,
-  fine-tuning, adapter implementation, dependency merge, strategy logic, or
-  backtest logic is approved.
+- After the approved Phase 37K small diagnostic and Phase 37L scrutiny, no
+  additional installation, model download, Hugging Face download, inference,
+  sandbox, training, fine-tuning, adapter implementation, dependency merge,
+  strategy logic, or backtest logic is approved.
 
 Candidate diagnostic features if a future phase approves a small isolated
 diagnostic execution:
@@ -222,6 +232,8 @@ diagnostic execution:
 - Cross-sectional forecast rank.
 - Predicted high-low range and forecast volatility proxy.
 - Forecast dispersion if repeated samples are later feasible.
+- Invalid OHLC rate and invalid reason counts.
+- Seed-to-seed direction/rank/return stability.
 - Realized forecast error by regime.
 - Agreement/disagreement with retained S1-S5 trades.
 - Spearman rank IC between predicted 5-session return and realized 5-session
@@ -238,6 +250,9 @@ Safety rules:
 - Do not merge Kronos dependencies into Veridian core.
 - Do not start with a full Research200 sweep; any future diagnostic execution
   must be small, isolated, and separately approved.
+- Do not scale beyond the small diagnostic while invalid OHLC rows remain
+  unexplained.
+- Do not cherry-pick the best seed or decoding setting after results.
 - Do not download model/tokenizer weights before license/model-card review and
   explicit user approval.
 

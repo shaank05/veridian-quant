@@ -64,7 +64,7 @@ Broad voting and generic 2+ strategy consensus are dropped. Narrow S2/S4
 confirmation is retained only as a parked diagnostic observation. No ensemble,
 weights, allocation, or production approval resulted from this work.
 
-Phase 37A through 37J opened a strictly controlled external-model intelligence
+Phase 37A through 37M opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and
 classified Kronos as feasible only for offline diagnostic research. Phase 37B
 documents the future evaluation design in
@@ -89,9 +89,15 @@ validate model quality. Phase 37J designs the first small offline diagnostic
 experiment in
 `docs/03_research/external_model_kronos_small_diagnostic_experiment_design.md`;
 it recommends 5 HIGH-liquidity symbols x 6 dates = 30 forecasts for a possible
-future Phase 37K approval. No further Kronos inference, full Research200 run,
-strategy integration, raw predicted-candle trading, training, fine-tuning, or
-production use is approved.
+future Phase 37K approval. Phase 37K executed that approved small diagnostic.
+Phase 37L scrutinized the result: 30 / 30 forecasts completed, directional
+accuracy was 13 / 30 = 43.33%, Spearman rank IC was -0.268521,
+top-minus-bottom spread was -0.043511, and 17 / 150 forecast path rows had
+invalid OHLC relationships. Phase 37M documents the next design-only
+reproducibility/output-validity diagnostic in
+`docs/03_research/external_model_kronos_reproducibility_validity_design.md`.
+No further Kronos inference, full Research200 run, strategy integration, raw
+predicted-candle trading, training, fine-tuning, or production use is approved.
 
 ---
 
@@ -709,12 +715,15 @@ Next direction:
   No risk model, VIX rule, liquidity filter, drawdown throttle, rolling-R
   threshold, benchmark-regime filter, gap filter, dynamic sizing change, or
   production behavior is approved.
-- Treat Phase 37A through 37J as a controlled external-model research lane.
+- Treat Phase 37A through 37M as a controlled external-model research lane.
   Kronos may be evaluated later as an offline diagnostic/ranking/context/
-  confirmation layer, but after the one approved Phase 37H smoke test, no
-  additional sandbox implementation, adapter implementation, model download,
-  Hugging Face download, inference, direct strategy use, raw predicted-candle
-  execution, production use, or dependency merge is approved.
+  confirmation layer, but after the approved Phase 37K small diagnostic and
+  Phase 37L scrutiny, broader diagnostics are paused until output validity and
+  stochastic reproducibility are tested through a separately approved 37N-style
+  reproducibility/validity run. No additional sandbox implementation, adapter
+  implementation, model download, Hugging Face download, inference, direct
+  strategy use, raw predicted-candle execution, production use, or dependency
+  merge is approved.
 - Close the simple S2 context-filter branch. Do not continue with threshold
   fishing, filter stacking, or another minor benchmark/relative/sector context
   tweak. Company fundamentals are now ingested and audited as research context,
@@ -753,9 +762,10 @@ The following are future research directions, not accepted production rules:
   pre-registered.
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
-- Kronos offline diagnostic/ranking/context/confirmation evaluation, beginning
-  only with separate Phase 37K execution approval for the pre-registered small
-  diagnostic design.
+- Kronos offline diagnostic/ranking/context/confirmation evaluation, paused
+  after Phase 37K/37L until a separately approved Phase 37N-style stochastic
+  reproducibility/output-validity diagnostic addresses invalid OHLC rows and
+  ranking stability.
 - Universe/regime segmentation research.
 - S2 risk model research.
 - Meta-ranking / capital allocation layer.

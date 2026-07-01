@@ -492,6 +492,15 @@ symbols x 6 dates = 30 forecasts, 400-session lookback, and 5-session horizon.
 This is not execution approval and does not support production or trading
 claims.
 
+Phase 37K later executed the approved small diagnostic, and Phase 37L
+scrutinized the result: 30 / 30 forecasts completed, directional accuracy was
+13 / 30 = 43.33%, Spearman rank IC was -0.268521, top-minus-bottom spread was
+-0.043511, top2-minus-bottom2 spread was -0.010859, and 17 / 150 forecast path
+rows had invalid OHLC relationships. Phase 37M therefore adds a design-only
+stochastic reproducibility/output-validity gate before any broader diagnostic.
+The hypothesis is still not accepted or rejected permanently; invalid output
+rows, seed stability, and rank stability must be understood first.
+
 ## Expected Research Value
 
 - Evaluate whether forecast-derived diagnostics have positive rank
@@ -501,11 +510,16 @@ claims.
   strong bull periods.
 - Determine whether external forecasts add information beyond existing
   liquidity, benchmark, drawdown, and VIX diagnostics.
+- Determine whether generated forecast paths are valid and reproducible enough
+  to use as diagnostics at all.
 
 ## When It May Fail
 
 - The model only repeats broad market, liquidity, or volatility effects.
 - Stochastic outputs are unstable.
+- Generated OHLC paths violate basic validity relationships.
+- Apparent rank or direction evidence depends on cherry-picked seed/decoding
+  settings.
 - Compute cost is too heavy for safe local research.
 - Lookahead, normalization leakage, or split leakage cannot be ruled out.
 - Model-weight terms block safe use.
@@ -553,6 +567,12 @@ dependency installation, model download, or fine-tuning.
 Phase 37J keeps this lane diagnostic-only. It does not approve a full
 Research200 run, alpha conclusion, threshold optimization, raw forecast trading,
 or small-diagnostic execution without separate 37K approval.
+
+Phase 37M adds a further gate after the weak/negative Phase 37K/37L result and
+17 / 150 invalid OHLC rows: no broader diagnostic, full Research200 run,
+best-seed selection, decoding cherry-picking, production use, or strategy use
+is appropriate until output validity and stochastic reproducibility are
+acceptable under a separately approved tiny follow-up.
 
 ## FFT / Wavelet Entry
 

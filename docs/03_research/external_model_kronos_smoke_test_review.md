@@ -196,6 +196,13 @@ Phase 37J is now documented in
 It designs a 5-symbol x 6-date small offline diagnostic only; it does not
 approve Phase 37K execution.
 
+Later status update: Phase 37K executed only after separate user approval.
+Phase 37L scrutinized the 30-forecast result and selected
+`REDESIGN_SMALL_DIAGNOSTIC` because signal metrics were weak/negative and
+17 / 150 forecast path rows had invalid OHLC relationships. Phase 37M now
+designs a smaller stochastic reproducibility/output-validity diagnostic before
+any broader Kronos run. This does not approve new inference.
+
 ## 13. Requirements for 37J
 
 Phase 37J should design a small offline diagnostic experiment only. It should

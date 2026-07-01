@@ -3,6 +3,9 @@
 ## Status
 
 Phase 37K executed the approved small offline Kronos diagnostic on July 1, 2026.
+Phase 37L later scrutinized the output and selected `REDESIGN_SMALL_DIAGNOSTIC`.
+Phase 37M now designs a stochastic reproducibility/output-validity diagnostic
+before any broader Kronos inference.
 
 This was not a trading backtest. It did not create strategy rules, tune
 thresholds, or approve production use. Generated outputs remain ignored under
@@ -127,6 +130,17 @@ From `kronos_small_diagnostic_metric_summary.csv`:
 - Bottom 2 realized return average: 0.003848
 - Top 2 minus bottom 2 spread: -0.010859
 
+Phase 37L additionally found an output-validity concern:
+
+- Forecast path rows present: 150 / 150
+- Invalid OHLC forecast path rows: 17 / 150
+- Invalid OHLC rate: 11.33%
+
+This validity concern is a blocker for broader diagnostics until a separate
+reproducibility/output-validity test checks whether invalid rows and unstable
+rankings come from stochastic sampling, decoding settings, data mapping,
+normalization/de-normalization, model behavior, or output validation.
+
 By-symbol headline:
 
 | Symbol | Forecasts | Directional accuracy | Avg predicted return | Avg realized return |
@@ -184,7 +198,7 @@ Confirmed in metadata:
 
 ## Decision
 
-Decision: `PROCEED_TO_37L_RESULT_SCRUTINY`.
+Phase 37K decision: `PROCEED_TO_37L_RESULT_SCRUTINY`.
 
 Reason:
 
@@ -194,3 +208,14 @@ Reason:
 - The laptop-impact and runtime limits were acceptable.
 - The decision is based on output validity and readiness for review, not on
   apparent profitability.
+
+Phase 37L review decision: `REDESIGN_SMALL_DIAGNOSTIC`.
+
+Phase 37M next-design decision:
+`PROCEED_TO_37N_REPRO_VALIDITY_EXECUTION_APPROVAL`.
+
+This does not approve execution. It only records that the next useful Kronos
+step should be a small, separately approved stochastic reproducibility and
+output-validity diagnostic. No full Research200 run, strategy integration,
+production use, raw forecast trading, threshold tuning, or best-seed/decoding
+cherry-picking is approved.

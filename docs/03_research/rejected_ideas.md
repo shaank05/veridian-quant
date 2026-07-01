@@ -64,6 +64,13 @@ it, and Phase 37J designs a small diagnostic experiment only. These later phases
 do not approve additional inference, full Research200 execution, production use,
 raw forecast trading, threshold tuning, or strategy integration.
 
+Phase 37K later executed an approved 30-forecast small diagnostic, Phase 37L
+scrutinized weak/negative metrics and 17 / 150 invalid OHLC forecast path rows,
+and Phase 37M designs a reproducibility/output-validity diagnostic only. These
+later phases still do not approve broader inference, full Research200
+execution, production use, raw forecast trading, threshold tuning, strategy
+integration, or best-seed/decoding cherry-picking.
+
 Rejected or not approved:
 
 - Raw predicted-candle execution.
@@ -90,13 +97,19 @@ Rejected or not approved:
   production evidence.
 - Jumping from tiny/small Kronos diagnostics directly to a full Research200
   sweep.
+- Scaling Kronos diagnostics after invalid OHLC rows before output validity and
+  reproducibility are understood.
+- Choosing the best seed or decoding setting after seeing forecast quality,
+  PnL, rank IC, or invalid-row rates.
+- Filtering out invalid forecast rows and then treating the remaining rows as
+  strategy evidence without a predeclared validity policy.
 
 Reason:
 
 Kronos is a forecasting model, not a trading agent. Raw forecast paths can look
 attractive while failing forecast/ranking diagnostics, and stochastic inference,
-normalization, data availability, model-weight terms, and compute cost all need
-separate controls before use.
+normalization, de-normalization, data availability, output validity,
+model-weight terms, and compute cost all need separate controls before use.
 
 Consequence:
 

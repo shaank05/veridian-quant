@@ -1231,3 +1231,38 @@ Consequence:
   fine-tuning.
 - Phase 37K must begin with explicit user approval for exact symbols, dates,
   output folder, runtime limit, and no-production/no-trading boundaries.
+
+---
+
+## 2026-07-01 - Design Kronos Reproducibility / Output-Validity Diagnostic Only
+
+Decision:
+
+Proceed with Phase 37M as a docs-only stochastic reproducibility and
+output-validity diagnostic design. Select
+`PROCEED_TO_37N_REPRO_VALIDITY_EXECUTION_APPROVAL`.
+
+Reason:
+
+Phase 37K completed 30 / 30 approved `Kronos-small` CPU forecasts, but Phase
+37L scrutinized weak/negative metrics and an output-validity concern:
+directional accuracy was 13 / 30 = 43.33%, Spearman rank IC was -0.268521,
+top-minus-bottom spread was -0.043511, top2-minus-bottom2 spread was
+-0.010859, and 17 / 150 forecast path rows had invalid OHLC relationships.
+Before any broader diagnostic, Research200 expansion, or strategy-adjacent use,
+the lane needs a small bounded test of whether invalid rows and ranking
+instability are caused by stochastic sampling, decoding settings, data mapping,
+normalization/de-normalization, model behavior, or output validation.
+
+Consequence:
+
+- Add `docs/03_research/external_model_kronos_reproducibility_validity_design.md`.
+- Future default design is at most 18 forecast runs: 2 symbols x 3 dates x 3
+  seeds/settings, with 90 forecast path rows.
+- Keep Phase 37M docs/design only.
+- Do not approve new Kronos inference, full Research200 inference, production
+  use, strategy integration, raw forecast trading, threshold tuning, training,
+  fine-tuning, model download, install, or Kronos repo modification.
+- Phase 37N must begin with explicit user approval for exact symbols, dates,
+  seed list, decoding settings, output folder, runtime limit, and no-production
+  / no-trading boundaries.

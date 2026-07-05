@@ -64,6 +64,17 @@ Broad voting and generic 2+ strategy consensus are dropped. Narrow S2/S4
 confirmation is retained only as a parked diagnostic observation. No ensemble,
 weights, allocation, or production approval resulted from this work.
 
+Phase 36B/36C closed the cross-strategy risk diagnostic branch. Liquidity is the
+strongest S2 risk diagnostic, with benchmark regime, drawdown state, gap risk,
+rolling R, and India VIX retained only as diagnostics. Phase 36D then documents
+the next S2 diagnostic design in
+`docs/03_research/s2_state_risk_intrade_diagnostic_design.md`: Lane A studies
+entry-state x risk inputs, and Lane B studies in-trade Markov state evolution.
+Phase 36D is docs/design only. It approves no dynamic exit, no `exit if
+RET_DOWN` rule, no entry filter, no state filter, no risk filter, no sizing
+change, no backtest implementation, and no strategy behavior change. The next
+selected gate is `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+
 Phase 37A through 37M opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and
 classified Kronos as feasible only for offline diagnostic research. Phase 37B
@@ -599,6 +610,14 @@ Completed follow-up phases:
 - **Phase 35B/35C:** cross-strategy overlap and confirmation closeout
   documented in `docs/02_audits/cross_strategy_overlap_audit.md`. Broad voting
   and generic 2+ consensus are dropped; S2/S4 is diagnostic-only.
+- **Phase 36D:** S2 state x risk and in-trade state evolution diagnostic
+  design completed in
+  `docs/03_research/s2_state_risk_intrade_diagnostic_design.md`. Lane A covers
+  entry-state x risk inputs. Lane B covers daily in-trade state deterioration
+  and hypothetical next-open exit analysis. Docs/design only; no S2 rule,
+  dynamic exit, state filter, risk filter, backtest implementation, or strategy
+  behavior change is approved. Next selected gate:
+  `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
 - **Phase 37O:** Kronos adapter/output-validation debug design completed in
   `docs/03_research/external_model_kronos_adapter_output_validation_debug.md`.
   The lane remains blocked by invalid OHLC output validity; next gated decision
@@ -643,11 +662,10 @@ Completed follow-up phases:
 
 Remaining planned follow-up phases:
 
-- **Next branch:** decide separately. Do not continue with another simple S2
-  context-threshold tweak, guard tweak, state-label exclusion, voting variant,
-  or automatic implementation phase. Preferred candidates are Cross-Strategy
-  Risk Model Input Discovery, Universe/Regime Segmentation Research, or S2 Risk
-  Model Research.
+- **Next branch:** Phase 36E S2 State Metadata / In-Trade Reconstruction
+  Discovery. Verify whether S2 state metadata, daily state reconstruction,
+  trade-id alignment, and risk-context joins can support the Phase 36D audit
+  lanes without lookahead or strategy behavior changes.
 - **Later:** broader strategy exposure/regime audit, historical index
   constituents, and point-in-time classification.
 
@@ -789,6 +807,12 @@ Next direction:
   No risk model, VIX rule, liquidity filter, drawdown throttle, rolling-R
   threshold, benchmark-regime filter, gap filter, dynamic sizing change, or
   production behavior is approved.
+- Treat Phase 36D as a docs-only S2 diagnostic design. Entry-state x risk and
+  in-trade state evolution are approved only for future discovery and
+  read-only audit planning. No dynamic exit, `exit if RET_DOWN` rule, entry
+  filter, state exclusion, risk filter, sizing change, backtest optimization,
+  or strategy behavior change is approved. Next selected gate:
+  `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
 - Treat Phase 37A through 37W as a closed external-model research lane for
   Kronos. Final verdict:
   `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`. No further local Kronos
@@ -832,8 +856,8 @@ The following are future research directions, not accepted production rules:
 - Wavelet strategy.
 - Cross-strategy risk-model input discovery.
 - Cross-strategy pre-registered risk experiment design after Phase 36B/36C.
-- S2 state x risk input diagnostic design, if separately scoped and
-  pre-registered.
+- S2 state x risk and in-trade state evolution diagnostics after Phase 36D,
+  beginning with state metadata / reconstruction discovery.
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
 - Kronos offline diagnostic/ranking/context/confirmation evaluation is closed

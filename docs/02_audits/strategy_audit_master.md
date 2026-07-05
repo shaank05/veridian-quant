@@ -17,6 +17,7 @@ No strategy is production-approved.
 - S5: `docs/02_audits/s5_audit.md`
 - Cross-strategy overlap / confirmation: `docs/02_audits/cross_strategy_overlap_audit.md`
 - Cross-strategy risk diagnostics: `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`
+- S2 state x risk / in-trade diagnostic design: `docs/03_research/s2_state_risk_intrade_diagnostic_design.md`
 - Kronos external-model closeout: `docs/03_research/external_model_kronos_closeout.md`
 
 ---
@@ -41,6 +42,7 @@ No strategy is production-approved.
 | Benchmark/sector/cap context layer | Phase 33F.3 context audit documented | Yes | Diagnostic audit only | Retained S1-S5 trade PnL logs audited; S2 remains strongest; no context filter or strategy promotion approved |
 | Cross-strategy voting / confirmation ensemble | Phase 35B/35C closed | No | Diagnostic audit only | Broad voting and generic 2+ consensus dropped; S2/S4 retained only as a parked diagnostic observation |
 | Cross-strategy risk diagnostics | Phase 36B/36C closed | No | Diagnostic audit only | Liquidity retained as strongest S2 diagnostic; VIX retained only as secondary context; no risk model, filter, throttle, sizing change, or production approval |
+| S2 state x risk / in-trade diagnostic design | Phase 36D docs-only design | No | Design only | Lane A entry-state x risk and Lane B in-trade state evolution designed; next gate is 36E metadata/reconstruction discovery; no dynamic exit, entry filter, state filter, risk filter, backtest, or strategy change approved |
 | Kronos external-model lane | Closed after Phase 37W | No | Diagnostic only | `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`; no further local inference, local patch, Research200 scaling, raw candle execution, strategy use, production use, or dependency merge approved |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
@@ -117,6 +119,22 @@ First-pass variant decisions:
 ---
 
 ## Current Benchmark Evidence
+
+### Phase 36D S2 State x Risk / In-Trade Diagnostic Design
+
+Phase 36D designs the next internal S2 diagnostic branch after the Phase
+36B/36C risk diagnostic closeout and the Kronos lane closeout. Full design:
+`docs/03_research/s2_state_risk_intrade_diagnostic_design.md`.
+
+Decision:
+
+- `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+- Lane A will study S2 entry-state components against risk inputs.
+- Lane B will study daily in-trade state deterioration and hypothetical
+  next-open exits as audit evidence only.
+- No dynamic exit, `exit if RET_DOWN` rule, entry filter, state exclusion, risk
+  filter, risk sizing change, backtest implementation, production use, or
+  strategy promotion is approved.
 
 ### Phase 37W Kronos External-Model Closeout
 

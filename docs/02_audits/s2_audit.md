@@ -96,6 +96,33 @@ Decision:
 
 ---
 
+## Phase 36D State x Risk / In-Trade Diagnostic Design
+
+Phase 36D creates a docs-only design for the next S2 diagnostic branch:
+`docs/03_research/s2_state_risk_intrade_diagnostic_design.md`.
+
+The design has two lanes:
+
+- Lane A: Entry-State x Risk Input Diagnostic. Study which S2 entry states or
+  components work or fail under liquidity, benchmark, drawdown, VIX, gap, year,
+  and concentration contexts.
+- Lane B: In-Trade State Evolution Diagnostic. Study whether open S2 trades
+  deteriorate into bad Markov states before stop, target, or time stop, and
+  whether a hypothetical next-open exit would have avoided losses or killed
+  winners.
+
+Decision:
+
+- `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+- No S2 rule is approved.
+- No dynamic exit is approved.
+- No `exit if RET_DOWN` rule is approved.
+- No entry filter, state filter, risk filter, liquidity filter, VIX/drawdown/
+  benchmark rule, risk sizing change, backtest implementation, or production
+  behavior is approved.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.
@@ -359,9 +386,12 @@ Decision:
 - Reject guard/ranking variants as benchmarks.
 - Retain S2/S4 confirmation only as a diagnostic observation, not an S2
   implementation path.
+- Retain Phase 36D entry-state x risk and in-trade state evolution work as a
+  diagnostic design only; proceed next to metadata/reconstruction discovery.
 - Do not continue immediate S2 tuning.
-- Move next research to risk-model, universe, or regime work rather than a
-  voting variant.
+- Move any next S2 work through explicit discovery/design gates rather than a
+  voting variant, simple context threshold, state exclusion, or immediate
+  implementation.
 
 Rationale:
 
@@ -379,5 +409,6 @@ Rationale:
 - More robust capacity-aware ranking.
 - Use Phase 27J signal-time context infrastructure in future rankers.
 - Potential S2 revisit after broader independent strategy comparison or materially new regime/ranking infrastructure.
+- Phase 36E S2 state metadata / in-trade reconstruction discovery.
 - Sector/industry conditioning if metadata becomes available.
 - Symbol-level robustness filters after broader strategy comparison.

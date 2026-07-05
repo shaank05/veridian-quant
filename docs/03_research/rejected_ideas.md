@@ -49,6 +49,42 @@ for next-open entries.
 
 ---
 
+## Phase 36D Immediate S2 State/Exit Rule Rejections
+
+Phase 36D creates a diagnostic design only. Full design:
+`docs/03_research/s2_state_risk_intrade_diagnostic_design.md`.
+
+Rejected or not approved for implementation now:
+
+- Immediate dynamic S2 exit rule.
+- `exit if RET_DOWN`.
+- Immediate in-trade Markov state monitoring as live trading logic.
+- New S2 entry-state filter.
+- New S2 state exclusion.
+- Entry-state x risk filter.
+- Liquidity filter.
+- Drawdown/VIX/benchmark rule.
+- Risk sizing change.
+- Production use or strategy promotion.
+- Backtest optimization before diagnostic evidence exists.
+
+Reason:
+
+The idea is plausible but untested. A bad in-trade state may also occur inside
+winning trades, and a next-open exit after deterioration may avoid stops while
+also cutting targets. Entry-state x risk findings may be unstable across years,
+symbols, liquidity buckets, and small state combinations.
+
+Consequence:
+
+Proceed only to `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`. Verify state metadata,
+daily state reconstruction, trade-id alignment, next-open hypothetical exit
+feasibility, pre-start lookback, and safe risk-context joins before any
+read-only audit helper is implemented. Any future rule must be pre-registered
+after diagnostics, not inferred directly from Phase 36D.
+
+---
+
 ## Phase 37B External-Model Misuse Rejections / Deferrals
 
 Kronos is allowed only as a future offline diagnostic/ranking/context/

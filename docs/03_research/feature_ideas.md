@@ -167,12 +167,55 @@ Anti-overfitting guardrails:
 Possible future branches:
 
 - Cross-strategy pre-registered risk experiment design.
-- S2 state x risk input diagnostic design.
+- S2 state x risk / in-trade state metadata discovery after Phase 36D.
 - Exact data-quality audit for liquidity if liquidity is elevated toward
   implementation.
 
 No risk model, VIX rule, liquidity filter, drawdown throttle, dynamic sizing
 change, or production behavior is approved by these candidates.
+
+---
+
+## S2 State x Risk / In-Trade State Evolution Diagnostic Ideas
+
+Phase 36D design reference:
+
+- `docs/03_research/s2_state_risk_intrade_diagnostic_design.md`
+
+Current status:
+
+- Docs/design only.
+- Next selected gate: `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+- Lane A studies entry-state components and composite states against liquidity,
+  drawdown state, benchmark regime, VIX, gap context, year, symbol
+  concentration, and secondary sector/rolling-R context.
+- Lane B studies daily in-trade Markov state evolution after S2 entry,
+  including whether deterioration into states such as `RET_DOWN`, `VOL_HIGH`,
+  or historically poor states appears before stop/target/time stop.
+- A future audit may estimate hypothetical next-open exits after state
+  deterioration, but only as diagnostic counterfactual evidence.
+
+Candidate diagnostic features:
+
+- Entry composite state and state components.
+- Entry transition metadata, if available.
+- Daily in-trade composite state and components.
+- First in-trade deterioration date.
+- Sessions from entry to deterioration.
+- Sessions from deterioration to realized exit.
+- Next-open hypothetical PnL/R after deterioration.
+- Avoided-stop and missed-target flags.
+- State x liquidity, benchmark, drawdown, VIX, and gap context buckets.
+
+Safety rules:
+
+- No dynamic exit, `exit if RET_DOWN` rule, entry filter, state exclusion, risk
+  filter, or sizing rule is approved.
+- Daily in-trade state for date D must use only information available at or
+  before D.
+- Hypothetical state-triggered execution should be next session open unless a
+  later design justifies otherwise.
+- Any future rule requires a pre-registered experiment after diagnostics.
 
 ---
 

@@ -1507,3 +1507,40 @@ Consequence:
 - Reopen only after concrete upstream improvement or explicit user approval for
   a new design such as upstream fix validation, close-only diagnostic,
   patched-Kronos experiment, or new model revision smoke test.
+
+---
+
+## 2026-07-05 - Design S2 State x Risk and In-Trade State Evolution Diagnostics Only
+
+Decision:
+
+Proceed with Phase 36D as docs-only S2 diagnostic design. Select
+`PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+
+Reason:
+
+S2's retained safer `exclude_ret_down` benchmark remains the strongest retained
+internal strategy, with about Rs 9.72L net PnL, about 1.189 PF, about 24.04%
+max drawdown, 577 trades, and about 45.23% win rate. It remains fragile,
+especially in 2024, 2025, and partial 2026, and Phase 34 found regime/state
+non-stationarity plus stop churn as the core failure mode.
+
+Phase 36B/36C identified useful risk diagnostics, especially liquidity, plus
+benchmark regime, drawdown state, gap risk, rolling R, and VIX as secondary
+context. The missing question is whether S2 state behavior explains trade
+quality at entry and during the holding period.
+
+Consequence:
+
+- Add `docs/03_research/s2_state_risk_intrade_diagnostic_design.md`.
+- Define Lane A: Entry-State x Risk Input Diagnostic.
+- Define Lane B: In-Trade State Evolution Diagnostic.
+- Require Phase 36E discovery before any implementation to verify S2 state
+  metadata, daily state reconstruction, trade-id alignment, next-open
+  hypothetical exit feasibility, pre-start lookback, and risk-context joins.
+- Keep all future claims numeric and sample-size labeled.
+- Do not approve a dynamic exit rule.
+- Do not approve an `exit if RET_DOWN` rule.
+- Do not approve a new entry filter, state exclusion, liquidity filter,
+  drawdown/VIX/benchmark rule, risk sizing change, backtest optimization,
+  production use, or strategy promotion.

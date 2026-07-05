@@ -552,6 +552,59 @@ clarification, output-validity improvements, and prediction-quality evidence.
 
 ---
 
+# H12 - S2 State/Risk Failure and In-Trade Deterioration Diagnostics
+
+## Hypothesis
+
+S2 failures may be explained by entry-state x risk interactions and/or by
+post-entry Markov state deterioration during the holding period.
+
+The retained S2 safer benchmark remains useful, but weak periods in 2024, 2025,
+and partial 2026 suggest that aggregate S2 performance may hide unstable
+state/risk pockets and stop-churn paths.
+
+Phase 36D designs this as diagnostics only:
+
+- `docs/03_research/s2_state_risk_intrade_diagnostic_design.md`
+
+## Expected Research Value
+
+- Determine whether entry-state components perform differently under liquidity,
+  benchmark, drawdown, VIX, and gap-risk contexts.
+- Determine whether trades that later stop out deteriorate into poor Markov
+  states before realized exit.
+- Estimate whether a hypothetical next-open exit after state deterioration
+  would have reduced losses or cut winners too early.
+- Separate stable state/risk evidence from 2025-only or tiny-bucket artifacts.
+
+## When It May Fail
+
+- Bad states appear equally in winners and losers.
+- Many target-hit trades pass through the same bad states.
+- Hypothetical exits reduce drawdown but destroy expectancy.
+- Evidence depends on one year, one symbol, or one small state/risk bucket.
+- Daily state reconstruction is not available without lookahead or missing
+  pre-start lookback.
+
+## Candidate Features
+
+- Entry composite Markov state and state components.
+- Entry state x liquidity, benchmark, drawdown, VIX, and gap context.
+- Daily in-trade composite state and components.
+- First deterioration date and lead time before exit.
+- Hypothetical next-open exit PnL/R after deterioration.
+- Avoided-stop and missed-target diagnostics.
+
+Audit status:
+
+- Phase 36D is docs/design only.
+- No dynamic exit, `exit if RET_DOWN` rule, entry filter, state exclusion, risk
+  filter, sizing change, backtest, production use, or strategy promotion is
+  approved.
+- Next selected gate: `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+
+---
+
 # Rejected or Deferred Hypotheses
 
 The following are not accepted production rules.

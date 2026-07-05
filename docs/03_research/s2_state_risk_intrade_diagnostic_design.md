@@ -366,3 +366,16 @@ Possible post-scrutiny decisions:
 Phase 36D creates the design only. The next phase should discover whether S2
 state metadata and daily read-only state reconstruction are available enough to
 support the two audit lanes without changing strategy behavior.
+
+Phase 36E discovery result:
+
+- Discovery doc:
+  `docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`.
+- Lane A Entry-State x Risk classification: `READY_WITH_MINOR_GAPS`.
+- Lane B In-Trade State Evolution classification:
+  `NEEDS_DAILY_STATE_RECONSTRUCTION`.
+- Next selected gate:
+  `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+- No diagnostic helper, backtest, report generation, dynamic exit, entry
+  filter, state exclusion, risk filter, sizing change, production use, or
+  strategy promotion is approved.

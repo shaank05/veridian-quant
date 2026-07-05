@@ -18,6 +18,7 @@ No strategy is production-approved.
 - Cross-strategy overlap / confirmation: `docs/02_audits/cross_strategy_overlap_audit.md`
 - Cross-strategy risk diagnostics: `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`
 - S2 state x risk / in-trade diagnostic design: `docs/03_research/s2_state_risk_intrade_diagnostic_design.md`
+- S2 state metadata / in-trade reconstruction discovery: `docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`
 - Kronos external-model closeout: `docs/03_research/external_model_kronos_closeout.md`
 
 ---
@@ -43,6 +44,7 @@ No strategy is production-approved.
 | Cross-strategy voting / confirmation ensemble | Phase 35B/35C closed | No | Diagnostic audit only | Broad voting and generic 2+ consensus dropped; S2/S4 retained only as a parked diagnostic observation |
 | Cross-strategy risk diagnostics | Phase 36B/36C closed | No | Diagnostic audit only | Liquidity retained as strongest S2 diagnostic; VIX retained only as secondary context; no risk model, filter, throttle, sizing change, or production approval |
 | S2 state x risk / in-trade diagnostic design | Phase 36D docs-only design | No | Design only | Lane A entry-state x risk and Lane B in-trade state evolution designed; next gate is 36E metadata/reconstruction discovery; no dynamic exit, entry filter, state filter, risk filter, backtest, or strategy change approved |
+| S2 state metadata / in-trade reconstruction discovery | Phase 36E discovery-only | No | Discovery only | Lane A is `READY_WITH_MINOR_GAPS`; Lane B is `NEEDS_DAILY_STATE_RECONSTRUCTION`; next gate is 36F reconstruction prototype design; no helper, backtest, report, dynamic exit, filter, rule, or strategy change approved |
 | Kronos external-model lane | Closed after Phase 37W | No | Diagnostic only | `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`; no further local inference, local patch, Research200 scaling, raw candle execution, strategy use, production use, or dependency merge approved |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
@@ -135,6 +137,24 @@ Decision:
 - No dynamic exit, `exit if RET_DOWN` rule, entry filter, state exclusion, risk
   filter, risk sizing change, backtest implementation, production use, or
   strategy promotion is approved.
+
+### Phase 36E S2 State Metadata / In-Trade Reconstruction Discovery
+
+Phase 36E discovers whether the Phase 36D lanes are implementable from existing
+metadata and read-only reconstruction. Full discovery:
+`docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`.
+
+Decision:
+
+- Lane A Entry-State x Risk: `READY_WITH_MINOR_GAPS`.
+- Lane B In-Trade State Evolution: `NEEDS_DAILY_STATE_RECONSTRUCTION`.
+- Next selected gate:
+  `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+- Entry state metadata exists in retained S2 signal and trade-context outputs.
+- Daily in-trade state paths are not stored and must be reconstructed from
+  OHLC with strict date-alignment controls.
+- No diagnostic helper, backtest, report generation, dynamic exit, filter,
+  rule, sizing change, production use, or strategy promotion is approved.
 
 ### Phase 37W Kronos External-Model Closeout
 

@@ -77,11 +77,22 @@ symbols, liquidity buckets, and small state combinations.
 
 Consequence:
 
-Proceed only to `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`. Verify state metadata,
-daily state reconstruction, trade-id alignment, next-open hypothetical exit
-feasibility, pre-start lookback, and safe risk-context joins before any
-read-only audit helper is implemented. Any future rule must be pre-registered
-after diagnostics, not inferred directly from Phase 36D.
+Phase 36D allowed only `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`: verify state
+metadata, daily state reconstruction, trade-id alignment, next-open
+hypothetical exit feasibility, pre-start lookback, and safe risk-context joins
+before any read-only audit helper is implemented. Any future rule must be
+pre-registered after diagnostics, not inferred directly from Phase 36D.
+
+Phase 36E update:
+
+- Discovery reference:
+  `docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`.
+- Entry-state metadata exists, but in-trade daily state paths are not stored.
+- Proceed only to
+  `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+- Still rejected/not approved: dynamic exit, `exit if RET_DOWN`, entry filter,
+  state exclusion, liquidity/risk/VIX/drawdown/benchmark rule, sizing change,
+  backtest optimization, production use, and strategy promotion.
 
 ---
 

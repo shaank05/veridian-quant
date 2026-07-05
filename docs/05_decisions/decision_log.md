@@ -1544,3 +1544,43 @@ Consequence:
 - Do not approve a new entry filter, state exclusion, liquidity filter,
   drawdown/VIX/benchmark rule, risk sizing change, backtest optimization,
   production use, or strategy promotion.
+
+---
+
+## 2026-07-05 - Discover S2 State Metadata and In-Trade Reconstruction Feasibility Only
+
+Decision:
+
+Proceed with Phase 36E as discovery-only S2 state metadata / in-trade
+reconstruction review. Select
+`PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+
+Reason:
+
+Phase 36E found that S2 entry-state metadata already exists in retained
+`signal_log.csv` and `trade_signal_context.csv` artifacts, including
+`state_label`, `state_observation_count`, `positive_transition_probability`,
+`average_forward_return_pct`, and `median_forward_return_pct`. Existing helpers
+can parse composite `RET_*|VOL_*|DD_*|LOW_*` labels into components. Trade,
+PnL, and trade-context artifacts share `trade_id`.
+
+Daily in-trade state paths are not stored. Lane B therefore requires read-only
+daily state reconstruction from OHLC using the existing S2 `build_state_frame`
+logic, with explicit controls for pre-start lookback, next-session-open
+hypothetical execution, and same-day realized stop/target handling.
+
+Consequence:
+
+- Add
+  `docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`.
+- Classify Lane A Entry-State x Risk as `READY_WITH_MINOR_GAPS`.
+- Classify Lane B In-Trade State Evolution as
+  `NEEDS_DAILY_STATE_RECONSTRUCTION`.
+- Design a reconstruction prototype before any audit helper.
+- Do not implement a diagnostic helper.
+- Do not run a backtest.
+- Do not generate reports.
+- Do not approve a dynamic exit or `exit if RET_DOWN` rule.
+- Do not approve a new entry filter, state exclusion, liquidity filter,
+  drawdown/VIX/benchmark rule, risk sizing change, backtest optimization,
+  production use, or strategy promotion.

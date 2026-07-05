@@ -123,6 +123,36 @@ Decision:
 
 ---
 
+## Phase 36E State Metadata / In-Trade Reconstruction Discovery
+
+Phase 36E completed discovery for the Phase 36D diagnostic lanes:
+`docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`.
+
+Findings:
+
+- S2 state is built in
+  `src/veridian_quant/v2/strategies/s2_markov_state_transition.py` by
+  `build_state_frame`.
+- Entry composite state metadata exists in retained `signal_log.csv` and
+  `trade_signal_context.csv`.
+- Existing parsing helpers can split `RET_*|VOL_*|DD_*|LOW_*` into state
+  components.
+- Trade logs, PnL logs, and trade-signal context share `trade_id`.
+- Daily in-trade state paths are not stored in retained artifacts and require
+  read-only reconstruction from OHLC.
+
+Decision:
+
+- Lane A Entry-State x Risk: `READY_WITH_MINOR_GAPS`.
+- Lane B In-Trade State Evolution: `NEEDS_DAILY_STATE_RECONSTRUCTION`.
+- Next selected gate:
+  `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+- No diagnostic helper, backtest, report generation, dynamic exit, `exit if
+  RET_DOWN` rule, entry filter, state exclusion, risk filter, sizing change,
+  production use, or strategy promotion is approved.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.
@@ -388,6 +418,8 @@ Decision:
   implementation path.
 - Retain Phase 36D entry-state x risk and in-trade state evolution work as a
   diagnostic design only; proceed next to metadata/reconstruction discovery.
+- Retain Phase 36E as discovery-only; proceed next to read-only daily state
+  reconstruction prototype design before any audit helper.
 - Do not continue immediate S2 tuning.
 - Move any next S2 work through explicit discovery/design gates rather than a
   voting variant, simple context threshold, state exclusion, or immediate
@@ -409,6 +441,6 @@ Rationale:
 - More robust capacity-aware ranking.
 - Use Phase 27J signal-time context infrastructure in future rankers.
 - Potential S2 revisit after broader independent strategy comparison or materially new regime/ranking infrastructure.
-- Phase 36E S2 state metadata / in-trade reconstruction discovery.
+- Phase 36F S2 state reconstruction prototype design.
 - Sector/industry conditioning if metadata becomes available.
 - Symbol-level robustness filters after broader strategy comparison.

@@ -184,8 +184,9 @@ Phase 36D design reference:
 
 Current status:
 
-- Docs/design only.
-- Next selected gate: `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+- Docs/design/discovery only.
+- Next selected gate:
+  `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
 - Lane A studies entry-state components and composite states against liquidity,
   drawdown state, benchmark regime, VIX, gap context, year, symbol
   concentration, and secondary sector/rolling-R context.
@@ -216,6 +217,20 @@ Safety rules:
 - Hypothetical state-triggered execution should be next session open unless a
   later design justifies otherwise.
 - Any future rule requires a pre-registered experiment after diagnostics.
+
+Phase 36E discovery update:
+
+- Discovery reference:
+  `docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`.
+- Lane A Entry-State x Risk is `READY_WITH_MINOR_GAPS` because retained
+  `signal_log.csv` and `trade_signal_context.csv` already include entry
+  `state_label` and same-state evidence metadata.
+- Lane B In-Trade State Evolution is `NEEDS_DAILY_STATE_RECONSTRUCTION`
+  because retained artifacts do not store daily open-trade Markov state paths.
+- Next selected gate:
+  `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+- No helper, backtest, report generation, dynamic exit, filter, rule, or
+  strategy behavior change is approved.
 
 ---
 

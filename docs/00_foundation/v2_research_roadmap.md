@@ -73,7 +73,12 @@ entry-state x risk inputs, and Lane B studies in-trade Markov state evolution.
 Phase 36D is docs/design only. It approves no dynamic exit, no `exit if
 RET_DOWN` rule, no entry filter, no state filter, no risk filter, no sizing
 change, no backtest implementation, and no strategy behavior change. The next
-selected gate is `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+gate selected by Phase 36D was `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+Phase 36E discovery is documented in
+`docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`: entry
+state metadata exists with minor gaps, but in-trade state evolution needs daily
+state reconstruction. The next selected gate is
+`PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
 
 Phase 37A through 37M opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and
@@ -616,8 +621,15 @@ Completed follow-up phases:
   entry-state x risk inputs. Lane B covers daily in-trade state deterioration
   and hypothetical next-open exit analysis. Docs/design only; no S2 rule,
   dynamic exit, state filter, risk filter, backtest implementation, or strategy
-  behavior change is approved. Next selected gate:
+  behavior change is approved. Phase 36D selected:
   `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+- **Phase 36E:** S2 state metadata / in-trade reconstruction discovery
+  completed in
+  `docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`.
+  Lane A is `READY_WITH_MINOR_GAPS`; Lane B is
+  `NEEDS_DAILY_STATE_RECONSTRUCTION`. No diagnostic helper, backtest, report,
+  dynamic exit, filter, rule, or strategy change is approved. Next selected
+  gate: `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
 - **Phase 37O:** Kronos adapter/output-validation debug design completed in
   `docs/03_research/external_model_kronos_adapter_output_validation_debug.md`.
   The lane remains blocked by invalid OHLC output validity; next gated decision
@@ -662,10 +674,10 @@ Completed follow-up phases:
 
 Remaining planned follow-up phases:
 
-- **Next branch:** Phase 36E S2 State Metadata / In-Trade Reconstruction
-  Discovery. Verify whether S2 state metadata, daily state reconstruction,
-  trade-id alignment, and risk-context joins can support the Phase 36D audit
-  lanes without lookahead or strategy behavior changes.
+- **Next branch:** Phase 36F S2 State Reconstruction Prototype Design. Design a
+  read-only daily state reconstruction prototype before any audit helper so
+  date alignment, pre-start lookback, next-open hypothetical exits, and
+  same-day realized-exit caveats are explicit.
 - **Later:** broader strategy exposure/regime audit, historical index
   constituents, and point-in-time classification.
 
@@ -811,8 +823,12 @@ Next direction:
   in-trade state evolution are approved only for future discovery and
   read-only audit planning. No dynamic exit, `exit if RET_DOWN` rule, entry
   filter, state exclusion, risk filter, sizing change, backtest optimization,
-  or strategy behavior change is approved. Next selected gate:
+  or strategy behavior change is approved. Phase 36D selected:
   `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+- Treat Phase 36E as discovery-only. Entry-state x risk is close to ready from
+  existing metadata, but in-trade state evolution requires daily state
+  reconstruction design before any helper. Next selected gate:
+  `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
 - Treat Phase 37A through 37W as a closed external-model research lane for
   Kronos. Final verdict:
   `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`. No further local Kronos
@@ -856,8 +872,7 @@ The following are future research directions, not accepted production rules:
 - Wavelet strategy.
 - Cross-strategy risk-model input discovery.
 - Cross-strategy pre-registered risk experiment design after Phase 36B/36C.
-- S2 state x risk and in-trade state evolution diagnostics after Phase 36D,
-  beginning with state metadata / reconstruction discovery.
+- S2 daily state reconstruction prototype design after Phase 36E.
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
 - Kronos offline diagnostic/ranking/context/confirmation evaluation is closed

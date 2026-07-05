@@ -598,10 +598,15 @@ Phase 36D designs this as diagnostics only:
 Audit status:
 
 - Phase 36D is docs/design only.
+- Phase 36E discovery is documented in
+  `docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`.
+- Lane A Entry-State x Risk is `READY_WITH_MINOR_GAPS`.
+- Lane B In-Trade State Evolution is `NEEDS_DAILY_STATE_RECONSTRUCTION`.
 - No dynamic exit, `exit if RET_DOWN` rule, entry filter, state exclusion, risk
   filter, sizing change, backtest, production use, or strategy promotion is
   approved.
-- Next selected gate: `PROCEED_TO_36E_STATE_METADATA_DISCOVERY`.
+- Next selected gate:
+  `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
 
 ---
 

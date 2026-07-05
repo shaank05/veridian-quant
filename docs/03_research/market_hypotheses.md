@@ -602,11 +602,15 @@ Audit status:
   `docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`.
 - Lane A Entry-State x Risk is `READY_WITH_MINOR_GAPS`.
 - Lane B In-Trade State Evolution is `NEEDS_DAILY_STATE_RECONSTRUCTION`.
+- Phase 36F prototype design is documented in
+  `docs/03_research/s2_daily_state_reconstruction_prototype_design.md`.
+- The in-trade deterioration hypothesis remains pending reconstruction
+  coverage, entry-state match validation, and same-day stop/target safety.
 - No dynamic exit, `exit if RET_DOWN` rule, entry filter, state exclusion, risk
   filter, sizing change, backtest, production use, or strategy promotion is
   approved.
 - Next selected gate:
-  `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+  `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
 
 ---
 

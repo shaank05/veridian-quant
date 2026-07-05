@@ -19,6 +19,7 @@ No strategy is production-approved.
 - Cross-strategy risk diagnostics: `docs/02_audits/cross_strategy_risk_diagnostic_audit.md`
 - S2 state x risk / in-trade diagnostic design: `docs/03_research/s2_state_risk_intrade_diagnostic_design.md`
 - S2 state metadata / in-trade reconstruction discovery: `docs/03_research/s2_state_metadata_intrade_reconstruction_discovery.md`
+- S2 daily state reconstruction prototype design: `docs/03_research/s2_daily_state_reconstruction_prototype_design.md`
 - Kronos external-model closeout: `docs/03_research/external_model_kronos_closeout.md`
 
 ---
@@ -45,6 +46,7 @@ No strategy is production-approved.
 | Cross-strategy risk diagnostics | Phase 36B/36C closed | No | Diagnostic audit only | Liquidity retained as strongest S2 diagnostic; VIX retained only as secondary context; no risk model, filter, throttle, sizing change, or production approval |
 | S2 state x risk / in-trade diagnostic design | Phase 36D docs-only design | No | Design only | Lane A entry-state x risk and Lane B in-trade state evolution designed; next gate is 36E metadata/reconstruction discovery; no dynamic exit, entry filter, state filter, risk filter, backtest, or strategy change approved |
 | S2 state metadata / in-trade reconstruction discovery | Phase 36E discovery-only | No | Discovery only | Lane A is `READY_WITH_MINOR_GAPS`; Lane B is `NEEDS_DAILY_STATE_RECONSTRUCTION`; next gate is 36F reconstruction prototype design; no helper, backtest, report, dynamic exit, filter, rule, or strategy change approved |
+| S2 daily state reconstruction prototype design | Phase 36F docs-only design | No | Design only | Future narrow prototype specified for daily state rebuild, trade lifecycle expansion, same-day stop/target safety, next-open feasibility, and validation; next gate is 36G prototype implementation; no full helper, dynamic exit, filter, rule, or strategy change approved |
 | Kronos external-model lane | Closed after Phase 37W | No | Diagnostic only | `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`; no further local inference, local patch, Research200 scaling, raw candle execution, strategy use, production use, or dependency merge approved |
 | FFT strategy | Future research | No | No | Deferred; not an accepted production rule |
 | Wavelet strategy | Future research | No | No | Deferred; not an accepted production rule |
@@ -154,6 +156,23 @@ Decision:
 - Daily in-trade state paths are not stored and must be reconstructed from
   OHLC with strict date-alignment controls.
 - No diagnostic helper, backtest, report generation, dynamic exit, filter,
+  rule, sizing change, production use, or strategy promotion is approved.
+
+### Phase 36F S2 Daily State Reconstruction Prototype Design
+
+Phase 36F designs the narrow prototype required before any full Lane A/B S2
+state audit helper. Full design:
+`docs/03_research/s2_daily_state_reconstruction_prototype_design.md`.
+
+Decision:
+
+- `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
+- The future prototype must reconstruct daily S2 states from OHLC, expand
+  trade holding dates, join states by symbol/date, enforce D-close/next-open
+  alignment, and validate entry-state match rate.
+- Same-day stop/target safety is mandatory: D-close state is not actionable if
+  the trade exited intraday on D.
+- No full audit helper, backtest, report generation, dynamic exit, filter,
   rule, sizing change, production use, or strategy promotion is approved.
 
 ### Phase 37W Kronos External-Model Closeout

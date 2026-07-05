@@ -489,3 +489,17 @@ Rationale:
 - No production use.
 - No strategy promotion.
 - No backtest optimization.
+
+Phase 36F follow-up:
+
+- Design doc:
+  `docs/03_research/s2_daily_state_reconstruction_prototype_design.md`.
+- Phase 36F defines the future narrow state reconstruction prototype, including
+  daily state reconstruction, holding-period expansion, same-day stop/target
+  safety, deterioration candidate flags, next-open feasibility, and coverage
+  validation.
+- Next selected gate:
+  `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
+- Still not approved: full audit helper, dynamic exit, `exit if RET_DOWN`,
+  entry filter, state exclusion, risk filter, sizing change, production use,
+  strategy promotion, or backtest optimization.

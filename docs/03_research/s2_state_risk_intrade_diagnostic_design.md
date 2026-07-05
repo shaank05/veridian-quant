@@ -379,3 +379,18 @@ Phase 36E discovery result:
 - No diagnostic helper, backtest, report generation, dynamic exit, entry
   filter, state exclusion, risk filter, sizing change, production use, or
   strategy promotion is approved.
+
+Phase 36F prototype design result:
+
+- Design doc:
+  `docs/03_research/s2_daily_state_reconstruction_prototype_design.md`.
+- Phase 36F defines the narrow future reconstruction prototype required before
+  a full Lane A/B audit helper.
+- Required prototype controls include daily state reconstruction, trade
+  lifecycle expansion, D-close / next-open alignment, same-day stop/target
+  safety, deterioration candidate flags, and entry-state match validation.
+- Next selected gate:
+  `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
+- No full audit helper, dynamic exit, entry filter, state exclusion, risk
+  filter, sizing change, production use, strategy promotion, or backtest
+  optimization is approved.

@@ -1584,3 +1584,38 @@ Consequence:
 - Do not approve a new entry filter, state exclusion, liquidity filter,
   drawdown/VIX/benchmark rule, risk sizing change, backtest optimization,
   production use, or strategy promotion.
+
+---
+
+## 2026-07-05 - Design S2 Daily State Reconstruction Prototype Only
+
+Decision:
+
+Proceed with Phase 36F as docs-only S2 daily state reconstruction prototype
+design. Select
+`PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
+
+Reason:
+
+Phase 36E found that Lane B cannot use stored daily in-trade state paths because
+they do not exist in retained reports. Daily reconstruction appears feasible
+from OHLC using the existing `build_state_frame` logic, but implementation must
+first define exact date alignment, holding-period expansion, same-day
+stop/target safety, and next-open hypothetical-exit feasibility.
+
+Consequence:
+
+- Add `docs/03_research/s2_daily_state_reconstruction_prototype_design.md`.
+- Future prototype should reconstruct one S2 state row per symbol/date, expand
+  accepted S2 trades into holding-period rows, and join state by symbol/date.
+- Date-D state is known only after D close; hypothetical deterioration exits
+  must execute at next valid session open.
+- If the actual trade exits intraday on D, D-close state is not actionable.
+- Future prototype must validate reconstructed entry-state match rate against
+  stored state metadata before any full audit helper.
+- Do not implement prototype code in Phase 36F.
+- Do not implement a full Lane A/B audit helper.
+- Do not run backtests or generate reports.
+- Do not approve a dynamic exit, `exit if RET_DOWN`, entry filter, state
+  exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
+  backtest optimization, production use, or strategy promotion.

@@ -79,6 +79,12 @@ Phase 36E discovery is documented in
 state metadata exists with minor gaps, but in-trade state evolution needs daily
 state reconstruction. The next selected gate is
 `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+Phase 36F prototype design is documented in
+`docs/03_research/s2_daily_state_reconstruction_prototype_design.md`: it defines
+the future read-only reconstruction prototype, including daily state rebuild,
+trade lifecycle expansion, same-day stop/target safety, deterioration
+candidates, next-open feasibility, and validation gates. The next selected gate
+is `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
 
 Phase 37A through 37M opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and
@@ -630,6 +636,14 @@ Completed follow-up phases:
   `NEEDS_DAILY_STATE_RECONSTRUCTION`. No diagnostic helper, backtest, report,
   dynamic exit, filter, rule, or strategy change is approved. Next selected
   gate: `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+- **Phase 36F:** S2 daily state reconstruction prototype design completed in
+  `docs/03_research/s2_daily_state_reconstruction_prototype_design.md`. The
+  future prototype must reconstruct daily S2 states, expand trade lifecycle
+  rows, enforce same-day stop/target safety, evaluate next-open feasibility,
+  and validate reconstructed entry-state match rate before any full audit
+  helper. Docs/design only; no prototype code, backtest, report, dynamic exit,
+  filter, rule, or strategy change is approved. Next selected gate:
+  `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
 - **Phase 37O:** Kronos adapter/output-validation debug design completed in
   `docs/03_research/external_model_kronos_adapter_output_validation_debug.md`.
   The lane remains blocked by invalid OHLC output validity; next gated decision
@@ -674,10 +688,9 @@ Completed follow-up phases:
 
 Remaining planned follow-up phases:
 
-- **Next branch:** Phase 36F S2 State Reconstruction Prototype Design. Design a
-  read-only daily state reconstruction prototype before any audit helper so
-  date alignment, pre-start lookback, next-open hypothetical exits, and
-  same-day realized-exit caveats are explicit.
+- **Next branch:** Phase 36G S2 State Reconstruction Prototype Implementation.
+  Implement only the narrow read-only reconstruction prototype described in
+  Phase 36F, not the full audit helper and not any trading rule.
 - **Later:** broader strategy exposure/regime audit, historical index
   constituents, and point-in-time classification.
 
@@ -829,6 +842,11 @@ Next direction:
   existing metadata, but in-trade state evolution requires daily state
   reconstruction design before any helper. Next selected gate:
   `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+- Treat Phase 36F as docs/design only. It approves only a future narrow
+  reconstruction prototype implementation, not a full audit helper, dynamic
+  exit, filter, rule, backtest optimization, or strategy behavior change. Next
+  selected gate:
+  `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
 - Treat Phase 37A through 37W as a closed external-model research lane for
   Kronos. Final verdict:
   `DOCS_ONLY_CLOSEOUT_AND_BIMONTHLY_REVIEW`. No further local Kronos
@@ -872,7 +890,7 @@ The following are future research directions, not accepted production rules:
 - Wavelet strategy.
 - Cross-strategy risk-model input discovery.
 - Cross-strategy pre-registered risk experiment design after Phase 36B/36C.
-- S2 daily state reconstruction prototype design after Phase 36E.
+- S2 daily state reconstruction prototype implementation after Phase 36F.
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
 - Kronos offline diagnostic/ranking/context/confirmation evaluation is closed

@@ -153,6 +153,34 @@ Decision:
 
 ---
 
+## Phase 36F Daily State Reconstruction Prototype Design
+
+Phase 36F designs the narrow future prototype needed before any full S2 state
+risk / in-trade audit helper:
+`docs/03_research/s2_daily_state_reconstruction_prototype_design.md`.
+
+The design requires a future prototype to:
+
+- Reconstruct daily S2 state rows from OHLC using the existing S2 state builder.
+- Expand executed S2 trades into holding-period rows by `trade_id`.
+- Join reconstructed state by symbol/date.
+- Treat date-D state as known only after D close.
+- Execute any hypothetical deterioration exit no earlier than the next session
+  open.
+- Exclude D-close state as actionable when the actual trade exited intraday on
+  D.
+- Validate reconstructed entry-state match rate against stored trade/signal
+  metadata before any full audit helper.
+
+Decision:
+
+- `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
+- No full audit helper, backtest, report generation, dynamic exit, `exit if
+  RET_DOWN`, entry filter, state exclusion, risk filter, sizing change,
+  production use, or strategy promotion is approved.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.
@@ -420,6 +448,8 @@ Decision:
   diagnostic design only; proceed next to metadata/reconstruction discovery.
 - Retain Phase 36E as discovery-only; proceed next to read-only daily state
   reconstruction prototype design before any audit helper.
+- Retain Phase 36F as docs/design only; proceed next only to the narrow
+  read-only state reconstruction prototype implementation.
 - Do not continue immediate S2 tuning.
 - Move any next S2 work through explicit discovery/design gates rather than a
   voting variant, simple context threshold, state exclusion, or immediate
@@ -441,6 +471,6 @@ Rationale:
 - More robust capacity-aware ranking.
 - Use Phase 27J signal-time context infrastructure in future rankers.
 - Potential S2 revisit after broader independent strategy comparison or materially new regime/ranking infrastructure.
-- Phase 36F S2 state reconstruction prototype design.
+- Phase 36G S2 state reconstruction prototype implementation.
 - Sector/industry conditioning if metadata becomes available.
 - Symbol-level robustness filters after broader strategy comparison.

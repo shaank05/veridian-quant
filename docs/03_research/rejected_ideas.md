@@ -94,6 +94,19 @@ Phase 36E update:
   state exclusion, liquidity/risk/VIX/drawdown/benchmark rule, sizing change,
   backtest optimization, production use, and strategy promotion.
 
+Phase 36F update:
+
+- Prototype design reference:
+  `docs/03_research/s2_daily_state_reconstruction_prototype_design.md`.
+- Proceed only to
+  `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
+- Phase 36F still does not approve a full audit helper, dynamic exit, `exit if
+  RET_DOWN`, entry filter, state exclusion, liquidity/risk/VIX/drawdown/
+  benchmark rule, sizing change, production use, strategy promotion, or
+  backtest optimization.
+- The future prototype must prove reconstruction coverage and entry-state match
+  quality before any full audit helper is considered.
+
 ---
 
 ## Phase 37B External-Model Misuse Rejections / Deferrals

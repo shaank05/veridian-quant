@@ -184,9 +184,9 @@ Phase 36D design reference:
 
 Current status:
 
-- Docs/design/discovery only.
+- Docs/design/discovery/prototype-design only.
 - Next selected gate:
-  `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
+  `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
 - Lane A studies entry-state components and composite states against liquidity,
   drawdown state, benchmark regime, VIX, gap context, year, symbol
   concentration, and secondary sector/rolling-R context.
@@ -231,6 +231,20 @@ Phase 36E discovery update:
   `PROCEED_TO_36F_STATE_RECONSTRUCTION_PROTOTYPE_DESIGN`.
 - No helper, backtest, report generation, dynamic exit, filter, rule, or
   strategy behavior change is approved.
+
+Phase 36F prototype design update:
+
+- Design reference:
+  `docs/03_research/s2_daily_state_reconstruction_prototype_design.md`.
+- Future prototype should reconstruct daily S2 states from OHLC, expand trade
+  lifecycle rows, enforce same-day stop/target safety, compute deterioration
+  candidate flags, and evaluate audit-only next-open feasibility.
+- Entry-state match validation is a required gate before any full audit helper.
+- Next selected gate:
+  `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
+- Still not approved: full audit helper, dynamic exit, `exit if RET_DOWN`,
+  entry filter, state exclusion, risk filter, sizing change, backtest
+  optimization, or production behavior.
 
 ---
 

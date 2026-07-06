@@ -116,3 +116,80 @@ audit implementation.
 ## 8. Decision
 
 `FIX_OHLC_INPUT_AND_RERUN_36H`
+
+---
+
+## 9. Phase 36H.1 OHLC Input Fix
+
+Phase 36H.1 updates the prototype to support the existing Veridian OHLC loading
+path instead of requiring only pre-exported per-symbol CSVs.
+
+Implementation:
+
+- Existing `--ohlc-csv-dir` support is preserved.
+- The CLI now supports `--ohlc-source db`.
+- The DB source uses `DatabaseClient().get_engine()` and
+  `SQLAlchemyDailyOHLCVLoader`, matching existing v2 runner/audit patterns.
+- Retained symbols are inferred from loaded trades.
+- The OHLC load window is inferred from retained signal/entry dates through
+  exit dates, with a pre-start buffer for state construction.
+- No strategy runner or backtest path is invoked.
+
+Focused tests:
+
+- `uv run pytest tests/v2/test_s2_state_reconstruction.py -v`
+- Result: 17 passed.
+
+## 10. Phase 36H.1 Rerun Status
+
+Run status: `BLOCKED_DB_CONNECTION`.
+
+Attempted command:
+
+`uv run python -m veridian_quant.v2.run_s2_state_reconstruction_prototype --ohlc-source db --output-dir reports/v2/s2_state_reconstruction_prototype_20260706`
+
+The first attempt failed before database access because Windows console output
+could not encode Unicode status symbols printed by `DatabaseClient`. The retry
+used `PYTHONIOENCODING=utf-8`.
+
+The DB-backed retry initialized the SQLAlchemy engine, then timed out while
+connecting to the configured database host:
+
+- Host: `34.14.156.222`.
+- Port: `5432`.
+- Error class: `psycopg2.OperationalError`.
+- Error: connection timed out.
+
+The command was retried with elevated network permission and failed with the
+same timeout. Therefore the remaining blocker is database reachability, not the
+prototype CLI input design.
+
+No generated prototype output folder was created.
+
+## 11. Phase 36H.1 Coverage / Validation
+
+Not computed because DB OHLC loading could not complete.
+
+Retained-trade preflight from Phase 36H remains valid:
+
+- Trades loaded: 577.
+- Unique `trade_id` values: 577.
+- Unique symbols: 146.
+- Missing `trade_id`: 0.
+- Missing symbol: 0.
+- Missing entry date: 0.
+- Missing exit date: 0.
+- Missing stored entry state label: 0.
+
+Lifecycle expansion, reconstructed state joins, entry-state validation,
+same-day safety counts, first deterioration candidates, and next-open
+feasibility remain not generated.
+
+## 12. Phase 36H.1 Decision
+
+`REVISE_36H1_OHLC_INPUT_FIX`
+
+The OHLC input design now supports the existing DB loader, but the controlled
+prototype run cannot complete until database connectivity is available or an
+approved local/read-only OHLC source is supplied. Do not proceed to full Lane
+A/B audit from this blocked run.

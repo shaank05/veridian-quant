@@ -238,6 +238,38 @@ Decision:
 
 ---
 
+## Phase 36H.1 OHLC Input Fix / Prototype Rerun
+
+Phase 36H.1 added a DB-backed OHLC input option to the reconstruction
+prototype while preserving per-symbol CSV input support.
+
+Implementation status:
+
+- `--ohlc-source db` added to the prototype CLI.
+- DB source uses existing `DatabaseClient` and `SQLAlchemyDailyOHLCVLoader`.
+- Symbols and OHLC date window are inferred from retained trades.
+- Focused tests passed: 17 tests.
+
+Rerun status:
+
+- The SQLAlchemy engine initialized.
+- OHLC loading timed out connecting to the configured database at
+  `34.14.156.222:5432`.
+- The retry with elevated network permission failed with the same timeout.
+- No prototype output folder was generated.
+
+Decision:
+
+- `REVISE_36H1_OHLC_INPUT_FIX`.
+- Reconstruction coverage, entry-state match rate, deterioration candidates,
+  and next-open feasibility remain unavailable.
+- No full Lane A/B audit helper is approved.
+- No strategy backtest, S2 logic change, dynamic exit, `exit if RET_DOWN`,
+  entry filter, state exclusion, risk filter, sizing rule, threshold
+  optimization, production behavior, or strategy promotion is approved.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.

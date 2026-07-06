@@ -457,3 +457,25 @@ next-open feasibility outputs were generated.
 Phase 36H decision:
 
 `FIX_OHLC_INPUT_AND_RERUN_36H`
+
+---
+
+## 21. Phase 36H.1 OHLC Input Fix Status
+
+Phase 36H.1 fixed the prototype input design so the CLI can use the existing
+Veridian OHLC loader:
+
+- CSV directory input remains supported.
+- `--ohlc-source db` was added.
+- The DB path uses `DatabaseClient().get_engine()` and
+  `SQLAlchemyDailyOHLCVLoader`.
+- Retained symbols and the required OHLC window are inferred from retained
+  trades.
+
+Focused synthetic tests passed, but the controlled prototype rerun remains
+blocked because the configured database connection timed out while loading
+OHLC. No reconstruction coverage or validation outputs were generated.
+
+Phase 36H.1 decision:
+
+`REVISE_36H1_OHLC_INPUT_FIX`

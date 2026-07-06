@@ -98,6 +98,11 @@ trades loaded cleanly, but the prototype run is blocked because the CLI
 requires a caller-provided per-symbol OHLC CSV directory and no such directory
 was available in the workspace. The selected gate is
 `FIX_OHLC_INPUT_AND_RERUN_36H`.
+Phase 36H.1 added DB-backed OHLC loading via the existing Veridian
+`DatabaseClient` and `SQLAlchemyDailyOHLCVLoader` path while preserving CSV
+input support. Focused tests passed, but the controlled rerun remains blocked
+because the configured database connection timed out. The selected gate is
+`REVISE_36H1_OHLC_INPUT_FIX`.
 
 Phase 37A through 37M opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and
@@ -903,7 +908,7 @@ The following are future research directions, not accepted production rules:
 - Wavelet strategy.
 - Cross-strategy risk-model input discovery.
 - Cross-strategy pre-registered risk experiment design after Phase 36B/36C.
-- Fix S2 daily state reconstruction OHLC input and rerun Phase 36H.
+- Resolve S2 state reconstruction DB/OHLC reachability after Phase 36H.1.
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
 - Kronos offline diagnostic/ranking/context/confirmation evaluation is closed

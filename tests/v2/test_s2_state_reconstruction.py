@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+from pathlib import Path
 
 import pandas as pd
 
@@ -9,7 +10,10 @@ from veridian_quant.v2.analysis.s2_state_reconstruction import (
     compute_next_open_exit_feasibility,
     expand_trade_lifecycle_dates,
     first_deterioration_occurrences,
+    infer_ohlc_load_window,
     join_daily_states_to_trades,
+    load_ohlc_for_reconstruction,
+    load_ohlc_from_daily_loader,
     parse_s2_state_label,
     summarize_reconstruction_coverage,
     validate_entry_state_match,
@@ -290,6 +294,144 @@ def test_coverage_summary_counts_rows_and_trades() -> None:
     assert row["same_day_exit_blocked_count"] == 1
 
 
+def test_ohlc_source_layer_uses_csv_dir(tmp_path) -> None:
+    csv_path = tmp_path / "AAA.csv"
+    _ohlc().to_csv(csv_path, index=False)
+
+    loaded = load_ohlc_for_reconstruction(
+        _trades(),
+        ohlc_source="csv",
+        ohlc_csv_dir=tmp_path,
+    )
+
+    assert list(loaded) == ["AAA"]
+    assert list(loaded["AAA"].columns) == [
+        "date",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+    ]
+    assert loaded["AAA"]["date"].is_monotonic_increasing
+
+
+def test_ohlc_source_layer_uses_mocked_db_loader() -> None:
+    loader = FakeDailyLoader({"AAA": _ohlc_unsorted_with_duplicate()})
+
+    loaded = load_ohlc_for_reconstruction(
+        _trades(),
+        ohlc_source="db",
+        ohlc_loader=loader,
+        lookback_buffer_days=10,
+    )
+
+    assert loader.calls == [
+        (["AAA"], date(2025, 12, 22), date(2026, 1, 6))
+    ]
+    assert loaded["AAA"]["date"].dt.date.tolist() == [
+        date(2026, 1, 2),
+        date(2026, 1, 5),
+        date(2026, 1, 6),
+    ]
+    assert loaded["AAA"].iloc[-1]["close"] == 110.0
+
+
+def test_missing_ohlc_source_gives_clear_error() -> None:
+    try:
+        load_ohlc_for_reconstruction(_trades(), ohlc_source="csv")
+    except ValueError as error:
+        assert "ohlc_csv_dir is required" in str(error)
+    else:  # pragma: no cover - assertion guard
+        raise AssertionError("expected missing CSV source error")
+
+    try:
+        load_ohlc_for_reconstruction(_trades(), ohlc_source="db")
+    except ValueError as error:
+        assert "ohlc_loader is required" in str(error)
+    else:  # pragma: no cover - assertion guard
+        raise AssertionError("expected missing DB loader error")
+
+
+def test_loader_missing_symbol_fails_clearly() -> None:
+    loader = FakeDailyLoader({})
+
+    try:
+        load_ohlc_from_daily_loader(
+            loader,
+            ["AAA"],
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 1, 6),
+        )
+    except FileNotFoundError as error:
+        assert "missing OHLC data from loader for symbols: AAA" in str(error)
+    else:  # pragma: no cover - assertion guard
+        raise AssertionError("expected missing loader symbol error")
+
+
+def test_infer_ohlc_load_window_uses_signal_or_entry_start_with_buffer() -> None:
+    trades = pd.DataFrame(
+        [
+            _trade(signal_date="2026-01-02", entry_date="2026-01-05"),
+            _trade("T2", signal_date=None, entry_date="2026-01-04"),
+        ]
+    )
+
+    assert infer_ohlc_load_window(trades, lookback_buffer_days=7) == (
+        date(2025, 12, 26),
+        date(2026, 1, 6),
+    )
+
+
+def test_cli_wires_db_source_without_strategy_backtest(monkeypatch, tmp_path, capsys) -> None:
+    from veridian_quant.v2 import run_s2_state_reconstruction_prototype as cli
+
+    observed: dict[str, object] = {}
+
+    class FakeResult:
+        output_dir = tmp_path / "out"
+        outputs = {"metadata": tmp_path / "out" / "metadata.json"}
+        metadata = {"caveat": "Read-only diagnostics only"}
+
+    class FakeLoader:
+        pass
+
+    def fake_build_ohlc_loader(ohlc_source: str, lookback_buffer_days: int) -> FakeLoader:
+        observed["build_source"] = ohlc_source
+        observed["build_buffer"] = lookback_buffer_days
+        return FakeLoader()
+
+    def fake_run(**kwargs: object) -> FakeResult:
+        observed.update(kwargs)
+        return FakeResult()
+
+    monkeypatch.setattr(cli, "_build_ohlc_loader", fake_build_ohlc_loader)
+    monkeypatch.setattr(cli, "run_s2_state_reconstruction_prototype", fake_run)
+
+    exit_code = cli.main(
+        [
+            "--ohlc-source",
+            "db",
+            "--lookback-buffer-days",
+            "42",
+            "--report-dir",
+            "reports/s2",
+            "--output-dir",
+            str(tmp_path / "out"),
+        ]
+    )
+
+    assert exit_code == 0
+    assert observed["build_source"] == "db"
+    assert observed["build_buffer"] == 42
+    assert observed["ohlc_source"] == "db"
+    assert observed["ohlc_csv_dir"] is None
+    assert observed["report_dir"] == Path("reports/s2")
+    assert observed["output_dir"] == tmp_path / "out"
+    assert observed["lookback_buffer_days"] == 42
+    assert "Read-only diagnostics only" in capsys.readouterr().out
+
+
 def _trade(
     trade_id: str = "T1",
     symbol: str = "AAA",
@@ -339,6 +481,21 @@ def _ohlc(symbol: str = "AAA") -> pd.DataFrame:
     )
 
 
+def _ohlc_unsorted_with_duplicate() -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "date": pd.to_datetime(
+                ["2026-01-06", "2026-01-02", "2026-01-05", "2026-01-06"]
+            ),
+            "open": [110.0, 100.0, 105.0, 111.0],
+            "high": [111.0, 102.0, 108.0, 112.0],
+            "low": [108.0, 99.0, 104.0, 109.0],
+            "close": [109.0, 101.0, 107.0, 110.0],
+            "volume": [900, 1000, 1000, 1000],
+        }
+    )
+
+
 def _states(
     dates: list[str],
     labels: list[str] | None = None,
@@ -370,3 +527,18 @@ def _joined_with_states(
         labels=labels,
     )
     return join_daily_states_to_trades(lifecycle, states)
+
+
+class FakeDailyLoader:
+    def __init__(self, frames: dict[str, pd.DataFrame]) -> None:
+        self.frames = frames
+        self.calls: list[tuple[list[str], date, date]] = []
+
+    def load_symbols(
+        self,
+        symbols: list[str],
+        start_date: date,
+        end_date: date,
+    ) -> dict[str, pd.DataFrame]:
+        self.calls.append((symbols, start_date, end_date))
+        return {symbol: self.frames[symbol] for symbol in symbols if symbol in self.frames}

@@ -8,7 +8,7 @@ implement exits, optimize thresholds, or write production trading rules.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 import json
 from pathlib import Path
 from typing import Iterable, Mapping
@@ -23,6 +23,7 @@ DEFAULT_S2_REPORT_DIR = Path(
     "reports/v2/s2_markov_2020_2026_research200_exclude_ret_down_full_diagnostics"
 )
 DEFAULT_OUTPUT_ROOT = Path("reports/v2")
+DEFAULT_OHLC_LOOKBACK_BUFFER_DAYS = 365
 
 REQUIRED_RETAINED_TRADE_FILES = (
     "trade_log.csv",
@@ -634,16 +635,20 @@ def run_s2_state_reconstruction_prototype(
     report_dir: Path | str = DEFAULT_S2_REPORT_DIR,
     ohlc_csv_dir: Path | str | None = None,
     output_dir: Path | str | None = None,
+    ohlc_source: str = "csv",
+    ohlc_loader: object | None = None,
+    lookback_buffer_days: int = DEFAULT_OHLC_LOOKBACK_BUFFER_DAYS,
 ) -> ReconstructionRunResult:
     """Export prototype outputs from retained reports and per-symbol OHLC CSVs."""
 
-    if ohlc_csv_dir is None:
-        raise ValueError(
-            "ohlc_csv_dir is required for the read-only prototype CLI; "
-            "it must contain one normalized OHLC CSV per traded symbol."
-        )
     trades = load_s2_retained_trades(report_dir)
-    ohlcv_by_symbol = load_ohlc_csv_dir(ohlc_csv_dir, trades["symbol"].dropna().unique())
+    ohlcv_by_symbol = load_ohlc_for_reconstruction(
+        trades,
+        ohlc_source=ohlc_source,
+        ohlc_csv_dir=ohlc_csv_dir,
+        ohlc_loader=ohlc_loader,
+        lookback_buffer_days=lookback_buffer_days,
+    )
     states = reconstruct_daily_state_frames(ohlcv_by_symbol)
     lifecycle = expand_trade_lifecycle_dates(trades, ohlcv_by_symbol)
     joined = join_daily_states_to_trades(lifecycle, states)
@@ -665,7 +670,9 @@ def run_s2_state_reconstruction_prototype(
     metadata = {
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "report_dir": str(report_dir),
-        "ohlc_csv_dir": str(ohlc_csv_dir),
+        "ohlc_source": ohlc_source,
+        "ohlc_csv_dir": str(ohlc_csv_dir) if ohlc_csv_dir is not None else None,
+        "lookback_buffer_days": lookback_buffer_days,
         "caveat": DIAGNOSTIC_ONLY_CAVEAT,
         "scope": "Phase 36G prototype export only; no backtest executed.",
     }
@@ -710,6 +717,44 @@ def run_s2_state_reconstruction_prototype(
     return ReconstructionRunResult(output_path, outputs, metadata)
 
 
+def load_ohlc_for_reconstruction(
+    trades: pd.DataFrame,
+    *,
+    ohlc_source: str,
+    ohlc_csv_dir: Path | str | None = None,
+    ohlc_loader: object | None = None,
+    lookback_buffer_days: int = DEFAULT_OHLC_LOOKBACK_BUFFER_DAYS,
+) -> dict[str, pd.DataFrame]:
+    """Load normalized OHLC for retained trades from CSV or an existing loader."""
+
+    source = str(ohlc_source).strip().lower()
+    symbols = trades["symbol"].dropna().unique()
+    if source == "csv":
+        if ohlc_csv_dir is None:
+            raise ValueError(
+                "ohlc_csv_dir is required when ohlc_source='csv'; provide "
+                "--ohlc-csv-dir or use --ohlc-source db."
+            )
+        return load_ohlc_csv_dir(ohlc_csv_dir, symbols)
+    if source == "db":
+        if ohlc_loader is None:
+            raise ValueError(
+                "ohlc_loader is required when ohlc_source='db'; the CLI must "
+                "construct an existing Veridian DailyOHLCVLoader."
+            )
+        start_date, end_date = infer_ohlc_load_window(
+            trades,
+            lookback_buffer_days=lookback_buffer_days,
+        )
+        return load_ohlc_from_daily_loader(
+            ohlc_loader,
+            symbols,
+            start_date=start_date,
+            end_date=end_date,
+        )
+    raise ValueError("ohlc_source must be 'csv' or 'db'")
+
+
 def load_ohlc_csv_dir(
     ohlc_csv_dir: Path | str,
     symbols: Iterable[object],
@@ -730,6 +775,57 @@ def load_ohlc_csv_dir(
     if missing:
         raise FileNotFoundError(
             "missing OHLC CSV files for symbols: " + ", ".join(missing[:20])
+        )
+    return data
+
+
+def infer_ohlc_load_window(
+    trades: pd.DataFrame,
+    lookback_buffer_days: int = DEFAULT_OHLC_LOOKBACK_BUFFER_DAYS,
+) -> tuple[date, date]:
+    """Infer an OHLC load window from retained trades with pre-start buffer."""
+
+    if lookback_buffer_days < 0:
+        raise ValueError("lookback_buffer_days must be non-negative")
+    start_candidates = []
+    for column in ("signal_date", "entry_date"):
+        if column in trades:
+            start_candidates.append(pd.to_datetime(trades[column], errors="coerce"))
+    if not start_candidates or "exit_date" not in trades:
+        raise ValueError("trades must include signal/entry dates and exit_date")
+    start_values = pd.concat(start_candidates).dropna()
+    end_values = pd.to_datetime(trades["exit_date"], errors="coerce").dropna()
+    if start_values.empty or end_values.empty:
+        raise ValueError("could not infer OHLC date range from retained trades")
+    start = start_values.min().date() - timedelta(days=lookback_buffer_days)
+    end = end_values.max().date()
+    return start, end
+
+
+def load_ohlc_from_daily_loader(
+    loader: object,
+    symbols: Iterable[object],
+    *,
+    start_date: date,
+    end_date: date,
+) -> dict[str, pd.DataFrame]:
+    """Load normalized OHLC using an existing Veridian daily OHLC loader."""
+
+    normalized_symbols = sorted({str(value).strip().upper() for value in symbols if _present(value)})
+    if not hasattr(loader, "load_symbols"):
+        raise TypeError("ohlc_loader must provide load_symbols(symbols, start_date, end_date)")
+    loaded = loader.load_symbols(normalized_symbols, start_date, end_date)
+    data: dict[str, pd.DataFrame] = {}
+    missing: list[str] = []
+    for symbol in normalized_symbols:
+        frame = loaded.get(symbol) if isinstance(loaded, Mapping) else None
+        if frame is None or frame.empty:
+            missing.append(symbol)
+            continue
+        data[symbol] = normalize_ohlcv_dataframe(frame)
+    if missing:
+        raise FileNotFoundError(
+            "missing OHLC data from loader for symbols: " + ", ".join(missing[:20])
         )
     return data
 

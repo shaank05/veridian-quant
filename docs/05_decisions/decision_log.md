@@ -1686,3 +1686,38 @@ Consequence:
   exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
   backtest optimization, production use, threshold optimization, or strategy
   promotion.
+
+---
+
+## 2026-07-06 - Add DB OHLC Input but Block Rerun on Database Timeout
+
+Decision:
+
+Select `REVISE_36H1_OHLC_INPUT_FIX`.
+
+Reason:
+
+Phase 36H.1 fixed the immediate CLI input-design blocker by preserving
+per-symbol CSV input and adding `--ohlc-source db`, backed by the existing
+Veridian `DatabaseClient` plus `SQLAlchemyDailyOHLCVLoader` pattern. Retained
+symbols and the OHLC date window are inferred from retained trades, and focused
+synthetic tests passed.
+
+The controlled prototype rerun still could not complete. The SQLAlchemy engine
+initialized, but loading OHLC timed out connecting to the configured database
+at `34.14.156.222:5432`. A retry with elevated network permission produced the
+same timeout. No reconstruction outputs were generated.
+
+Consequence:
+
+- Keep the DB-backed input support and tests.
+- Treat the remaining blocker as DB/OHLC reachability, not an S2 strategy or
+  state-builder issue.
+- Do not proceed to reconstruction scrutiny until a controlled run generates
+  coverage and validation outputs.
+- Do not run an S2 strategy backtest.
+- Do not implement a full Lane A/B audit helper.
+- Do not approve a dynamic exit, `exit if RET_DOWN`, entry filter, state
+  exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
+  backtest optimization, production use, threshold optimization, or strategy
+  promotion.

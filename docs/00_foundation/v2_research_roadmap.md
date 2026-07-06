@@ -85,6 +85,13 @@ the future read-only reconstruction prototype, including daily state rebuild,
 trade lifecycle expansion, same-day stop/target safety, deterioration
 candidates, next-open feasibility, and validation gates. The next selected gate
 is `PROCEED_TO_36G_STATE_RECONSTRUCTION_PROTOTYPE_IMPLEMENTATION`.
+Phase 36G implements the narrow read-only prototype in
+`src/veridian_quant/v2/analysis/s2_state_reconstruction.py`, with focused
+synthetic tests and an optional export CLI. The implementation still approves
+no dynamic exit, `exit if RET_DOWN`, entry filter, state exclusion, risk filter,
+sizing change, backtest, production behavior, or threshold optimization. The
+next selected gate is
+`PROCEED_TO_36H_STATE_RECONSTRUCTION_PROTOTYPE_RUN`.
 
 Phase 37A through 37M opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and
@@ -890,7 +897,8 @@ The following are future research directions, not accepted production rules:
 - Wavelet strategy.
 - Cross-strategy risk-model input discovery.
 - Cross-strategy pre-registered risk experiment design after Phase 36B/36C.
-- S2 daily state reconstruction prototype implementation after Phase 36F.
+- Controlled S2 daily state reconstruction prototype run/export after Phase
+  36G.
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
 - Kronos offline diagnostic/ranking/context/confirmation evaluation is closed

@@ -181,6 +181,35 @@ Decision:
 
 ---
 
+## Phase 36G Daily State Reconstruction Prototype Implementation
+
+Phase 36G implements the narrow read-only reconstruction prototype:
+`src/veridian_quant/v2/analysis/s2_state_reconstruction.py`.
+
+Implemented prototype capabilities:
+
+- Load retained S2 executed-trade reports by `trade_id`.
+- Parse `RET_*|VOL_*|DD_*|LOW_*` composite state labels.
+- Reconstruct daily state frames through the existing S2 `build_state_frame`.
+- Expand trades into entry-through-exit holding-date rows.
+- Join reconstructed state by symbol/date without dropping missing rows.
+- Validate stored entry-state metadata against reconstructed state.
+- Treat actual exit dates as not actionable after close.
+- Create diagnostic-only deterioration candidate flags.
+- Identify first actionable deterioration occurrences.
+- Assess next-open hypothetical exit feasibility without executing a rule.
+- Summarize reconstruction coverage.
+
+Decision:
+
+- `PROCEED_TO_36H_STATE_RECONSTRUCTION_PROTOTYPE_RUN`.
+- No full Lane A/B audit helper is approved yet.
+- No S2 strategy behavior, dynamic exit, `exit if RET_DOWN`, entry filter,
+  state exclusion, risk filter, sizing rule, threshold optimization, backtest,
+  production behavior, or strategy promotion is approved.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.

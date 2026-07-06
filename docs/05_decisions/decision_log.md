@@ -1619,3 +1619,36 @@ Consequence:
 - Do not approve a dynamic exit, `exit if RET_DOWN`, entry filter, state
   exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
   backtest optimization, production use, or strategy promotion.
+
+---
+
+## 2026-07-06 - Implement S2 Daily State Reconstruction Prototype Only
+
+Decision:
+
+Proceed with Phase 36G as a narrow read-only prototype implementation. Select
+`PROCEED_TO_36H_STATE_RECONSTRUCTION_PROTOTYPE_RUN`.
+
+Reason:
+
+Phase 36G adds the prototype module
+`src/veridian_quant/v2/analysis/s2_state_reconstruction.py`, focused synthetic
+tests, and an optional CLI wrapper for controlled exports. The implementation
+loads retained S2 executed-trade reports, reconstructs daily S2 state rows from
+OHLC through the existing `build_state_frame`, expands trade lifecycles, joins
+state by symbol/date, validates stored entry-state metadata, marks same-day
+actual exits as non-actionable after close, creates diagnostic-only
+deterioration candidates, identifies first actionable occurrences, and assesses
+next-open feasibility.
+
+Consequence:
+
+- Phase 36G is implementation-only for reconstruction feasibility.
+- A future Phase 36H may run/export prototype coverage under controlled,
+  read-only conditions.
+- Do not implement a full Lane A/B audit helper yet.
+- Do not run a strategy backtest.
+- Do not approve a dynamic exit, `exit if RET_DOWN`, entry filter, state
+  exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
+  backtest optimization, production use, threshold optimization, or strategy
+  promotion.

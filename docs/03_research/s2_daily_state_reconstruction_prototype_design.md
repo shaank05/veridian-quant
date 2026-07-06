@@ -405,3 +405,33 @@ Possible decisions after prototype:
 Phase 36F approves only a future narrow reconstruction prototype
 implementation. It does not approve a full Lane A/B audit helper, a dynamic
 exit experiment, or any S2 trading rule.
+
+---
+
+## 19. Phase 36G Implementation Reference
+
+Phase 36G implements the narrow read-only prototype described here.
+
+Implementation:
+
+- Source module:
+  `src/veridian_quant/v2/analysis/s2_state_reconstruction.py`.
+- Focused synthetic tests:
+  `tests/v2/test_s2_state_reconstruction.py`.
+- Optional CLI wrapper:
+  `src/veridian_quant/v2/run_s2_state_reconstruction_prototype.py`.
+
+The implementation loads retained S2 trade artifacts, parses composite state
+labels, wraps the existing S2 `build_state_frame` state builder, expands
+executed trades into holding-date rows, joins reconstructed states, validates
+stored entry-state metadata, marks same-day exit dates as non-actionable,
+creates diagnostic-only deterioration candidate flags, identifies first
+actionable occurrences, and assesses next-open feasibility.
+
+The CLI requires a caller-provided per-symbol OHLC CSV directory and exports
+prototype coverage files only. It does not run a strategy, execute a backtest,
+alter trade logs, optimize thresholds, or promote a rule.
+
+Phase 36G decision:
+
+`PROCEED_TO_36H_STATE_RECONSTRUCTION_PROTOTYPE_RUN`

@@ -435,3 +435,25 @@ alter trade logs, optimize thresholds, or promote a rule.
 Phase 36G decision:
 
 `PROCEED_TO_36H_STATE_RECONSTRUCTION_PROTOTYPE_RUN`
+
+---
+
+## 20. Phase 36H Run Status
+
+Phase 36H attempted the controlled prototype run/export:
+
+`docs/03_research/s2_state_reconstruction_prototype_run.md`
+
+Status:
+
+`BLOCKED_PRE_FLIGHT`
+
+Retained S2 trade artifacts are present and loadable, but the current CLI
+requires a caller-provided per-symbol OHLC CSV directory through
+`--ohlc-csv-dir`. No such directory was available in the workspace, so no
+lifecycle expansion, reconstructed state joins, entry-state validation, or
+next-open feasibility outputs were generated.
+
+Phase 36H decision:
+
+`FIX_OHLC_INPUT_AND_RERUN_36H`

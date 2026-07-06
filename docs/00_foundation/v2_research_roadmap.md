@@ -92,6 +92,12 @@ no dynamic exit, `exit if RET_DOWN`, entry filter, state exclusion, risk filter,
 sizing change, backtest, production behavior, or threshold optimization. The
 next selected gate is
 `PROCEED_TO_36H_STATE_RECONSTRUCTION_PROTOTYPE_RUN`.
+Phase 36H preflight is documented in
+`docs/03_research/s2_state_reconstruction_prototype_run.md`. Retained S2
+trades loaded cleanly, but the prototype run is blocked because the CLI
+requires a caller-provided per-symbol OHLC CSV directory and no such directory
+was available in the workspace. The selected gate is
+`FIX_OHLC_INPUT_AND_RERUN_36H`.
 
 Phase 37A through 37M opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and
@@ -897,8 +903,7 @@ The following are future research directions, not accepted production rules:
 - Wavelet strategy.
 - Cross-strategy risk-model input discovery.
 - Cross-strategy pre-registered risk experiment design after Phase 36B/36C.
-- Controlled S2 daily state reconstruction prototype run/export after Phase
-  36G.
+- Fix S2 daily state reconstruction OHLC input and rerun Phase 36H.
 - Exact liquidity data-quality audit before any liquidity diagnostic is elevated
   toward implementation.
 - Kronos offline diagnostic/ranking/context/confirmation evaluation is closed

@@ -210,6 +210,34 @@ Decision:
 
 ---
 
+## Phase 36H State Reconstruction Prototype Run
+
+Phase 36H preflight is documented in:
+`docs/03_research/s2_state_reconstruction_prototype_run.md`.
+
+Retained S2 trade artifacts loaded successfully:
+
+- Trades loaded: 577.
+- Unique `trade_id` values: 577.
+- Unique symbols: 146.
+- Missing stored entry state labels: 0.
+
+The reconstruction run did not proceed because the Phase 36G CLI requires a
+caller-provided per-symbol OHLC CSV directory via `--ohlc-csv-dir`, and no such
+directory was available in the workspace.
+
+Decision:
+
+- `FIX_OHLC_INPUT_AND_RERUN_36H`.
+- No reconstruction coverage, entry-state match rate, deterioration
+  candidates, or next-open feasibility outputs are available yet.
+- No full Lane A/B audit helper is approved.
+- No strategy backtest, S2 logic change, dynamic exit, `exit if RET_DOWN`,
+  entry filter, state exclusion, risk filter, sizing rule, threshold
+  optimization, production behavior, or strategy promotion is approved.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.

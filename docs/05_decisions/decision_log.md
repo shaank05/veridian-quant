@@ -1652,3 +1652,37 @@ Consequence:
   exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
   backtest optimization, production use, threshold optimization, or strategy
   promotion.
+
+---
+
+## 2026-07-06 - Block S2 State Reconstruction Prototype Run Pending OHLC Input
+
+Decision:
+
+Do not run Phase 36H reconstruction yet. Select
+`FIX_OHLC_INPUT_AND_RERUN_36H`.
+
+Reason:
+
+Phase 36H preflight confirmed that the retained S2 report folder and required
+trade artifacts exist, and the Phase 36G retained-trade loader can load 577
+unique trades across 146 symbols with no missing trade IDs, symbols, entry
+dates, exit dates, or stored entry-state labels.
+
+The controlled prototype run cannot proceed because the current CLI requires a
+caller-provided normalized per-symbol OHLC CSV directory via `--ohlc-csv-dir`.
+No such directory exists in the workspace. Existing data-quality report folders
+contain coverage and quality summaries, not OHLC bar files.
+
+Consequence:
+
+- Document the blocked run in
+  `docs/03_research/s2_state_reconstruction_prototype_run.md`.
+- Fix the OHLC input source/design before rerunning Phase 36H.
+- Do not invent missing OHLC data.
+- Do not run an S2 strategy backtest.
+- Do not implement a full Lane A/B audit helper.
+- Do not approve a dynamic exit, `exit if RET_DOWN`, entry filter, state
+  exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
+  backtest optimization, production use, threshold optimization, or strategy
+  promotion.

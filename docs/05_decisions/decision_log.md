@@ -1757,3 +1757,38 @@ Consequence:
   exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
   backtest optimization, production use, threshold optimization, or strategy
   promotion.
+
+---
+
+## 2026-07-07 - Design Full Read-Only S2 State x Risk / In-Trade Audit
+
+Decision:
+
+Select
+`PROCEED_TO_36K_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_IMPLEMENTATION`.
+
+Reason:
+
+After DB connectivity was fixed externally and the timezone-normalization bug
+was corrected, the reconstruction prototype generated
+`reports/v2/s2_state_reconstruction_prototype_20260707/`. Phase 36I scrutiny
+classified reconstruction as `PASS_WITH_CAVEATS`: state join coverage was
+7,113 / 7,113, entry-state match was 577 / 577, duplicate trade/date rows were
+0, same-day actionability failures were 0, and next-open feasible candidate
+rows were 1,854. The remaining caveat is that 5 terminal trades exit on
+2026-04-29 while reconstructed state path ends 2026-04-28.
+
+Phase 36J creates the full read-only S2 State x Risk / In-Trade audit design:
+`docs/03_research/s2_state_risk_intrade_full_audit_design.md`.
+
+Consequence:
+
+- Implement a future read-only 36K audit helper only after this design.
+- Explicitly label or exclude terminal-edge cases in the future helper.
+- Generate Lane A entry-state x risk diagnostics and Lane B in-trade state
+  evolution diagnostics with sample-size flags.
+- Do not run an S2 strategy backtest.
+- Do not approve a dynamic exit, `exit if RET_DOWN`, entry filter, state
+  exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
+  backtest optimization, production use, threshold optimization, or strategy
+  promotion.

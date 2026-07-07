@@ -394,3 +394,19 @@ Phase 36F prototype design result:
 - No full audit helper, dynamic exit, entry filter, state exclusion, risk
   filter, sizing change, production use, strategy promotion, or backtest
   optimization is approved.
+
+Phase 36I / 36J follow-on:
+
+- The DB-backed reconstruction prototype later completed and Phase 36I
+  classified it as `PASS_WITH_CAVEATS`.
+- Phase 36I confirmed 7,113 / 7,113 state joins, 577 / 577 entry-state matches,
+  0 duplicate trade/date rows, and 0 same-day exit actionability failures.
+- Phase 36I retained a terminal-edge caveat: 5 trades exit on 2026-04-29 while
+  reconstructed state path ends 2026-04-28.
+- Phase 36J creates the full read-only audit design:
+  `docs/03_research/s2_state_risk_intrade_full_audit_design.md`.
+- Next selected gate:
+  `PROCEED_TO_36K_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_IMPLEMENTATION`.
+- No dynamic exit, `exit if RET_DOWN`, entry filter, state exclusion, risk
+  filter, sizing change, production use, strategy promotion, or backtest
+  optimization is approved.

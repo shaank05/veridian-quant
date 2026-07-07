@@ -721,3 +721,24 @@ Market and relative-strength context:
 - Relative strength trend vs Nifty.
 
 Initial S3 research used a simple transparent subset. Additional S3 features are parked for now because the standalone strategy did not produce production-quality results and further threshold tuning risks overfitting.
+
+---
+
+## S2 State x Risk / In-Trade Diagnostics
+
+Phase 36J designs a future read-only S2 diagnostic helper, not a rule engine:
+
+`docs/03_research/s2_state_risk_intrade_full_audit_design.md`
+
+Candidate diagnostic features for the future helper:
+
+- Entry composite state and parsed state components.
+- Liquidity, benchmark regime, VIX, drawdown, gap, sector, year, and symbol
+  context.
+- In-trade deterioration flags such as `contains_ret_down`,
+  `entered_ret_down_after_entry`, `entered_vol_high_after_entry`,
+  `return_state_worse_than_entry`, and `state_changed_from_entry`.
+- Audit-only next-open hypothetical exit deltas.
+
+These are not approved entry filters, exits, risk rules, or production
+features. They are evidence-gathering fields for a future read-only audit.

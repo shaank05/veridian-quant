@@ -730,3 +730,22 @@ Research, or S2 Risk Model Research rather than another voting variant.
 Before major new strategy-family exploration, the project should prioritize the
 Phase 33 benchmark, sector, market-cap, regime, exposure, and
 capital-utilization context foundation.
+
+---
+
+## S2 State x Risk / In-Trade Hypothesis
+
+Phase 36J defines the next read-only S2 audit design:
+
+`docs/03_research/s2_state_risk_intrade_full_audit_design.md`
+
+Hypothesis:
+
+S2 fragility may be explained by interactions between entry state, liquidity,
+benchmark regime, VIX, drawdown/gap context, and in-trade state deterioration.
+The full audit should test whether deteriorating states appear early enough and
+selectively enough to explain stop churn without destroying winners.
+
+This is diagnostic only. It does not approve `exit if RET_DOWN`, entry-state
+filters, liquidity/VIX/benchmark/drawdown rules, risk sizing changes,
+production use, or threshold tuning.

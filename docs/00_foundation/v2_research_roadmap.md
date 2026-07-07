@@ -108,6 +108,16 @@ connectivity was expected to be available. The CLI and retained inputs were
 confirmed, but OHLC loading again timed out connecting to the configured
 database at `34.14.156.222:5432`; no reconstruction outputs were generated.
 The selected gate is `FIX_DB_CONNECTIVITY_AND_RERUN_36H2`.
+After DB access was fixed externally and the reconstruction timezone mismatch
+was corrected, the prototype run generated
+`reports/v2/s2_state_reconstruction_prototype_20260707/`. Phase 36I scrutiny
+classified reconstruction as `PASS_WITH_CAVEATS`: 7,113 / 7,113 lifecycle rows
+joined state, 577 / 577 entry states matched, same-day exit safety failures
+were 0, and 5 terminal trades require explicit edge-case handling. Phase 36J
+then created the full read-only S2 State x Risk / In-Trade audit design in
+`docs/03_research/s2_state_risk_intrade_full_audit_design.md`. The selected
+gate is
+`PROCEED_TO_36K_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_IMPLEMENTATION`.
 
 Phase 37A through 37M opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and

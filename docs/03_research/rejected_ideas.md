@@ -436,3 +436,24 @@ Reason:
 
 Do not use this branch to approve an ensemble, weights, allocation, production
 behavior, future/after-entry confirmation, or post-hoc strategy combinations.
+
+---
+
+## S2 State x Risk / In-Trade Guardrails
+
+Phase 36J explicitly rejects automatic promotion of reconstructed S2 state
+diagnostics into rules.
+
+Not approved:
+
+- `exit if RET_DOWN`.
+- Dynamic state exits.
+- Entry-state exclusions.
+- Liquidity, VIX, benchmark, drawdown, or gap filters.
+- Risk sizing changes.
+- Threshold searches over deterioration flags.
+- 2025-only fixes.
+- Small-sample state/risk bucket promotion.
+
+Any future S2 rule experiment must be separately pre-registered after full
+read-only audit scrutiny.

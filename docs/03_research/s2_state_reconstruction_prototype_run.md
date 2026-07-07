@@ -254,3 +254,47 @@ The blocker remains DB/OHLC reachability. Phase 36I reconstruction prototype
 scrutiny cannot proceed until a controlled DB rerun generates usable coverage
 and validation outputs. Do not proceed to a full Lane A/B audit from this
 blocked run.
+
+---
+
+## 16. Later Phase 36H.2 Completion / Phase 36I Scrutiny Summary
+
+After DB connectivity was fixed externally and the prototype timezone mismatch
+was corrected, the DB-backed reconstruction run completed and generated:
+
+`reports/v2/s2_state_reconstruction_prototype_20260707/`
+
+Generated outputs remain report artifacts and are not committed unless
+separately approved.
+
+Phase 36I scrutiny verdict:
+
+`PASS_WITH_CAVEATS`
+
+Key run/scrutiny numbers:
+
+- Trades loaded: 577.
+- Trades with lifecycle expanded: 577.
+- Lifecycle rows: 7,113.
+- Rows with state joined: 7,113.
+- Rows missing state: 0.
+- State join coverage: 100.0%.
+- Duplicate trade/date rows: 0.
+- Entry-state trades checked: 577.
+- Entry-state matches: 577.
+- Entry-state mismatches: 0.
+- Missing stored state: 0.
+- Missing reconstructed state: 0.
+- Entry-state match rate: 100.0%.
+- Same-day exit blocked rows: 572.
+- Exit-date actionable failures: 0.
+- Next-open feasibility rows: 2,885.
+- Feasible rows: 1,854.
+- Infeasible rows: 1,031.
+- Missing next-open count: 0.
+- Terminal-edge caveat: 5 trades exit on 2026-04-29 while reconstructed state
+  path ends 2026-04-28.
+
+Phase 36I decision:
+
+`PROCEED_TO_36J_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_DESIGN`

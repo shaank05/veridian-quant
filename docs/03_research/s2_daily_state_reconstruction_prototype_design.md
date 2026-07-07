@@ -500,3 +500,34 @@ outputs were generated.
 Phase 36H.2 decision:
 
 `FIX_DB_CONNECTIVITY_AND_RERUN_36H2`
+
+---
+
+## 23. Phase 36I / 36J Follow-On
+
+After DB connectivity was fixed externally and a timezone-normalization bug was
+corrected in the prototype, the DB-backed reconstruction run generated:
+
+`reports/v2/s2_state_reconstruction_prototype_20260707/`
+
+Phase 36I scrutiny verdict:
+
+`PASS_WITH_CAVEATS`
+
+Key scrutiny numbers:
+
+- State rows joined: 7,113 / 7,113.
+- Entry-state matches: 577 / 577.
+- Duplicate trade/date rows: 0.
+- Same-day exit safety failures: 0.
+- Next-open feasible candidate rows: 1,854.
+- Terminal-edge caveat: 5 trades exit on 2026-04-29 while reconstructed state
+  path ends 2026-04-28.
+
+Phase 36J designs the future full read-only S2 State x Risk / In-Trade audit:
+
+`docs/03_research/s2_state_risk_intrade_full_audit_design.md`
+
+Phase 36J decision:
+
+`PROCEED_TO_36K_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_IMPLEMENTATION`

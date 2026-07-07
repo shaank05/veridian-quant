@@ -305,6 +305,40 @@ Decision:
 
 ---
 
+## Phase 36I / 36J Reconstruction Scrutiny and Full Audit Design
+
+After DB connectivity was fixed externally and the prototype timezone mismatch
+was corrected, the DB-backed reconstruction prototype generated:
+
+`reports/v2/s2_state_reconstruction_prototype_20260707/`
+
+Phase 36I scrutiny verdict:
+
+- `PASS_WITH_CAVEATS`.
+- State rows joined: 7,113 / 7,113.
+- Entry-state matches: 577 / 577.
+- Duplicate trade/date rows: 0.
+- Same-day exit safety failures: 0.
+- Next-open feasible candidate rows: 1,854.
+- Terminal-edge caveat: 5 trades exit on 2026-04-29 while reconstructed state
+  path ends 2026-04-28.
+
+Phase 36J creates the future full read-only S2 State x Risk / In-Trade audit
+design:
+
+`docs/03_research/s2_state_risk_intrade_full_audit_design.md`
+
+Decision:
+
+- `PROCEED_TO_36K_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_IMPLEMENTATION`.
+- No full audit helper is implemented yet.
+- No strategy backtest, S2 logic change, dynamic exit, `exit if RET_DOWN`,
+  entry filter, state exclusion, liquidity/VIX/benchmark/drawdown rule, risk
+  sizing rule, threshold optimization, production behavior, or strategy
+  promotion is approved.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.

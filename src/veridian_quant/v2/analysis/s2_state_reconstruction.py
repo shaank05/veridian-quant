@@ -790,11 +790,11 @@ def infer_ohlc_load_window(
     start_candidates = []
     for column in ("signal_date", "entry_date"):
         if column in trades:
-            start_candidates.append(pd.to_datetime(trades[column], errors="coerce"))
+            start_candidates.append(_date_series(trades[column]))
     if not start_candidates or "exit_date" not in trades:
         raise ValueError("trades must include signal/entry dates and exit_date")
     start_values = pd.concat(start_candidates).dropna()
-    end_values = pd.to_datetime(trades["exit_date"], errors="coerce").dropna()
+    end_values = _date_series(trades["exit_date"]).dropna()
     if start_values.empty or end_values.empty:
         raise ValueError("could not infer OHLC date range from retained trades")
     start = start_values.min().date() - timedelta(days=lookback_buffer_days)
@@ -890,20 +890,33 @@ def _symbol_dates(frame: pd.DataFrame | None) -> list[pd.Timestamp]:
 
 
 def _date_series(values: object) -> pd.Series:
-    converted = pd.to_datetime(values, errors="coerce")
-    if isinstance(converted, pd.Series):
-        return converted.dt.normalize()
-    if isinstance(converted, pd.Timestamp):
-        converted = [converted]
-    return pd.Series(converted).dt.normalize()
+    if isinstance(values, pd.Series):
+        raw = values.copy(deep=True)
+    elif isinstance(values, pd.Index):
+        raw = pd.Series(values.to_list())
+    elif isinstance(values, (list, tuple)):
+        raw = pd.Series(list(values))
+    else:
+        raw = pd.Series([values])
+    normalized = raw.apply(_normalize_date_value)
+    return pd.to_datetime(normalized, errors="coerce")
 
 
 def _as_timestamp(value: object) -> pd.Timestamp | None:
-    if not _present(value):
-        return None
-    timestamp = pd.to_datetime(value, errors="coerce")
+    timestamp = _normalize_date_value(value)
     if pd.isna(timestamp):
         return None
+    return timestamp
+
+
+def _normalize_date_value(value: object) -> pd.Timestamp:
+    if not _present(value):
+        return pd.NaT
+    timestamp = pd.to_datetime(value, errors="coerce")
+    if pd.isna(timestamp):
+        return pd.NaT
+    if timestamp.tzinfo is not None:
+        timestamp = timestamp.tz_localize(None)
     return timestamp.normalize()
 
 

@@ -193,3 +193,64 @@ The OHLC input design now supports the existing DB loader, but the controlled
 prototype run cannot complete until database connectivity is available or an
 approved local/read-only OHLC source is supplied. Do not proceed to full Lane
 A/B audit from this blocked run.
+
+---
+
+## 13. Phase 36H.2 DB Rerun Status
+
+Run status: `BLOCKED_DB_CONNECTION`.
+
+Attempted command:
+
+`uv run python -m veridian_quant.v2.run_s2_state_reconstruction_prototype --ohlc-source db --output-dir reports/v2/s2_state_reconstruction_prototype_20260707`
+
+The first controlled rerun reached `DatabaseClient`, but Windows console output
+could not encode Unicode status symbols printed by the DB client. The command
+was rerun with `PYTHONIOENCODING=utf-8`; no prototype source change was made.
+
+The UTF-8 rerun initialized the SQLAlchemy engine, then timed out while loading
+OHLC from the configured database:
+
+- Host: `34.14.156.222`.
+- Port: `5432`.
+- Error class: `psycopg2.OperationalError`.
+- Error: connection timed out.
+- Approximate command runtime before failure: 26 seconds.
+
+The retained S2 report folder and required retained inputs were present:
+
+- `trade_log.csv`.
+- `trade_pnl_log.csv`.
+- `trade_signal_context.csv`.
+
+The CLI supports `--ohlc-source db`, and the attempted OHLC source was `db`.
+No S2 strategy backtest was run. No strategy logic was changed. No prototype
+output folder was generated.
+
+## 14. Phase 36H.2 Coverage / Validation
+
+Not computed because DB OHLC loading could not complete.
+
+Retained-trade preflight from Phase 36H remains valid:
+
+- Trades loaded: 577.
+- Unique `trade_id` values: 577.
+- Unique symbols: 146.
+- Missing `trade_id`: 0.
+- Missing symbol: 0.
+- Missing entry date: 0.
+- Missing exit date: 0.
+- Missing stored entry state label: 0.
+
+Lifecycle expansion, reconstructed state joins, entry-state validation,
+same-day safety counts, first deterioration candidates, and next-open
+feasibility remain not generated.
+
+## 15. Phase 36H.2 Decision
+
+`FIX_DB_CONNECTIVITY_AND_RERUN_36H2`
+
+The blocker remains DB/OHLC reachability. Phase 36I reconstruction prototype
+scrutiny cannot proceed until a controlled DB rerun generates usable coverage
+and validation outputs. Do not proceed to a full Lane A/B audit from this
+blocked run.

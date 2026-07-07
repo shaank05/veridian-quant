@@ -67,6 +67,23 @@ def test_expand_trade_lifecycle_across_symbol_trading_dates() -> None:
     ]
 
 
+def test_expand_trade_lifecycle_handles_tz_aware_ohlc_dates() -> None:
+    trades = _trades(exit_date="2026-01-06")
+    lifecycle = expand_trade_lifecycle_dates(trades, {"AAA": _ohlc_tz_aware()})
+
+    assert lifecycle["holding_date"].dt.tz is None
+    assert lifecycle["holding_date"].dt.date.tolist() == [
+        date(2026, 1, 2),
+        date(2026, 1, 5),
+        date(2026, 1, 6),
+    ]
+    assert lifecycle["actual_exit_on_holding_date"].tolist() == [
+        False,
+        False,
+        True,
+    ]
+
+
 def test_lifecycle_excludes_dates_outside_entry_exit() -> None:
     lifecycle = expand_trade_lifecycle_dates(_trades(exit_date="2026-01-05"), {"AAA": _ohlc()})
 
@@ -86,6 +103,25 @@ def test_join_daily_state_to_lifecycle_marks_missing_rows() -> None:
         "STATE_JOINED",
     ]
     assert len(joined) == len(lifecycle)
+
+
+def test_join_daily_state_handles_tz_aware_state_dates() -> None:
+    lifecycle = expand_trade_lifecycle_dates(
+        _trades(exit_date="2026-01-06"),
+        {"AAA": _ohlc()},
+    )
+    joined = join_daily_states_to_trades(
+        lifecycle,
+        _states_tz_aware(["2026-01-02", "2026-01-05", "2026-01-06"]),
+    )
+
+    assert joined["holding_date"].dt.tz is None
+    assert joined["date"].dt.tz is None
+    assert joined["state_join_status"].tolist() == [
+        "STATE_JOINED",
+        "STATE_JOINED",
+        "STATE_JOINED",
+    ]
 
 
 def test_entry_state_match_summary_handles_match_mismatch_and_missing() -> None:
@@ -188,6 +224,32 @@ def test_next_open_feasibility_computes_pnl_and_r_when_possible() -> None:
     assert row["hypothetical_exit_r"] == 0.5
     assert row["delta_pnl"] == -50.0
     assert row["delta_r"] == -0.5
+
+
+def test_next_open_feasibility_handles_mixed_timezone_calendar_dates() -> None:
+    first = pd.DataFrame(
+        [
+            {
+                "trade_id": "T1",
+                "symbol": "AAA",
+                "candidate_flag_name": "contains_ret_down",
+                "first_occurrence_date": pd.Timestamp("2026-01-02"),
+                "actionable": True,
+            }
+        ]
+    )
+    trades = _trades(exit_date="2026-01-06")
+
+    feasibility = compute_next_open_exit_feasibility(
+        first,
+        trades,
+        {"AAA": _ohlc_tz_aware()},
+    )
+
+    row = feasibility.iloc[0]
+    assert row["next_session_date"] == pd.Timestamp("2026-01-05")
+    assert bool(row["hypothetical_exit_feasible"]) is True
+    assert row["hypothetical_exit_price"] == 105.0
 
 
 def test_next_open_feasibility_marks_too_late_and_missing_open() -> None:
@@ -481,6 +543,12 @@ def _ohlc(symbol: str = "AAA") -> pd.DataFrame:
     )
 
 
+def _ohlc_tz_aware() -> pd.DataFrame:
+    frame = _ohlc()
+    frame["date"] = pd.to_datetime(frame["date"], utc=True)
+    return frame
+
+
 def _ohlc_unsorted_with_duplicate() -> pd.DataFrame:
     return pd.DataFrame(
         {
@@ -515,6 +583,15 @@ def _states(
             }
         )
     return pd.DataFrame(rows)
+
+
+def _states_tz_aware(
+    dates: list[str],
+    labels: list[str] | None = None,
+) -> pd.DataFrame:
+    states = _states(dates, labels=labels)
+    states["date"] = pd.to_datetime(states["date"], utc=True)
+    return states
 
 
 def _joined_with_states(

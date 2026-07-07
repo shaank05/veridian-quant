@@ -1721,3 +1721,39 @@ Consequence:
   exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
   backtest optimization, production use, threshold optimization, or strategy
   promotion.
+
+---
+
+## 2026-07-07 - Block S2 State Reconstruction DB Rerun on Database Timeout
+
+Decision:
+
+Select `FIX_DB_CONNECTIVITY_AND_RERUN_36H2`.
+
+Reason:
+
+Phase 36H.2 reran the existing read-only reconstruction prototype with
+`--ohlc-source db` and output target
+`reports/v2/s2_state_reconstruction_prototype_20260707`. The retained S2 report
+folder and required inputs were present, and the CLI supports the DB OHLC
+source.
+
+The first attempt reached `DatabaseClient` but failed on Windows console
+encoding of Unicode DB-client status output. A second attempt with
+`PYTHONIOENCODING=utf-8` initialized the SQLAlchemy engine, then timed out while
+loading OHLC from the configured database at `34.14.156.222:5432`. No
+reconstruction outputs were generated.
+
+Consequence:
+
+- Treat the remaining blocker as DB/OHLC reachability.
+- Do not revise S2 strategy logic or the reconstruction prototype for this
+  timeout.
+- Do not proceed to Phase 36I scrutiny until a controlled rerun generates
+  usable coverage and validation outputs.
+- Do not run an S2 strategy backtest.
+- Do not implement a full Lane A/B audit helper.
+- Do not approve a dynamic exit, `exit if RET_DOWN`, entry filter, state
+  exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
+  backtest optimization, production use, threshold optimization, or strategy
+  promotion.

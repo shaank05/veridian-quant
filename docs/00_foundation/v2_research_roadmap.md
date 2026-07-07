@@ -103,6 +103,11 @@ Phase 36H.1 added DB-backed OHLC loading via the existing Veridian
 input support. Focused tests passed, but the controlled rerun remains blocked
 because the configured database connection timed out. The selected gate is
 `REVISE_36H1_OHLC_INPUT_FIX`.
+Phase 36H.2 reran the same controlled DB-backed prototype command after the DB
+connectivity was expected to be available. The CLI and retained inputs were
+confirmed, but OHLC loading again timed out connecting to the configured
+database at `34.14.156.222:5432`; no reconstruction outputs were generated.
+The selected gate is `FIX_DB_CONNECTIVITY_AND_RERUN_36H2`.
 
 Phase 37A through 37M opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and

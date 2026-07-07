@@ -1,0 +1,9 @@
+{
+  "caveat": "Read-only S2 state reconstruction prototype. Not a strategy rule, not a backtest, and not approved for production behavior.",
+  "created_at_utc": "2026-07-07T08:51:42.476383+00:00",
+  "lookback_buffer_days": 365,
+  "ohlc_csv_dir": null,
+  "ohlc_source": "db",
+  "report_dir": "reports\\v2\\s2_markov_2020_2026_research200_exclude_ret_down_full_diagnostics",
+  "scope": "Phase 36G prototype export only; no backtest executed."
+}

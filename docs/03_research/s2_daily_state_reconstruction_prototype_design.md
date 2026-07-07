@@ -479,3 +479,24 @@ OHLC. No reconstruction coverage or validation outputs were generated.
 Phase 36H.1 decision:
 
 `REVISE_36H1_OHLC_INPUT_FIX`
+
+---
+
+## 22. Phase 36H.2 DB Rerun Status
+
+Phase 36H.2 reran the controlled prototype with `--ohlc-source db` after DB
+connectivity was expected to be available.
+
+Status:
+
+`BLOCKED_DB_CONNECTION`
+
+The retained S2 folder and required trade inputs were present, and the CLI
+supports the DB OHLC source. The SQLAlchemy engine initialized, but OHLC loading
+again timed out connecting to `34.14.156.222:5432`. No reconstruction coverage,
+entry-state validation, deterioration candidate, or next-open feasibility
+outputs were generated.
+
+Phase 36H.2 decision:
+
+`FIX_DB_CONNECTIVITY_AND_RERUN_36H2`

@@ -270,6 +270,41 @@ Decision:
 
 ---
 
+## Phase 36H.2 State Reconstruction Prototype DB Rerun
+
+Phase 36H.2 reran the controlled DB-backed reconstruction prototype:
+`docs/03_research/s2_state_reconstruction_prototype_run.md`.
+
+Preflight status:
+
+- Retained S2 report folder exists.
+- Required retained inputs exist:
+  `trade_log.csv`, `trade_pnl_log.csv`, and `trade_signal_context.csv`.
+- The CLI supports `--ohlc-source db`.
+
+Rerun status:
+
+- The first attempt exposed a Windows console Unicode encoding issue in
+  DB-client status printing; the command was rerun with
+  `PYTHONIOENCODING=utf-8`.
+- The SQLAlchemy engine initialized.
+- OHLC loading timed out connecting to the configured database at
+  `34.14.156.222:5432`.
+- No prototype output folder was generated.
+
+Decision:
+
+- `FIX_DB_CONNECTIVITY_AND_RERUN_36H2`.
+- Reconstruction coverage, entry-state match rate, deterioration candidates,
+  and next-open feasibility remain unavailable.
+- Phase 36I reconstruction prototype scrutiny is not ready.
+- No full Lane A/B audit helper is approved.
+- No strategy backtest, S2 logic change, dynamic exit, `exit if RET_DOWN`,
+  entry filter, state exclusion, risk filter, sizing rule, threshold
+  optimization, production behavior, or strategy promotion is approved.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.

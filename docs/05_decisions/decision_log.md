@@ -1655,6 +1655,37 @@ Consequence:
 
 ---
 
+## 2026-07-07 - Implement Full Read-Only S2 State x Risk / In-Trade Audit Helper
+
+Decision:
+
+Select `PROCEED_TO_36L_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_RUN`.
+
+Reason:
+
+Phase 36K implements the read-only helper specified by Phase 36J:
+`src/veridian_quant/v2/analysis/s2_state_risk_intrade_audit.py`, runner
+`src/veridian_quant/v2/run_s2_state_risk_intrade_audit.py`, and focused
+synthetic tests in `tests/v2/test_s2_state_risk_intrade_audit.py`.
+
+The helper reuses the Phase 36G reconstruction pipeline, exports Lane A
+entry-state x risk diagnostics, Lane B in-trade state evolution diagnostics,
+terminal-edge-case handling, same-day safety validation, next-open feasibility
+summaries, reconstruction validation, metadata, and readme outputs. It is
+diagnostic-only and has not yet been run on the retained S2 benchmark.
+
+Consequence:
+
+- Proceed next to a controlled Phase 36L read-only audit run.
+- Do not proceed to dynamic exit or filter experiment design yet.
+- Do not run an S2 strategy backtest.
+- Do not approve a dynamic exit, `exit if RET_DOWN`, entry filter, state
+  exclusion, liquidity filter, drawdown/VIX/benchmark rule, risk sizing change,
+  backtest optimization, production use, threshold optimization, or strategy
+  promotion.
+
+---
+
 ## 2026-07-06 - Block S2 State Reconstruction Prototype Run Pending OHLC Input
 
 Decision:

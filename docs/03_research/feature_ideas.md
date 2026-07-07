@@ -742,3 +742,10 @@ Candidate diagnostic features for the future helper:
 
 These are not approved entry filters, exits, risk rules, or production
 features. They are evidence-gathering fields for a future read-only audit.
+
+Phase 36K implementation reference:
+
+- Source: `src/veridian_quant/v2/analysis/s2_state_risk_intrade_audit.py`.
+- Runner: `src/veridian_quant/v2/run_s2_state_risk_intrade_audit.py`.
+- Next gate:
+  `PROCEED_TO_36L_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_RUN`.

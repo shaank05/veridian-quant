@@ -488,3 +488,32 @@ Phase 36J does not approve:
 ## 18. Decision
 
 `PROCEED_TO_36K_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_IMPLEMENTATION`
+
+---
+
+## 19. Phase 36K Implementation Reference
+
+Phase 36K implements the full read-only S2 State x Risk / In-Trade audit helper
+described here.
+
+Implementation:
+
+- Source module:
+  `src/veridian_quant/v2/analysis/s2_state_risk_intrade_audit.py`.
+- CLI runner:
+  `src/veridian_quant/v2/run_s2_state_risk_intrade_audit.py`.
+- Focused synthetic tests:
+  `tests/v2/test_s2_state_risk_intrade_audit.py`.
+
+The helper reuses the Phase 36G reconstruction pipeline, builds Lane A
+entry-state x risk frames and summaries, builds Lane B in-trade event frames
+and summaries, and exports terminal-edge-case, same-day safety, next-open
+feasibility, reconstruction validation, metadata, and readme outputs.
+
+Phase 36K remains read-only diagnostics only. It does not run a strategy
+backtest, implement a dynamic exit, create `exit if RET_DOWN`, add filters,
+optimize thresholds, change S2 behavior, or approve production use.
+
+Phase 36K decision:
+
+`PROCEED_TO_36L_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_RUN`

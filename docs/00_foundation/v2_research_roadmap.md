@@ -118,6 +118,13 @@ then created the full read-only S2 State x Risk / In-Trade audit design in
 `docs/03_research/s2_state_risk_intrade_full_audit_design.md`. The selected
 gate is
 `PROCEED_TO_36K_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_IMPLEMENTATION`.
+Phase 36K implements the read-only helper in
+`src/veridian_quant/v2/analysis/s2_state_risk_intrade_audit.py`, with runner
+`src/veridian_quant/v2/run_s2_state_risk_intrade_audit.py` and focused tests.
+The helper exports diagnostics only; no S2 backtest, dynamic exit, filter, rule,
+threshold optimization, production behavior, or strategy promotion is approved.
+The selected gate is
+`PROCEED_TO_36L_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_RUN`.
 
 Phase 37A through 37M opened a strictly controlled external-model intelligence
 lane for Kronos. Phase 37A completed read-only repository discovery and

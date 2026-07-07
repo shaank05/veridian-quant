@@ -339,6 +339,37 @@ Decision:
 
 ---
 
+## Phase 36K Full Read-Only State x Risk / In-Trade Audit Implementation
+
+Phase 36K implements the read-only audit helper:
+
+- Source:
+  `src/veridian_quant/v2/analysis/s2_state_risk_intrade_audit.py`.
+- Runner:
+  `src/veridian_quant/v2/run_s2_state_risk_intrade_audit.py`.
+- Tests:
+  `tests/v2/test_s2_state_risk_intrade_audit.py`.
+
+Implemented diagnostic surfaces:
+
+- Lane A entry-state x risk frame and grouped PnL/R summaries.
+- Lane B in-trade state event frame and deterioration/next-open summaries.
+- Terminal-edge-case audit.
+- Same-day exit safety summary.
+- Next-open feasibility summary.
+- Reconstruction validation and coverage exports.
+- Metadata/readme with explicit non-approval language.
+
+Decision:
+
+- `PROCEED_TO_36L_FULL_READ_ONLY_S2_STATE_RISK_INTRATRADE_AUDIT_RUN`.
+- No strategy backtest, S2 logic change, dynamic exit, `exit if RET_DOWN`,
+  entry filter, state exclusion, liquidity/VIX/benchmark/drawdown rule, risk
+  sizing rule, threshold optimization, production behavior, or strategy
+  promotion is approved.
+
+---
+
 ## Strategy Summary
 
 S2 is a standalone strategy family.
